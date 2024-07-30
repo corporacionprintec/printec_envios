@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Cliente</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Función para mostrar u ocultar campos según el tipo de solicitud
+        function toggleFields() {
+            var tipoSolicitud = document.getElementById('compraMantenimiento').value;
+            document.getElementById('productosContainer').style.display = (tipoSolicitud === 'compra') ? 'block' : 'none';
+            document.getElementById('mantenimientoContainer').style.display = (tipoSolicitud === 'mantenimiento') ? 'block' : 'none';
+        }
+
+        // Función para imprimir el membrete
+        function printMembrete() {
+            var printWindow = window.open('', '', 'height=600,width=800');
+            var printDocument = printWindow.document;
+
+            printDocument.open();
+            printDocument.write('<html><head><title>Imprimir Membrete</title>');
+            printDocument.write('</head><body>');
+            printDocument.write('<h1>Datos del Membrete</h1>');
+            printDocument.write('<p>Nombre: ' + document.getElementById('nombre').value + '</p>');
+            printDocument.write('<p>DNI: ' + document.getElementById('dni').value + '</p>');
+            printDocument.write('<p>Tipo de Envío: ' + document.getElementById('envio').value + '</p>');
+            printDocument.write('<p>Dirección: ' + document.getElementById('direccion').value + '</p>');
+            printDocument.write('<p>Agencia: ' + document.getElementById('agencia').value + '</p>');
+            printDocument.write('<p>Compra o Mantenimiento: ' + document.getElementById('compraMantenimiento').value + '</p>');
+            if (document.getElementById('compraMantenimiento').value === 'compra') {
+                printDocument.write('<p>Productos: ' + document.getElementById('productos').value + '</p>');
+            } else if (document.getElementById('compraMantenimiento').value === 'mantenimiento') {
+                printDocument.write('<p>Producto a Realizar Mantenimiento: ' + document.getElementById('productoMantenimiento').value + '</p>');
+                printDocument.write('<p>Detalle del Mantenimiento: ' + document.getElementById('detalleMantenimiento').value + '</p>');
+            }
+            printDocument.write('<p>Comprobante de Pago: ' + document.getElementById('comprobantePago').files[0].name + '</p>');
+            printDocument.write('</body></html>');
+            printDocument.close();
+
+            printWindow.print();
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo de la empresa -->
+        <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
+        <h1>Formulario para Clientes</h1>
+        <form id="customer-form" action="php/guardar_clientes.php" method="POST" enctype="multipart/form-data">
+            <!-- Campos del formulario -->
+            <label for="nombre">Nombre y Apellido:</label>
+            <input type="text" id="nombre" name="nombre" required>
+            
+            <label for="dni">DNI:</label>
+            <input type="text" id="dni" name="dni" required>
+            
+            <label>Tipo de Envío:</label>
+            <select id="envio" name="envio" required>
+                <option value="domicilio">Domicilio</option>
+                <option value="agencia">Agencia</option>
+            </select>
+            
+            <div id="direccionContainer">
+                <label for="direccion">Dirección:</label>
+                <input type="text" id="direccion" name="direccion">
+            </div>
+            
+            <div id="agenciaContainer">
+                <label for="agencia">Nombre de la Agencia de Envío:</label>
+                <input type="text" id="agencia" name="agencia">
+            </div>
+            
+            <label for="compraMantenimiento">Compra o Mantenimiento:</label>
+            <select id="compraMantenimiento" name="compraMantenimiento" onchange="toggleFields()" required>
+                <option value="">Seleccione...</option>
+                <option value="compra">Compra</option>
+                <option value="mantenimiento">Mantenimiento</option>
+            </select>
+            
+            <div id="productosContainer" style="display: none;">
+                <label for="productos">Productos:</label>
+                <input type="text" id="productos" name="productos" placeholder="Ingrese el nombre del producto">
+                <label for="detallesProductos">Detalles de los Productos:</label>
+                <textarea id="detallesProductos" name="detallesProductos" placeholder="Ingrese la marca, modelo y cantidad" rows="4"></textarea>
+            </div>
+            
+            <div id="mantenimientoContainer" style="display: none;">
+                <label for="productoMantenimiento">Producto a Realizar Mantenimiento:</label>
+                <input type="text" id="productoMantenimiento" name="productoMantenimiento">
+                <label for="detalleMantenimiento">Detalle del Mantenimiento:</label>
+                <input type="text" id="detalleMantenimiento" name="detalleMantenimiento">
+            </div>
+            
+            <label for="comprobantePago">Subir comprobante de pago:</label>
+            <input type="file" id="comprobantePago" name="comprobantePago" accept="image/*" required>
+            
+            <!-- Botón para enviar el formulario -->
+            <input type="submit" value="Enviar">
+            <!-- Botón para imprimir el membrete -->
+            <button type="button" onclick="printMembrete()">Imprimir Membrete</button>
+        </form>
+    </div>
+</body>
+</html>
