@@ -36,29 +36,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $comprobantePago = '';
     }
 
+    // Generar UUID v4
+    function generateUUIDv4() {
+        $data = random_bytes(16);
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+        
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+    $uuid = generateUUIDv4();
+
     // Insertar datos en la base de datos
-    $sql = "INSERT INTO clientes (nombre, dni, telefono, envio, direccion, agencia, compraMantenimiento, productos, detalleMantenimiento, productoMantenimiento, comprobantePago)
-            VALUES ('$nombre', '$dni', '$telefono', '$envio', '$direccion', '$agencia', '$compraMantenimiento', '$productos', '$detalleMantenimiento', '$productoMantenimiento', '$comprobantePago')";
+    $sql = "INSERT INTO clientes (id, nombre, dni, telefono, envio, direccion, agencia, compraMantenimiento, productos, detalleMantenimiento, productoMantenimiento, comprobantePago)
+            VALUES ('$uuid', '$nombre', '$dni', '$telefono', '$envio', '$direccion', '$agencia', '$compraMantenimiento', '$productos', '$detalleMantenimiento', '$productoMantenimiento', '$comprobantePago')";
 
     if ($conn->query($sql) === TRUE) {
-        // Guardar los datos en la sesión
-        $_SESSION['cliente'] = [
-            'nombre' => $nombre,
-            'dni' => $dni,
-            'telefono' => $telefono,
-            'envio' => $envio,
-            'direccion' => $direccion,
-            'agencia' => $agencia,
-            'compraMantenimiento' => $compraMantenimiento,
-            'productos' => $productos,
-            'detalleMantenimiento' => $detalleMantenimiento,
-            'productoMantenimiento' => $productoMantenimiento,
-            'comprobantePago' => $comprobantePago,
-            'comprobantePagoRuta' => "uploads/$comprobantePago" // Ruta para mostrar en confirmacion.php
-        ];
-
-        // Redirigir a confirmacion.php
-        header("Location: confirmacion.php");
+        // Redirigir a confirmacion.php con UUID en la URL
+        header("Location: confirmacion.php?id=$uuid");
         exit();
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;

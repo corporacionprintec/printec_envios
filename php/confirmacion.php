@@ -1,13 +1,40 @@
 <?php
 session_start(); // Inicia la sesión
 
-// Verificar si los datos del cliente están en la sesión
-if (!isset($_SESSION['cliente'])) {
+// Verificar si se ha pasado un UUID en la URL
+if (!isset($_GET['id'])) {
+    echo "No se encontró el identificador del cliente.";
+    exit();
+}
+
+$id = $_GET['id'];
+
+// Conexión a la base de datos
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "envios_clientes";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Verificar conexión
+if ($conn->connect_error) {
+    die("Conexión fallida: " . $conn->connect_error);
+}
+
+// Consultar la base de datos usando el UUID
+$sql = "SELECT * FROM clientes WHERE id = '$id'";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    // Obtener datos del cliente
+    $cliente = $result->fetch_assoc();
+} else {
     echo "No se encontraron datos del cliente.";
     exit();
 }
 
-$cliente = $_SESSION['cliente'];
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -62,7 +89,7 @@ $cliente = $_SESSION['cliente'];
     <!-- Icono de WhatsApp -->
     <div class="whatsapp-icon">
         <a href="https://wa.me/966177851" target="_blank" title="En caso de alguna equivocación en sus datos, comuníquese con nosotros">
-        <img src="images_ventas/whatsapp.png" alt="whatsapp">
+            <img src="images_ventas/whatsapp.png" alt="whatsapp">
         </a>
     </div>
 </body>
