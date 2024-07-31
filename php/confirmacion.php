@@ -41,6 +41,7 @@ $cliente = $_SESSION['cliente'];
         <h1>Confirmación de Pedido</h1>
         <p><strong>Nombre y Apellido:</strong> <?php echo htmlspecialchars($cliente['nombre']); ?></p>
         <p><strong>DNI:</strong> <?php echo htmlspecialchars($cliente['dni']); ?></p>
+        <p><strong>Teléfono:</strong> <?php echo htmlspecialchars($cliente['telefono']); ?></p>
         <p><strong>Tipo de Envío:</strong> <?php echo htmlspecialchars($cliente['envio']); ?></p>
         <p><strong>Dirección:</strong> <?php echo htmlspecialchars($cliente['direccion']); ?></p>
         <p><strong>Agencia:</strong> <?php echo htmlspecialchars($cliente['agencia']); ?></p>
@@ -53,7 +54,7 @@ $cliente = $_SESSION['cliente'];
             <p><strong>Detalle del Mantenimiento:</strong> <?php echo htmlspecialchars($cliente['detalleMantenimiento']); ?></p>
         <?php endif; ?>
 
-        <p><strong>Comprobante de Pago:</strong> <?php echo htmlspecialchars($cliente['comprobantePagoRuta']); ?></p>
+        <p><strong>Comprobante de Pago:</strong> <a href="<?php echo htmlspecialchars($cliente['comprobantePagoRuta']); ?>" target="_blank">Ver comprobante</a></p>
 
         <p><strong>Estado del Pedido:</strong> Pendiente</p>
     </div>
@@ -61,7 +62,7 @@ $cliente = $_SESSION['cliente'];
     <!-- Icono de WhatsApp -->
     <div class="whatsapp-icon">
         <a href="https://wa.me/966177851" target="_blank" title="En caso de alguna equivocación en sus datos, comuníquese con nosotros">
-        <img src="c:\xampp\htdocs\printec_envios\images_ventas\whatsapp.png" alt="whatsapp">
+        <img src="images_ventas/whatsapp.png" alt="whatsapp">
         </a>
     </div>
 </body>
