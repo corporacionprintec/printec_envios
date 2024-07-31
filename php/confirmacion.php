@@ -61,7 +61,7 @@ $cliente = $_SESSION['cliente'];
     <!-- Icono de WhatsApp -->
     <div class="whatsapp-icon">
         <a href="https://wa.me/966177851" target="_blank" title="En caso de alguna equivocación en sus datos, comuníquese con nosotros">
-        <img src="images_ventas/whatsapp.png" alt="whatsapp">
+        <img src="c:\xampp\htdocs\printec_envios\images_ventas\whatsapp.png" alt="whatsapp">
         </a>
     </div>
 </body>
