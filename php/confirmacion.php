@@ -1,15 +1,17 @@
 <?php
 header('Content-Type: application/json');
 
+// Verificar si las variables de entorno están definidas (producción) o usar valores por defecto (desarrollo local)
+$servername = getenv('DB_HOST') ?: 'localhost';
+$username = getenv('DB_USER') ?: 'root';
+$password = getenv('DB_PASS') ?: '';
+$dbname = getenv('DB_NAME') ?: 'envios_clientes';
+$port = getenv('DB_PORT') ?: '3306';
+
 // Conexión a la base de datos
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "envios_clientes";
+$conn = new mysqli($servername, $username, $password, $dbname, $port);
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Verificar conexión
+// Verificar la conexión
 if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
