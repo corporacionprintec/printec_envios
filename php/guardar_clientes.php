@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Subir archivo de comprobante de pago
     $comprobantePagoRuta = '';
     if (isset($_FILES['comprobantePago']) && $_FILES['comprobantePago']['error'] == UPLOAD_ERR_OK) {
-        $target_dir = "uploads/";
+        $target_dir = __DIR__ . "/../uploads/";
         $target_file = $target_dir . basename($_FILES["comprobantePago"]["name"]);
         if (move_uploaded_file($_FILES["comprobantePago"]["tmp_name"], $target_file)) {
             $comprobantePagoRuta = basename($_FILES["comprobantePago"]["name"]);
@@ -54,8 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Insertar datos en la base de datos
     $sql = "INSERT INTO clientes (id, nombre, dni, telefono, envio, direccion, agencia, compraMantenimiento, productos, productoMantenimiento, detalleMantenimiento, comprobantePagoRuta, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
     $stmt = $conn->prepare($sql);
+
+    // Verificar si la preparación fue exitosa
+    if ($stmt === false) {
+        die("Error en la consulta SQL: " . $conn->error);
+    }
+
     $stmt->bind_param("ssssssssssss", $uuid, $nombre, $dni, $telefono, $envio, $direccion, $agencia, $compraMantenimiento, $productos, $productoMantenimiento, $detalleMantenimiento, $comprobantePagoRuta);
-    
+
+    // Ejecutar la consulta
     if ($stmt->execute()) {
         // Redirigir a la página de confirmación
         header("Location: /printec/confirmacion.html?id=" . urlencode($uuid));
