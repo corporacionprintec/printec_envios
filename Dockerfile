@@ -1,6 +1,9 @@
 # Usar la imagen oficial de PHP con Apache
 FROM php:7.4-apache
 
+# Instalar la extensión mysqli
+RUN docker-php-ext-install mysqli
+
 # Copiar el contenido del proyecto al directorio raíz de Apache
 COPY . /var/www/html/
 
