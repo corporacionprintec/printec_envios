@@ -1,144 +1,185 @@
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Formulario de Cliente</title>
-        <link rel="stylesheet" href="style.css">
-        <script>
-            // Función para mostrar u ocultar campos según el tipo de solicitud
-            function toggleFields() {
-                var tipoSolicitud = document.getElementById('compraMantenimiento').value;
-                document.getElementById('productosContainer').style.display = (tipoSolicitud === 'compra') ? 'block' : 'none';
-                document.getElementById('mantenimientoContainer').style.display = (tipoSolicitud === 'mantenimiento') ? 'block' : 'none';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Cliente</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilo para el botón de enviar en color verde */
+        input[type="submit"] {
+            background-color: #28a745; /* Verde */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Estilo para el botón de imprimir membrete */
+        button {
+            background-color: #007bff; /* Azul */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        /* Estilo para el botón de subir comprobante de pago */
+        #comprobantePago {
+            background-color: #ffc107; /* Amarillo */
+            color: black;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-block;
+        }
+    </style>
+    <script>
+        // Función para mostrar los campos de dirección y agencia de envío
+        function toggleRetiroFields() {
+            var tipoRetiro = document.getElementById('tipoRetiro').value;
+            var direccionLabel = document.getElementById('direccionLabel');
+            document.getElementById('direccionContainer').style.display = (tipoRetiro !== '') ? 'block' : 'none';
+            document.getElementById('agenciaContainer').style.display = (tipoRetiro !== '') ? 'block' : 'none';
+            if (tipoRetiro === 'agencia') {
+                direccionLabel.textContent = 'Dirección Detallada: Ejemplo (sucursal de la agencia)';
+            } else {
+                direccionLabel.textContent = 'Dirección Detallada: Ejemplo (Av Moscú 854/Parcona/Ica/Ica)';
             }
+        }
 
-            // Función para imprimir el membrete
-            function printMembrete() {
-                var printWindow = window.open('', '', 'height=600,width=800');
-                var printDocument = printWindow.document;
+        // Función para mostrar u ocultar campos según el motivo de envío
+        function toggleFields() {
+            var motivoEnvio = document.getElementById('motivoEnvio').value;
+            document.getElementById('productosContainer').style.display = (motivoEnvio === 'compra') ? 'block' : 'none';
+            document.getElementById('mantenimientoContainer').style.display = (motivoEnvio === 'mantenimiento') ? 'block' : 'none';
+            document.getElementById('comprobanteContainer').style.display = (motivoEnvio === 'compra' || motivoEnvio === 'mantenimiento') ? 'block' : 'none';
+            document.getElementById('printButton').style.display = (motivoEnvio === 'mantenimiento') ? 'inline-block' : 'none';
+        }
 
-                printDocument.open();
-                printDocument.write('<html><head><title>Imprimir Membrete</title>');
-                printDocument.write('<style>');
-                printDocument.write('body { font-family: Arial, sans-serif; margin: 20px; padding: 0; }');
-                printDocument.write('h1 { font-size: 32px; margin-bottom: 20px; }');
-                printDocument.write('p { font-size: 27px; margin: 10px 0; line-height: 1.5; }');
-                printDocument.write('.container { max-width: 800px; margin: 0 auto; }');
-                printDocument.write('.logo { width: 200px; display: block; margin: 0 auto 20px; }');
-                printDocument.write('.remitente { padding: 10px; border-radius: 5px; margin-bottom: 20px; }');
-                printDocument.write('.destinatario { color: #dc3545; padding: 10px; border-radius: 5px; }'); // Rojo
-                printDocument.write('</style>');
-                printDocument.write('</head><body>');
+        // Función para imprimir el membrete
+        function printMembrete() {
+            var printWindow = window.open('', '', 'height=600,width=800');
+            var printDocument = printWindow.document;
 
-                // Logo de la empresa
-                printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
+            printDocument.open();
+            printDocument.write('<html><head><title>Imprimir Membrete</title>');
+            printDocument.write('<style>');
+            printDocument.write('body { font-family: Arial, sans-serif; margin: 20px; padding: 0; }');
+            printDocument.write('h1 { font-size: 32px; margin-bottom: 20px; }');
+            printDocument.write('p { font-size: 27px; margin: 10px 0; line-height: 1.5; }');
+            printDocument.write('.container { max-width: 800px; margin: 0 auto; }');
+            printDocument.write('.logo { width: 200px; display: block; margin: 0 auto 20px; }');
+            printDocument.write('.remitente { padding: 10px; border-radius: 5px; margin-bottom: 20px; }');
+            printDocument.write('.destinatario { color: #dc3545; padding: 10px; border-radius: 5px; }'); // Rojo
+            printDocument.write('</style>');
+            printDocument.write('</head><body>');
 
-                // Datos del Remitente
-                printDocument.write('<div class="container remitente">');
-                printDocument.write('<h1>Datos del Remitente</h1>');
-                printDocument.write('<p><strong>De:</strong> Eyter Yoel Rojas Sanchez</p>');
-                printDocument.write('<p><strong>Dirección:</strong> Calle Huanuco N201 Ica-Ica-Ica</p>');
-                printDocument.write('<p><strong>Cel:</strong> 966177851</p>');
-                printDocument.write('<p><strong>RUC/DNI:</strong> 75532635</p>');
-                printDocument.write('</div>');
+            // Logo de la empresa
+            printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
 
-                // Datos del Destinatario
-                printDocument.write('<div class="container destinatario">');
-                printDocument.write('<h1>Datos del Destinatario</h1>');
-                printDocument.write('<p><strong>Nombre:</strong> ' + document.getElementById('nombre').value + '</p>');
-                printDocument.write('<p><strong>DNI:</strong> ' + document.getElementById('dni').value + '</p>');
-                printDocument.write('<p><strong>Teléfono:</strong> ' + document.getElementById('telefono').value + '</p>');
-                printDocument.write('<p><strong>Tipo de Envío:</strong> ' + document.getElementById('envio').value + '</p>');
-                printDocument.write('<p><strong>Dirección:</strong> ' + document.getElementById('direccion').value + '</p>');
-                printDocument.write('<p><strong>Agencia:</strong> ' + document.getElementById('agencia').value + '</p>');
-                
-                // Mostrar los campos de productos o mantenimiento según corresponda
-                var tipoSolicitud = document.getElementById('compraMantenimiento').value;
-                if (tipoSolicitud === 'compra') {
-                    printDocument.write('<p><strong>Productos:</strong> ' + document.getElementById('productos').value + '</p>');
-                    printDocument.write('<p><strong>Detalles de los Productos:</strong> ' + document.getElementById('detallesProductos').value + '</p>');
-                } else if (tipoSolicitud === 'mantenimiento') {
-                    printDocument.write('<p><strong>Producto a Realizar Mantenimiento:</strong> ' + document.getElementById('productoMantenimiento').value + '</p>');
-                    printDocument.write('<p><strong>Detalle del Mantenimiento:</strong> ' + document.getElementById('detalleMantenimiento').value + '</p>');
-                }
+            // Datos del Remitente
+            printDocument.write('<div class="container remitente">');
+            printDocument.write('<h1>Datos del Remitente</h1>');
+            printDocument.write('<p><strong>De:</strong> Eyter Yoel Rojas Sanchez</p>');
+            printDocument.write('<p><strong>Dirección:</strong> Calle Huanuco N201 Ica-Ica-Ica</p>');
+            printDocument.write('<p><strong>Cel:</strong> 966177851</p>');
+            printDocument.write('<p><strong>RUC/DNI:</strong> 75532635</p>');
+            printDocument.write('</div>');
 
-                printDocument.write('</div>');
+            // Datos del Destinatario
+            printDocument.write('<div class="container destinatario">');
+            printDocument.write('<h1>Datos del Destinatario</h1>');
+            printDocument.write('<p><strong>Nombre:</strong> ' + document.getElementById('nombre').value + '</p>');
+            printDocument.write('<p><strong>DNI:</strong> ' + document.getElementById('dni').value + '</p>');
+            printDocument.write('<p><strong>Teléfono:</strong> ' + document.getElementById('telefono').value + '</p>');
+            printDocument.write('<p><strong>Tipo de Retiro:</strong> ' + document.getElementById('tipoRetiro').value + '</p>');
+            printDocument.write('<p><strong>Dirección:</strong> ' + document.getElementById('direccion').value + '</p>');
+            printDocument.write('<p><strong>Agencia:</strong> ' + document.getElementById('agencia').value + '</p>');
 
-                printDocument.write('</body></html>');
-                printDocument.close();
+            printDocument.write('</div>');
+            printDocument.write('</body></html>');
+            printDocument.close();
 
-                printWindow.print();
-            }
-        </script>
-    </head>
-    <body>
-        <div class="container">
-            <!-- Logo de la empresa -->
-            <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
-            <h1>Formulario para Clientes</h1>
-            <form id="customer-form" action="php/guardar_clientes.php" method="POST" enctype="multipart/form-data">
-                <!-- Campos del formulario -->
-                <label for="nombre">Nombre y Apellido:</label>
-                <input type="text" id="nombre" name="nombre" required>
-                
-                <label for="dni">DNI:</label>
-                <input type="text" id="dni" name="dni" required>
-                
-                <label for="telefono">Teléfono:</label>
-                <input type="text" id="telefono" name="telefono" required>
-                
-                <label>Tipo de Envío:</label>
-                <select id="envio" name="envio" required>
-                    <option value="domicilio">Domicilio</option>
-                    <option value="agencia">Agencia</option>
+            printWindow.print();
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo de la empresa -->
+        <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
+        <h1>SOLICITA TU ENVÍO, AQUÍ!</h1>
+        <form id="customer-form" action="php/guardar_clientes.php" method="POST" enctype="multipart/form-data">
+            <!-- Campos del formulario -->
+            <label for="nombre">Nombre y Apellido:</label>
+            <input type="text" id="nombre" name="nombre" required>
+            
+            <label for="dni">DNI:</label>
+            <input type="text" id="dni" name="dni" required>
+            
+            <label for="telefono">Teléfono:</label>
+            <input type="text" id="telefono" name="telefono" required>
+            
+            <label>Selecciona tu Retiro (Agencia o Domicilio):</label>
+            <select id="tipoRetiro" name="tipoRetiro" onchange="toggleRetiroFields()" required>
+                <option value="">Seleccione...</option>
+                <option value="domicilio">Domicilio</option>
+                <option value="agencia">Agencia</option>
+            </select>
+            
+            <div id="direccionContainer" style="display: none;">
+                <label for="direccion" id="direccionLabel">Dirección Detallada: Ejemplo (Av Moscú 854/Parcona/Ica/Ica)</label>
+                <input type="text" id="direccion" name="direccion">
+            </div>
+            
+            <div id="agenciaContainer" style="display: none;">
+                <label for="agencia">Selecciona tu Agencia de Envío:</label>
+                <select id="agencia" name="agencia">
+                    <option value="Flores">Flores</option>
+                    <option value="Shalom">Shalom</option>
+                    <option value="Soyus">Soyus</option>
+                    <option value="Marvisur">Marvisur</option>
+                    <option value="Olva">Olva</option>
                 </select>
-                
-                <div id="direccionContainer">
-                    <label for="direccion">Dirección:</label>
-                    <input type="text" id="direccion" name="direccion">
-                </div>
-                
-                <div id="agenciaContainer">
-                    <label for="agencia">Nombre de la Agencia de Envío:</label>
-                    <select id="agencia" name="agencia">
-                        <option value="Flores">Flores</option>
-                        <option value="Shalom">Shalom</option>
-                        <option value="Soyus">Soyus</option>
-                        <option value="Marvisur">Marvisur</option>
-                        <option value="Olva">Olva</option>
-                    </select>
-                </div>
-                
-                <label for="compraMantenimiento">Compra o Mantenimiento:</label>
-                <select id="compraMantenimiento" name="compraMantenimiento" onchange="toggleFields()" required>
-                    <option value="">Seleccione...</option>
-                    <option value="compra">Compra</option>
-                    <option value="mantenimiento">Mantenimiento</option>
-                </select>
-                
-                <div id="productosContainer" style="display: none;">
-                    <label for="productos">Productos:</label>
-                    <input type="text" id="productos" name="productos" placeholder="Ingrese el nombre del producto">
-                    <label for="detallesProductos">Detalles de los Productos:</label>
-                    <textarea id="detallesProductos" name="detallesProductos" placeholder="Ingrese la marca, modelo y cantidad" rows="4"></textarea>
-                </div>
-                
-                <div id="mantenimientoContainer" style="display: none;">
-                    <label for="productoMantenimiento">Producto a Realizar Mantenimiento:</label>
-                    <input type="text" id="productoMantenimiento" name="productoMantenimiento">
-                    <label for="detalleMantenimiento">Detalle del Mantenimiento:</label>
-                    <input type="text" id="detalleMantenimiento" name="detalleMantenimiento">
-                </div>
-                
+            </div>
+            
+            <label for="motivoEnvio">Motivo de Envío (Compra o Mantenimiento):</label>
+            <select id="motivoEnvio" name="motivoEnvio" onchange="toggleFields()" required>
+                <option value="">Seleccione...</option>
+                <option value="compra">Compra</option>
+                <option value="mantenimiento">Mantenimiento</option>
+            </select>
+            
+            <div id="productosContainer" style="display: none;">
+                <label for="detallesProductos">DETALLA CON UN RESUMEN TU PEDIDO O DEJANOS ALGUNA OBSERVACIÓN:</label>
+                <textarea id="detallesProductos" name="productos" placeholder="Ingrese el resumen de su pedido" rows="4"></textarea>
+            </div>
+            
+            <div id="mantenimientoContainer" style="display: none;">
+                <label for="productoMantenimiento">Producto a Realizar Mantenimiento:</label>
+                <input type="text" id="productoMantenimiento" name="productoMantenimiento">
+                <label for="detalleMantenimiento">Detalle del Mantenimiento:</label>
+                <input type="text" id="detalleMantenimiento" name="detalleMantenimiento">
+            </div>
+            
+            <div id="comprobanteContainer" style="display: none;">
                 <label for="comprobantePago">Subir comprobante de pago:</label>
-                <input type="file" id="comprobantePago" name="comprobantePago" accept="image/*" required>
-                
-                <!-- Botón para enviar el formulario -->
-                <input type="submit" value="Enviar">
-                <!-- Botón para imprimir el membrete -->
-                <button type="button" onclick="printMembrete()">Imprimir Membrete</button>
-            </form>
-        </div>
-    </body>
-    </html>
+                <input type="file" id="comprobantePago" name="comprobantePago" accept="image/*">
+            </div>
+            
+            <!-- Botón para enviar el formulario -->
+            <input type="submit" value="Enviar">
+            <!-- Botón para imprimir el membrete -->
+            <button type="button" id="printButton" onclick="printMembrete()" style="display: none;">Imprimir Membrete</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .gif-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .whatsapp-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            z-index: 1000;
+        }
+    </style>
+    <script>
+        // Función para cargar los datos del cliente
+        function fetchClientData() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var id = urlParams.get('id');
+
+            if (id) {
+                fetch('/printec/php/confirmacion.php?id=' + encodeURIComponent(id))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && !data.error) {
+                            document.getElementById('nombre').innerText = data.nombre;
+                            document.getElementById('dni').innerText = data.dni;
+                            document.getElementById('telefono').innerText = data.telefono;
+                            document.getElementById('envio').innerText = data.envio;
+                            document.getElementById('direccion').innerText = data.direccion;
+                            document.getElementById('agencia').innerText = data.agencia;
+                            document.getElementById('estado').innerText = data.estado;
+
+                            if (data.compraMantenimiento === 'compra') {
+                                document.getElementById('productosContainer').style.display = 'block';
+                                document.getElementById('productos').innerText = data.productos;
+                                document.getElementById('mantenimientoContainer').style.display = 'none';
+                            } else if (data.compraMantenimiento === 'mantenimiento') {
+                                document.getElementById('productosContainer').style.display = 'none';
+                                document.getElementById('mantenimientoContainer').style.display = 'block';
+                                document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento;
+                                document.getElementById('detalleMantenimiento').innerText = data.detalleMantenimiento;
+                                document.getElementById('estadoPedidoContainer').style.display = 'block';
+                            }
+
+                            document.getElementById('comprobantePago').innerHTML = '<a href="/printec/php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
+                        } else {
+                            console.error('Error:', data.error);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+
+        // Ejecutar la función al cargar la página
+        window.onload = fetchClientData;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo de la empresa -->
+        <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
+        <h1>Confirmación de Envío</h1>
+        <p><strong>Nombre y Apellido:</strong> <span id="nombre"></span></p>
+        <p><strong>DNI:</strong> <span id="dni"></span></p>
+        <p><strong>Teléfono:</strong> <span id="telefono"></span></p>
+        <p><strong>Tipo de Envío:</strong> <span id="envio"></span></p>
+        <p><strong>Dirección:</strong> <span id="direccion"></span></p>
+        <p><strong>Agencia:</strong> <span id="agencia"></span></p>
+        
+        <div id="productosContainer" style="display: none;">
+            <p><strong>Productos:</strong> <span id="productos"></span></p>
+        </div>
+
+        <div id="mantenimientoContainer" style="display: none;">
+            <p><strong>Producto a Realizar Mantenimiento:</strong> <span id="productoMantenimiento"></span></p>
+            <p><strong>Detalle del Mantenimiento:</strong> <span id="detalleMantenimiento"></span></p>
+        </div>
+
+        <div id="estadoPedidoContainer" style="display: none;">
+            <p><strong>Estado del Pedido:</strong> <span id="estado"></span></p>
+        </div>
+        
+        <p id="comprobantePago"></p>
+        
+        <!-- Icono de WhatsApp -->
+        <a href="https://wa.me/966177851" target="_blank">
+            <img src="images_ventas/whatsapp.png" alt="WhatsApp" class="whatsapp-icon">
+        </a>
+
+        <!-- Contenedor de GIF -->
+        <!-- <div class="gif-container">
+            <img src="images_ventas/Q0t0.gif" alt="GIF de confirmación">
+        </div> -->
+    </div>
+</body>
+</html>

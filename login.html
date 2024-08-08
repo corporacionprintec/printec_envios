@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .form-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            width: 300px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-label {
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .link {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Iniciar Sesión</h2>
+        <form action="php/login.php" method="post">
+            <label for="login_email" class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" id="login_email" name="email" required>
+            <label for="login_password" class="form-label">Contraseña</label>
+            <input type="password" class="form-control" id="login_password" name="password" required>
+            <button type="submit" class="btn">Iniciar Sesión</button>
+        </form>
+        <div class="text-center">
+            <p>¿No tienes una cuenta? <a href="register.html" class="link">Registrarse</a></p> <!-- Enlace correcto a register.html -->
+        </div>
+    </div>
+</body>
+</html>
