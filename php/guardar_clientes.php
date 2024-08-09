@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Ejecutar la consulta
     if ($stmt->execute()) {
         // Redirigir a la página de confirmación
-        header("Location: /printec/confirmacion.html?id=" . urlencode($uuid));
+        header("Location: /confirmacion.html?id=" . urlencode($uuid));
         exit();
     } else {
         echo "Error: " . $stmt->error;
