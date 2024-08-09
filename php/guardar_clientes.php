@@ -19,13 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nombre = $_POST['nombre'];
     $dni = $_POST['dni'];
     $telefono = $_POST['telefono'];
-    $envio = $_POST['tipoRetiro']; // Aquí cambia "envio" por "tipoRetiro"
+    $envio = $_POST['tipoRetiro'];
     $direccion = $_POST['direccion'];
     $agencia = $_POST['agencia'];
-    $compraMantenimiento = $_POST['motivoEnvio']; // Aquí cambia "compraMantenimiento" por "motivoEnvio"
+    $compraMantenimiento = $_POST['motivoEnvio'];
     $productos = isset($_POST['productos']) ? $_POST['productos'] : '';
     $productoMantenimiento = isset($_POST['productoMantenimiento']) ? $_POST['productoMantenimiento'] : '';
-    $detalleMantenimiento = isset($_POST['detalleMantenimiento']) ? $_POST['detalleMantenimiento'] : '';
+    $razonMantenimiento = isset($_POST['detalleMantenimiento']) ? $_POST['detalleMantenimiento'] : ''; // Cambiado a razonMantenimiento
 
     // Generar UUID v4
     function generateUUIDv4() {
@@ -50,13 +50,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Insertar datos en la base de datos
-    $sql = "INSERT INTO clientes (id, nombre, dni, telefono, envio, direccion, agencia, compraMantenimiento, productos, productoMantenimiento, detalleMantenimiento, comprobantePagoRuta, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+    $sql = "INSERT INTO clientes (id, nombre, dni, telefono, envio, direccion, agencia, compraMantenimiento, productos, productoMantenimiento, razonMantenimiento, comprobantePagoRuta, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssssssssss", $uuid, $nombre, $dni, $telefono, $envio, $direccion, $agencia, $compraMantenimiento, $productos, $productoMantenimiento, $detalleMantenimiento, $comprobantePagoRuta);
+
+    if ($stmt === false) {
+        die('Error en la preparación de la consulta SQL: ' . $conn->error);
+    }
+
+    $stmt->bind_param("ssssssssssss", $uuid, $nombre, $dni, $telefono, $envio, $direccion, $agencia, $compraMantenimiento, $productos, $productoMantenimiento, $razonMantenimiento, $comprobantePagoRuta);
     
     if ($stmt->execute()) {
         // Redirigir a la página de confirmación
-        header("Location: /printec/confirmacion.html?id=" . urlencode($uuid));
+        header("Location: /printec_envios/confirmacion.html?id=" . urlencode($uuid));
         exit();
     } else {
         echo "Error: " . $stmt->error;

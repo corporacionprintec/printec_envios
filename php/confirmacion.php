@@ -1,41 +1,33 @@
 <?php
-header('Content-Type: application/json');
+// Obtener la ID del cliente de la URL
+$id = $_GET['id'];
 
-// Conexión a la base de datos
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "envios_clientes";
+// Conectar a la base de datos
+$conn = new mysqli("localhost", "root", "", "envios_clientes");
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Verificar conexión
 if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Obtener el UUID desde la URL
-$id = isset($_GET['id']) ? $_GET['id'] : '';
+// Preparar la consulta
+$sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, compraMantenimiento, productos, productoMantenimiento, razonMantenimiento, comprobantePagoRuta, estado FROM clientes WHERE id = ?";
+$stmt = $conn->prepare($sql);
 
-if ($id) {
-    // Consultar los datos del cliente
-    $sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, compraMantenimiento, productos, productoMantenimiento, detalleMantenimiento, comprobantePagoRuta, estado FROM clientes WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $data = $result->fetch_assoc();
-        echo json_encode($data);
-    } else {
-        echo json_encode(["error" => "Cliente no encontrado."]);
-    }
-
-    $stmt->close();
-} else {
-    echo json_encode(["error" => "ID del cliente no proporcionado."]);
+if ($stmt === false) {
+    die("Error en la preparación de la consulta SQL: " . $conn->error);
 }
 
+$stmt->bind_param("s", $id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    $data = $result->fetch_assoc();
+    echo json_encode($data);
+} else {
+    echo json_encode(['error' => 'Cliente no encontrado']);
+}
+
+$stmt->close();
 $conn->close();
 ?>

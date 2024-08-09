@@ -26,7 +26,7 @@
             var id = urlParams.get('id');
 
             if (id) {
-                fetch('/printec/php/confirmacion.php?id=' + encodeURIComponent(id))
+                fetch('/printec_envios/php/confirmacion.php?id=' + encodeURIComponent(id))
                     .then(response => response.json())
                     .then(data => {
                         if (data && !data.error) {
@@ -46,11 +46,11 @@
                                 document.getElementById('productosContainer').style.display = 'none';
                                 document.getElementById('mantenimientoContainer').style.display = 'block';
                                 document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento;
-                                document.getElementById('detalleMantenimiento').innerText = data.detalleMantenimiento;
+                                document.getElementById('detalleMantenimiento').innerText = data.razonMantenimiento;
                                 document.getElementById('estadoPedidoContainer').style.display = 'block';
                             }
 
-                            document.getElementById('comprobantePago').innerHTML = '<a href="/printec/php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
+                            document.getElementById('comprobantePago').innerHTML = '<a href="/printec_envios/php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
                         } else {
                             console.error('Error:', data.error);
                         }

@@ -142,7 +142,7 @@ $conn->close();
 <body>
     <div class="container">
         <!-- Logo de la empresa -->
-        <img src="../images_ventas/images.png" alt="Logo de la empresa" class="logo">
+        <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
         <h1>Detalles del Pedido</h1>
         <?php if ($pedido): ?>
             <div class="details">
@@ -159,10 +159,10 @@ $conn->close();
                     <p><strong>Productos:</strong> <?php echo htmlspecialchars($pedido['productos']); ?></p>
                 <?php elseif ($pedido['compraMantenimiento'] == 'mantenimiento'): ?>
                     <p><strong>Producto a Realizar Mantenimiento:</strong> <?php echo htmlspecialchars($pedido['productoMantenimiento']); ?></p>
-                    <p><strong>Detalle del Mantenimiento:</strong> <?php echo htmlspecialchars($pedido['detalleMantenimiento']); ?></p>
+                    <p><strong>Detalle del Mantenimiento:</strong> <?php echo isset($pedido['razonMantenimiento']) ? htmlspecialchars($pedido['razonMantenimiento']) : 'No especificado'; ?></p>
                 <?php endif; ?>
 
-                <p><strong>Comprobante de Pago:</strong> <a href="/printec/php/uploads/<?php echo htmlspecialchars($pedido['comprobantePagoRuta']); ?>" target="_blank">Ver Comprobante de Pago</a></p>
+                <p><strong>Comprobante de Pago:</strong> <a href="/printec_envios/php/uploads/<?php echo htmlspecialchars($pedido['comprobantePagoRuta']); ?>" target="_blank">Ver Comprobante de Pago</a></p>
             </div>
 
             <!-- Formulario para enviar comprobante de envío y clave de envío -->
