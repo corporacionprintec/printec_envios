@@ -26,7 +26,7 @@
             var id = urlParams.get('id');
 
             if (id) {
-                fetch('/printec/php/confirmacion.php?id=' + encodeURIComponent(id))
+                fetch('/php/confirmacion.php?id=' + encodeURIComponent(id))
                     .then(response => response.json())
                     .then(data => {
                         if (data && !data.error) {
