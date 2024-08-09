@@ -18,6 +18,28 @@
             height: 50px;
             z-index: 1000;
         }
+        .copy-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .copy-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #2c3e50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            outline: none;
+        }
+        .copy-button:hover {
+            background-color: #34495e;
+        }
+        .copy-button i {
+            margin-right: 8px;
+        }
     </style>
     <script>
         // Función para cargar los datos del cliente
@@ -51,12 +73,34 @@
                             }
 
                             document.getElementById('comprobantePago').innerHTML = '<a href="/printec_envios/php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
+                            
+                            // Mostrar comprobante de envío y clave de envío
+                            if (data.comprobanteEnvioRuta) {
+                                document.getElementById('comprobanteEnvio').innerHTML = '<a href="/printec_envios/php/uploads/' + data.comprobanteEnvioRuta + '" target="_blank">Ver Comprobante de Envío</a>';
+                            }
+                            if (data.claveEnvio) {
+                                document.getElementById('claveEnvio').innerText = data.claveEnvio;
+                            }
                         } else {
                             console.error('Error:', data.error);
                         }
                     })
                     .catch(error => console.error('Error:', error));
             }
+        }
+
+        // Función para copiar la URL al portapapeles
+        function copyUrl() {
+            var dummy = document.createElement('input');
+            var text = window.location.href;
+
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+
+            alert('URL copiada al portapapeles');
         }
 
         // Ejecutar la función al cargar la página
@@ -87,9 +131,18 @@
         <div id="estadoPedidoContainer" style="display: none;">
             <p><strong>Estado del Pedido:</strong> <span id="estado"></span></p>
         </div>
-        
+
         <p id="comprobantePago"></p>
+        <p><strong>Comprobante de Envío:</strong> <span id="comprobanteEnvio"></span></p>
+        <p><strong>Clave de Envío:</strong> <span id="claveEnvio"></span></p>
         
+        <!-- Botón para copiar la URL -->
+        <div class="copy-container">
+            <button class="copy-button" onclick="copyUrl()">
+                <i class="far fa-copy"></i> Copiar URL
+            </button>
+        </div>
+
         <!-- Icono de WhatsApp -->
         <a href="https://wa.me/966177851" target="_blank">
             <img src="images_ventas/whatsapp.png" alt="WhatsApp" class="whatsapp-icon">

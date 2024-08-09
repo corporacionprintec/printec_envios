@@ -10,7 +10,7 @@ if ($conn->connect_error) {
 }
 
 // Preparar la consulta
-$sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, compraMantenimiento, productos, productoMantenimiento, razonMantenimiento, comprobantePagoRuta, estado FROM clientes WHERE id = ?";
+$sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, compraMantenimiento, productos, productoMantenimiento, razonMantenimiento, comprobantePagoRuta, estado, comprobanteEnvioRuta, claveEnvio FROM clientes WHERE id = ?";
 $stmt = $conn->prepare($sql);
 
 if ($stmt === false) {
@@ -23,7 +23,24 @@ $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $data = $result->fetch_assoc();
-    echo json_encode($data);
+
+    // Generar la respuesta en JSON con todos los datos, incluyendo comprobante de envío y clave de envío
+    echo json_encode([
+        'nombre' => $data['nombre'],
+        'dni' => $data['dni'],
+        'telefono' => $data['telefono'],
+        'envio' => $data['envio'],
+        'direccion' => $data['direccion'],
+        'agencia' => $data['agencia'],
+        'compraMantenimiento' => $data['compraMantenimiento'],
+        'productos' => $data['productos'],
+        'productoMantenimiento' => $data['productoMantenimiento'],
+        'razonMantenimiento' => $data['razonMantenimiento'],
+        'comprobantePagoRuta' => $data['comprobantePagoRuta'],
+        'estado' => $data['estado'],
+        'comprobanteEnvioRuta' => $data['comprobanteEnvioRuta'], // Nueva información
+        'claveEnvio' => $data['claveEnvio'] // Nueva información
+    ]);
 } else {
     echo json_encode(['error' => 'Cliente no encontrado']);
 }
