@@ -50,7 +50,7 @@
                                 document.getElementById('estadoPedidoContainer').style.display = 'block';
                             }
 
-                            document.getElementById('comprobantePago').innerHTML = '<a href="/printec/php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
+                            document.getElementById('comprobantePago').innerHTML = '<a href="/php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
                         } else {
                             console.error('Error:', data.error);
                         }
@@ -95,10 +95,6 @@
             <img src="images_ventas/whatsapp.png" alt="WhatsApp" class="whatsapp-icon">
         </a>
 
-        <!-- Contenedor de GIF -->
-        <!-- <div class="gif-container">
-            <img src="images_ventas/Q0t0.gif" alt="GIF de confirmación">
-        </div> -->
     </div>
 </body>
 </html>
