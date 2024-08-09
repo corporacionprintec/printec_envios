@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $compraMantenimiento = $_POST['motivoEnvio']; // Aquí cambia "compraMantenimiento" por "motivoEnvio"
     $productos = isset($_POST['productos']) ? $_POST['productos'] : '';
     $productoMantenimiento = isset($_POST['productoMantenimiento']) ? $_POST['productoMantenimiento'] : '';
-    $detalleMantenimiento = isset($_POST['detalleMantenimiento']) ? $_POST['detalleMantenimiento'] : '';
+    $razonMantenimiento = isset($_POST['razonMantenimiento']) ? $_POST['razonMantenimiento'] : '';
 
     // Generar UUID v4
     function generateUUIDv4() {
