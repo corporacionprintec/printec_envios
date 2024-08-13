@@ -71,13 +71,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_param("ssssssssssss", $uuid, $nombre, $dni, $telefono, $envio, $direccion, $agencia, $compraMantenimiento, $productos, $productoMantenimiento, $razonMantenimiento, $comprobantePagoRuta);
     
     if ($stmt->execute()) {
-        // Redirigir a la página de confirmación
-        header("Location: /printec_envios/confirmacion.html?id=" . urlencode($uuid));
+        // Redirigir a la página de confirmación en la raíz del servidor
+        header("Location: /confirmacion.html?id=" . urlencode($uuid));
         exit();
     } else {
         echo "Error: " . $stmt->error;
     }
-
+    
     $stmt->close();
     $conn->close();
 }
