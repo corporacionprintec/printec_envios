@@ -48,7 +48,7 @@
             var id = urlParams.get('id');
 
             if (id) {
-                fetch('/php/confirmacion.php?id=' + encodeURIComponent(id))
+                fetch('php/confirmacion.php?id=' + encodeURIComponent(id))
                     .then(response => response.json())
                     .then(data => {
                         if (data && !data.error) {
@@ -56,7 +56,7 @@
                             document.getElementById('dni').innerText = data.dni;
                             document.getElementById('telefono').innerText = data.telefono;
                             document.getElementById('envio').innerText = data.envio;
-                            document.getElementById('direccion').innerText = data.direccion;
+                            document.getElementById('direccion').innerText = data.direccion || "No disponible";
                             document.getElementById('agencia').innerText = data.agencia;
                             document.getElementById('estado').innerText = data.estado;
 
@@ -72,11 +72,11 @@
                                 document.getElementById('estadoPedidoContainer').style.display = 'block';
                             }
 
-                            document.getElementById('comprobantePago').innerHTML = '<a href="/printec_envios/php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
+                            document.getElementById('comprobantePago').innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
                             
                             // Mostrar comprobante de envío y clave de envío
                             if (data.comprobanteEnvioRuta) {
-                                document.getElementById('comprobanteEnvio').innerHTML = '<a href="/printec_envios/php/uploads/' + data.comprobanteEnvioRuta + '" target="_blank">Ver Comprobante de Envío</a>';
+                                document.getElementById('comprobanteEnvio').innerHTML = '<a href="php/uploads/' + data.comprobanteEnvioRuta + '" target="_blank">Ver Comprobante de Envío</a>';
                             }
                             if (data.claveEnvio) {
                                 document.getElementById('claveEnvio').innerText = data.claveEnvio;

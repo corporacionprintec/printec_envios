@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Subir archivo de comprobante de pago
     $comprobantePagoRuta = '';
     if (isset($_FILES['comprobantePago']) && $_FILES['comprobantePago']['error'] == UPLOAD_ERR_OK) {
-        $target_dir = __DIR__ . "/../uploads/";
+        $target_dir = __DIR__ . "php/uploads/";
         $target_file = $target_dir . basename($_FILES["comprobantePago"]["name"]);
         if (move_uploaded_file($_FILES["comprobantePago"]["tmp_name"], $target_file)) {
             $comprobantePagoRuta = basename($_FILES["comprobantePago"]["name"]);
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     if ($stmt->execute()) {
         // Redirigir a la página de confirmación
-        header("Location: /confirmacion.html?id=" . urlencode($uuid));
+        header("Location: printec_envios/confirmacion.html?id=" . urlencode($uuid));
         exit();
     } else {
         echo "Error: " . $stmt->error;

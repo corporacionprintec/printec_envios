@@ -1,7 +1,14 @@
 <?php
-// Obtener la ID del cliente de la URL
+// Establecer el tipo de contenido a JSON
 header('Content-Type: application/json');
-$id = $_GET['id'];
+
+// Obtener la ID del cliente de la URL
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+
+if (!$id) {
+    echo json_encode(['error' => 'ID no proporcionado']);
+    exit;
+}
 
 // Verificar si las variables de entorno están definidas (producción) o usar valores por defecto (desarrollo local)
 $servername = getenv('DB_HOST') ?: 'localhost';
@@ -15,7 +22,8 @@ $conn = new mysqli($servername, $username, $password, $dbname, $port);
 
 // Verificar la conexión
 if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
+    echo json_encode(['error' => 'Conexión fallida: ' . $conn->connect_error]);
+    exit;
 }
 
 // Preparar la consulta
@@ -23,7 +31,8 @@ $sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, compraMantenimi
 $stmt = $conn->prepare($sql);
 
 if ($stmt === false) {
-    die("Error en la preparación de la consulta SQL: " . $conn->error);
+    echo json_encode(['error' => 'Error en la preparación de la consulta SQL: ' . $conn->error]);
+    exit;
 }
 
 $stmt->bind_param("s", $id);
@@ -32,24 +41,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $data = $result->fetch_assoc();
-
-    // Generar la respuesta en JSON con todos los datos, incluyendo comprobante de envío y clave de envío
-    echo json_encode([
-        'nombre' => $data['nombre'],
-        'dni' => $data['dni'],
-        'telefono' => $data['telefono'],
-        'envio' => $data['envio'],
-        'direccion' => $data['direccion'],
-        'agencia' => $data['agencia'],
-        'compraMantenimiento' => $data['compraMantenimiento'],
-        'productos' => $data['productos'],
-        'productoMantenimiento' => $data['productoMantenimiento'],
-        'razonMantenimiento' => $data['razonMantenimiento'],
-        'comprobantePagoRuta' => $data['comprobantePagoRuta'],
-        'estado' => $data['estado'],
-        'comprobanteEnvioRuta' => $data['comprobanteEnvioRuta'], // Nueva información
-        'claveEnvio' => $data['claveEnvio'] // Nueva información
-    ]);
+    echo json_encode($data);
 } else {
     echo json_encode(['error' => 'Cliente no encontrado']);
 }
