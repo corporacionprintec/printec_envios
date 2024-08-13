@@ -14,7 +14,8 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-$sql = "SELECT item, nombre, estado FROM clientes";
+// Consulta SQL para seleccionar los datos y ordenarlos por 'item' en orden descendente
+$sql = "SELECT item, nombre, estado FROM clientes ORDER BY item DESC";
 $result = $conn->query($sql);
 ?>
 

@@ -15,6 +15,9 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
+            width: 100%;
+            max-width: 300px;
+            margin: 10px 0;
         }
 
         /* Estilo para el botón de imprimir membrete */
@@ -27,6 +30,9 @@
             cursor: pointer;
             font-size: 16px;
             margin-left: 10px;
+            width: 100%;
+            max-width: 300px;
+            margin: 10px 0;
         }
 
         /* Estilo para el botón de subir comprobante de pago */
@@ -38,7 +44,20 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
-            display: inline-block;
+            display: block; /* Se asegura de que el botón ocupe toda la línea */
+            width: 100%;
+            max-width: 300px;
+            margin: 10px 0;
+        }
+
+        /* Ajustes responsivos para pantallas pequeñas */
+        @media (max-width: 600px) {
+            input[type="submit"],
+            button,
+            #comprobantePago {
+                width: 100%;
+                max-width: 100%;
+            }
         }
     </style>
     <script>
@@ -58,10 +77,23 @@
         // Función para mostrar u ocultar campos según el motivo de envío
         function toggleFields() {
             var motivoEnvio = document.getElementById('motivoEnvio').value;
-            document.getElementById('productosContainer').style.display = (motivoEnvio === 'compra') ? 'block' : 'none';
-            document.getElementById('mantenimientoContainer').style.display = (motivoEnvio === 'mantenimiento') ? 'block' : 'none';
-            document.getElementById('comprobanteContainer').style.display = (motivoEnvio === 'compra' || motivoEnvio === 'mantenimiento') ? 'block' : 'none';
-            document.getElementById('printButton').style.display = (motivoEnvio === 'mantenimiento') ? 'inline-block' : 'none';
+
+            // Resetear todos los contenedores antes de aplicar las reglas
+            document.getElementById('productosContainer').style.display = 'none';
+            document.getElementById('mantenimientoContainer').style.display = 'none';
+            document.getElementById('comprobanteContainer').style.display = 'none';
+            document.getElementById('printButton').style.display = 'none';
+
+            if (motivoEnvio === 'compra') {
+                document.getElementById('productosContainer').style.display = 'block';
+                document.getElementById('comprobanteContainer').style.display = 'block';
+            } else if (motivoEnvio === 'mantenimiento-envio') {
+                document.getElementById('mantenimientoContainer').style.display = 'block';
+                document.getElementById('printButton').style.display = 'inline-block';
+            } else if (motivoEnvio === 'mantenimiento-recoger') {
+                document.getElementById('mantenimientoContainer').style.display = 'block';
+                document.getElementById('comprobanteContainer').style.display = 'block';
+            }
         }
 
         // Función para imprimir el membrete
@@ -155,7 +187,8 @@
             <select id="motivoEnvio" name="motivoEnvio" onchange="toggleFields()" required>
                 <option value="">Seleccione...</option>
                 <option value="compra">Compra</option>
-                <option value="mantenimiento">Mantenimiento</option>
+                <option value="mantenimiento-envio">Mantenimiento Impresora (por enviar)</option>
+                <option value="mantenimiento-recoger">Mantenimiento Impresora (por recoger)</option>
             </select>
             
             <div id="productosContainer" style="display: none;">

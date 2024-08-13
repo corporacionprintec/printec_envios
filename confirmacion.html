@@ -40,17 +40,85 @@
         .copy-button i {
             margin-right: 8px;
         }
+        /* Estilo del formulario para subir comprobante */
+        .upload-comprobante-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .upload-comprobante-container form {
+            display: inline-block;
+        }
+        .upload-comprobante-container input[type="file"] {
+            margin-bottom: 10px;
+        }
     </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo de la empresa -->
+        <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
+        <h1>Confirmación de Envío</h1>
+        <p><span id="cliente_id" style="display: none;"></span></p>
+        <p><strong>Nombre y Apellido:</strong> <span id="nombre"></span></p>
+        <p><strong>DNI:</strong> <span id="dni"></span></p>
+        <p><strong>Teléfono:</strong> <span id="telefono"></span></p>
+        <p><strong>Tipo de Envío:</strong> <span id="envio"></span></p>
+        <p><strong>Dirección:</strong> <span id="direccion"></span></p>
+        <p><strong>Agencia:</strong> <span id="agencia"></span></p>
+        
+        <div id="productosContainer" style="display: none;">
+            <p><strong>Productos:</strong> <span id="productos"></span></p>
+        </div>
+
+        <div id="mantenimientoContainer" style="display: none;">
+            <p><strong>Producto a Realizar Mantenimiento:</strong> <span id="productoMantenimiento"></span></p>
+            <p><strong>Detalle del Mantenimiento:</strong> <span id="detalleMantenimiento"></span></p>
+        </div>
+
+        <div id="estadoPedidoContainer" style="display: none;">
+            <p><strong>Estado del Pedido:</strong> <span id="estado"></span></p>
+        </div>
+
+        <p id="comprobantePago"></p>
+        <p><strong>Comprobante de Envío:</strong> <span id="comprobanteEnvio"></span></p>
+        <p><strong>Clave de Envío:</strong> <span id="claveEnvio"></span></p>
+
+        <!-- Formulario para subir el comprobante de pago -->
+        <div class="upload-comprobante-container">
+            <form id="upload-comprobante-form" action="php/subir_comprobante.php" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="id" value="" id="cliente_id">
+                <input type="file" name="comprobantePago" accept="image/*" required>
+                <input type="submit" value="Subir Comprobante de Pago">
+            </form>
+        </div>
+
+        <!-- Botón para copiar la URL -->
+        <div class="copy-container">
+            <button class="copy-button" onclick="copyUrl()">
+                <i class="far fa-copy"></i> Copiar URL
+            </button>
+        </div>
+
+        <!-- Icono de WhatsApp -->  
+        <a href="https://wa.me/966177851" target="_blank">
+            <img src="images_ventas/whatsapp.png" alt="WhatsApp" class="whatsapp-icon">
+        </a>
+
+    </div>
+
     <script>
         // Función para cargar los datos del cliente
         function fetchClientData() {
             var urlParams = new URLSearchParams(window.location.search);
             var id = urlParams.get('id');
+            document.getElementById('cliente_id').innerText= id;
 
             if (id) {
+            console.log(id)
                 fetch('php/confirmacion.php?id=' + encodeURIComponent(id))
                     .then(response => response.json())
                     .then(data => {
+                        //console.log(data)
                         if (data && !data.error) {
                             document.getElementById('nombre').innerText = data.nombre;
                             document.getElementById('dni').innerText = data.dni;
@@ -64,16 +132,24 @@
                                 document.getElementById('productosContainer').style.display = 'block';
                                 document.getElementById('productos').innerText = data.productos;
                                 document.getElementById('mantenimientoContainer').style.display = 'none';
-                            } else if (data.compraMantenimiento === 'mantenimiento') {
+                            } else if (data.compraMantenimiento === 'mantenimiento-envio') {
                                 document.getElementById('productosContainer').style.display = 'none';
                                 document.getElementById('mantenimientoContainer').style.display = 'block';
                                 document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento;
                                 document.getElementById('detalleMantenimiento').innerText = data.razonMantenimiento;
                                 document.getElementById('estadoPedidoContainer').style.display = 'block';
+
+                                // Mostrar formulario para subir comprobante de pago
+                                document.querySelector('.upload-comprobante-container').style.display = 'block';
+                            } else if (data.compraMantenimiento === 'mantenimiento-recoger') {
+                                document.getElementById('productosContainer').style.display = 'none';
+                                document.getElementById('mantenimientoContainer').style.display = 'block';
+                                document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento;
+                                document.getElementById('detalleMantenimiento').innerText = data.razonMantenimiento;
+                                document.getElementById('estadoPedidoContainer').style.display = 'block';
+                                document.getElementById('comprobantePago').innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
                             }
 
-                            document.getElementById('comprobantePago').innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
-                            
                             // Mostrar comprobante de envío y clave de envío
                             if (data.comprobanteEnvioRuta) {
                                 document.getElementById('comprobanteEnvio').innerHTML = '<a href="php/uploads/' + data.comprobanteEnvioRuta + '" target="_blank">Ver Comprobante de Envío</a>';
@@ -106,48 +182,5 @@
         // Ejecutar la función al cargar la página
         window.onload = fetchClientData;
     </script>
-</head>
-<body>
-    <div class="container">
-        <!-- Logo de la empresa -->
-        <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
-        <h1>Confirmación de Envío</h1>
-        <p><strong>Nombre y Apellido:</strong> <span id="nombre"></span></p>
-        <p><strong>DNI:</strong> <span id="dni"></span></p>
-        <p><strong>Teléfono:</strong> <span id="telefono"></span></p>
-        <p><strong>Tipo de Envío:</strong> <span id="envio"></span></p>
-        <p><strong>Dirección:</strong> <span id="direccion"></span></p>
-        <p><strong>Agencia:</strong> <span id="agencia"></span></p>
-        
-        <div id="productosContainer" style="display: none;">
-            <p><strong>Productos:</strong> <span id="productos"></span></p>
-        </div>
-
-        <div id="mantenimientoContainer" style="display: none;">
-            <p><strong>Producto a Realizar Mantenimiento:</strong> <span id="productoMantenimiento"></span></p>
-            <p><strong>Detalle del Mantenimiento:</strong> <span id="detalleMantenimiento"></span></p>
-        </div>
-
-        <div id="estadoPedidoContainer" style="display: none;">
-            <p><strong>Estado del Pedido:</strong> <span id="estado"></span></p>
-        </div>
-
-        <p id="comprobantePago"></p>
-        <p><strong>Comprobante de Envío:</strong> <span id="comprobanteEnvio"></span></p>
-        <p><strong>Clave de Envío:</strong> <span id="claveEnvio"></span></p>
-        
-        <!-- Botón para copiar la URL -->
-        <div class="copy-container">
-            <button class="copy-button" onclick="copyUrl()">
-                <i class="far fa-copy"></i> Copiar URL
-            </button>
-        </div>
-
-        <!-- Icono de WhatsApp -->
-        <a href="https://wa.me/966177851" target="_blank">
-            <img src="images_ventas/whatsapp.png" alt="WhatsApp" class="whatsapp-icon">
-        </a>
-
-    </div>
 </body>
 </html>
