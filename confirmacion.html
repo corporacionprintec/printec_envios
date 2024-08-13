@@ -48,7 +48,7 @@
             var id = urlParams.get('id');
 
             if (id) {
-                fetch('/printec_envios/php/confirmacion.php?id=' + encodeURIComponent(id))
+                fetch('/php/confirmacion.php?id=' + encodeURIComponent(id))
                     .then(response => response.json())
                     .then(data => {
                         if (data && !data.error) {
@@ -148,10 +148,6 @@
             <img src="images_ventas/whatsapp.png" alt="WhatsApp" class="whatsapp-icon">
         </a>
 
-        <!-- Contenedor de GIF -->
-        <!-- <div class="gif-container">
-            <img src="images_ventas/Q0t0.gif" alt="GIF de confirmación">
-        </div> -->
     </div>
 </body>
 </html>

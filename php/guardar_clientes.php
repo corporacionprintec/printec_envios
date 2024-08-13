@@ -2,15 +2,17 @@
 session_start(); // Inicia la sesión
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Verificar si las variables de entorno están definidas (producción) o usar valores por defecto (desarrollo local)
+    $servername = getenv('DB_HOST') ?: 'localhost';
+    $username = getenv('DB_USER') ?: 'root';
+    $password = getenv('DB_PASS') ?: '';
+    $dbname = getenv('DB_NAME') ?: 'envios_clientes';
+    $port = getenv('DB_PORT') ?: '3306';
+
     // Conexión a la base de datos
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "envios_clientes";
+    $conn = new mysqli($servername, $username, $password, $dbname, $port);
 
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    // Verificar conexión
+    // Verificar la conexión
     if ($conn->connect_error) {
         die("Conexión fallida: " . $conn->connect_error);
     }
@@ -25,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $compraMantenimiento = $_POST['motivoEnvio'];
     $productos = isset($_POST['productos']) ? $_POST['productos'] : '';
     $productoMantenimiento = isset($_POST['productoMantenimiento']) ? $_POST['productoMantenimiento'] : '';
-    $razonMantenimiento = isset($_POST['detalleMantenimiento']) ? $_POST['detalleMantenimiento'] : ''; // Cambiado a razonMantenimiento
+    $razonMantenimiento = isset($_POST['razonMantenimiento']) ? $_POST['razonMantenimiento'] : '';
 
     // Generar UUID v4
     function generateUUIDv4() {
@@ -40,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Subir archivo de comprobante de pago
     $comprobantePagoRuta = '';
     if (isset($_FILES['comprobantePago']) && $_FILES['comprobantePago']['error'] == UPLOAD_ERR_OK) {
-        $target_dir = "uploads/";
+        $target_dir = __DIR__ . "/../uploads/";
         $target_file = $target_dir . basename($_FILES["comprobantePago"]["name"]);
         if (move_uploaded_file($_FILES["comprobantePago"]["tmp_name"], $target_file)) {
             $comprobantePagoRuta = basename($_FILES["comprobantePago"]["name"]);
@@ -61,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     if ($stmt->execute()) {
         // Redirigir a la página de confirmación
-        header("Location: /printec_envios/confirmacion.html?id=" . urlencode($uuid));
+        header("Location: /confirmacion.html?id=" . urlencode($uuid));
         exit();
     } else {
         echo "Error: " . $stmt->error;
