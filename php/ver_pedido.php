@@ -164,22 +164,33 @@ $conn->close();
                     <p><strong>Detalle del Mantenimiento:</strong> <?php echo isset($pedido['razonMantenimiento']) ? htmlspecialchars($pedido['razonMantenimiento']) : 'No especificado'; ?></p>
                 <?php endif; ?>
 
-                <p><strong>Comprobante de Pago:</strong> <a href="/php/uploads/<?php echo htmlspecialchars($pedido['comprobantePagoRuta']); ?>" target="_blank">Ver Comprobante de Pago</a></p>
-            </div>
+                <p><strong>Comprobante de Pago:</strong> <a href="/printec_envios/php/uploads/<?php echo htmlspecialchars($pedido['comprobantePagoRuta']); ?>" target="_blank">Ver Comprobante de Pago</a></p>
 
-            <!-- Formulario para enviar comprobante de envío y clave de envío -->
-            <form action="procesar_envio.php" method="post" enctype="multipart/form-data">
-                <div class="input-group">
-                    <label for="comprobanteEnvio">Enviar Comprobante de Envío</label>
-                    <input type="file" id="comprobanteEnvio" name="comprobanteEnvio" accept="image/*" onchange="enableButton()">
-                </div>
-                <div class="input-group">
-                    <label for="claveEnvio">Clave de Envío</label>
-                    <input type="text" id="claveEnvio" name="claveEnvio" onkeyup="enableButton()">
-                </div>
-                <input type="hidden" name="item" value="<?php echo htmlspecialchars($pedido['item']); ?>">
-                <button type="submit" id="enviarButton" class="btn" disabled>Enviar</button>
-            </form>
+                <!-- Mostrar el segundo comprobante si existe -->
+                <?php if (!empty($pedido['comprobantePagoRuta2'])): ?>
+                    <p><strong>Segundo Comprobante de Pago:</strong> <a href="/printec_envios/php/uploads/<?php echo htmlspecialchars($pedido['comprobantePagoRuta2']); ?>" target="_blank">Ver Segundo Comprobante de Pago</a></p>
+                <?php endif; ?>
+
+                <!-- Formulario para enviar comprobante de envío y clave de envío -->
+                <form action="procesar_envio.php" method="post" enctype="multipart/form-data">
+                    <div class="input-group">
+                        <label for="comprobanteEnvio">Enviar Comprobante de Envío</label>
+                        <input type="file" id="comprobanteEnvio" name="comprobanteEnvio" accept="image/*" onchange="enableButton()">
+                    </div>
+                    <div class="input-group">
+                        <label for="claveEnvio">Clave de Envío</label>
+                        <input type="text" id="claveEnvio" name="claveEnvio" onkeyup="enableButton()">
+                    </div>
+                    <div class="input-group">
+                        <label for="permitirVistaComprobante">
+                            <input type="checkbox" id="permitirVistaComprobante" name="permitirVistaComprobante">
+                            Permitir que el cliente vea el comprobante de envío y la clave
+                        </label>
+                    </div>
+                    <input type="hidden" name="item" value="<?php echo htmlspecialchars($pedido['item']); ?>">
+                    <button type="submit" id="enviarButton" class="btn" disabled>Enviar</button>
+                </form>
+            </div>
         <?php else: ?>
             <p>Pedido no encontrado.</p>
         <?php endif; ?>

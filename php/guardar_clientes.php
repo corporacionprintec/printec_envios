@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     if ($stmt->execute()) {
         // Redirigir a la página de confirmación en la raíz del servidor
-        header("Location: /confirmacion.html?id=" . urlencode($uuid));
+        header("Location: /printec_envios/confirmacion.html?id=" . urlencode($uuid));
         exit();
     } else {
         echo "Error: " . $stmt->error;

@@ -17,6 +17,7 @@ if ($conn->connect_error) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $item = intval($_POST['item']);
     $claveEnvio = $_POST['claveEnvio'];
+    $mostrarEnvio = isset($_POST['mostrarEnvio']) ? 1 : 0; // Nuevo campo de visibilidad
 
     // Manejar la subida de la imagen
     $comprobanteEnvioRuta = '';
@@ -31,10 +32,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Actualizar el pedido
-    $sql = "UPDATE clientes SET comprobanteEnvioRuta = ?, claveEnvio = ?, estado = 'enviado' WHERE item = ?";
+    // Actualizar el pedido con la nueva visibilidad
+    $sql = "UPDATE clientes SET comprobanteEnvioRuta = ?, claveEnvio = ?, estado = 'enviado', mostrarEnvio = ? WHERE item = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssi", $comprobanteEnvioRuta, $claveEnvio, $item);
+    $stmt->bind_param("ssii", $comprobanteEnvioRuta, $claveEnvio, $mostrarEnvio, $item);
 
     if ($stmt->execute()) {
         // Redirigir a la página de detalles del pedido con el estado actualizado

@@ -50,6 +50,10 @@
         .upload-comprobante-container input[type="file"] {
             margin-bottom: 10px;
         }
+        /* Ocultar el formulario del segundo comprobante inicialmente */
+        #upload-comprobante2-form {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -78,16 +82,33 @@
             <p><strong>Estado del Pedido:</strong> <span id="estado"></span></p>
         </div>
 
-        <p id="comprobantePago"></p>
+        <div id="comprobantesContainer">
+            <p><strong>Comprobantes de Pago:</strong></p>
+            <ul id="comprobantesList">
+                <!-- Aquí se añadirán los enlaces a los comprobantes de pago -->
+            </ul>
+        </div>
+
         <p><strong>Comprobante de Envío:</strong> <span id="comprobanteEnvio"></span></p>
         <p><strong>Clave de Envío:</strong> <span id="claveEnvio"></span></p>
 
-        <!-- Formulario para subir el comprobante de pago -->
+        <!-- Formulario para subir el primer comprobante de pago -->
         <div class="upload-comprobante-container">
-            <form id="upload-comprobante-form" method="POST" enctype="multipart/form-data">
+            <form id="upload-comprobante1-form" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="id" value="" id="cliente_id_input">
+                <label for="comprobantePago">Subir primer comprobante de pago:</label>
                 <input type="file" name="comprobantePago" accept="image/*" required>
-                <input type="submit" value="Subir Comprobante de Pago">
+                <input type="submit" value="Subir Primer Comprobante de Pago">
+            </form>
+        </div>
+
+        <!-- Formulario para subir el segundo comprobante de pago -->
+        <div class="upload-comprobante-container">
+            <form id="upload-comprobante2-form" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="id" value="" id="cliente_id_input2">
+                <label for="comprobantePago2">Subir segundo comprobante de pago:</label>
+                <input type="file" name="comprobantePago2" accept="image/*">
+                <input type="submit" value="Subir Segundo Comprobante de Pago">
             </form>
         </div>
 
@@ -112,6 +133,7 @@
             var id = urlParams.get('id');
             document.getElementById('cliente_id').innerText = id;
             document.getElementById('cliente_id_input').value = id;
+            document.getElementById('cliente_id_input2').value = id;
 
             if (id) {
                 fetch('php/confirmacion.php?id=' + encodeURIComponent(id))
@@ -136,22 +158,40 @@
                                 document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento;
                                 document.getElementById('detalleMantenimiento').innerText = data.razonMantenimiento;
                                 document.getElementById('estadoPedidoContainer').style.display = 'block';
-
-                                document.querySelector('.upload-comprobante-container').style.display = 'block';
                             } else if (data.compraMantenimiento === 'mantenimiento-recoger') {
                                 document.getElementById('productosContainer').style.display = 'none';
                                 document.getElementById('mantenimientoContainer').style.display = 'block';
                                 document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento;
                                 document.getElementById('detalleMantenimiento').innerText = data.razonMantenimiento;
                                 document.getElementById('estadoPedidoContainer').style.display = 'block';
-                                document.getElementById('comprobantePago').innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
                             }
 
-                            if (data.comprobanteEnvioRuta) {
-                                document.getElementById('comprobanteEnvio').innerHTML = '<a href="php/uploads/' + data.comprobanteEnvioRuta + '" target="_blank">Ver Comprobante de Envío</a>';
+                            var comprobantesList = document.getElementById('comprobantesList');
+                            if (data.comprobantePagoRuta) {
+                                var li1 = document.createElement('li');
+                                li1.innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Primer Comprobante de Pago</a>';
+                                comprobantesList.appendChild(li1);
+
+                                // Mostrar el formulario para el segundo comprobante solo si ya se subió el primero
+                                document.getElementById('upload-comprobante2-form').style.display = 'block';
                             }
-                            if (data.claveEnvio) {
-                                document.getElementById('claveEnvio').innerText = data.claveEnvio;
+                            if (data.comprobantePagoRuta2) {
+                                var li2 = document.createElement('li');
+                                li2.innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta2 + '" target="_blank">Ver Segundo Comprobante de Pago</a>';
+                                comprobantesList.appendChild(li2);
+                            }
+
+                            // Mostrar el comprobante de envío y clave solo si mostrarEnvio es verdadero
+                            if (data.mostrarEnvio && data.mostrarEnvio === 1) {
+                                if (data.comprobanteEnvioRuta) {
+                                    document.getElementById('comprobanteEnvio').innerHTML = '<a href="php/uploads/' + data.comprobanteEnvioRuta + '" target="_blank">Ver Comprobante de Envío</a>';
+                                }
+                                if (data.claveEnvio) {
+                                    document.getElementById('claveEnvio').innerText = data.claveEnvio;
+                                }
+                            } else {
+                                document.getElementById('comprobanteEnvio').innerText = 'Información no disponible aún';
+                                document.getElementById('claveEnvio').innerText = 'Información no disponible aún';
                             }
                         } else {
                             console.error('Error:', data.error);
@@ -174,30 +214,6 @@
 
             alert('URL copiada al portapapeles');
         }
-
-        // Subir el comprobante de pago con AJAX y actualizar el contenido
-        document.getElementById('upload-comprobante-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            var formData = new FormData(this);
-
-            fetch('php/subir_comprobante.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Comprobante de pago subido con éxito');
-                    document.getElementById('comprobantePago').innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
-                } else {
-                    alert('Error al subir el comprobante de pago');
-                }
-            })
-            .catch(error => {
-                console.error('Error al subir el comprobante:', error);
-                alert('Hubo un error al subir el comprobante de pago');
-            });
-        });
 
         // Ejecutar la función al cargar la página
         window.onload = fetchClientData;
