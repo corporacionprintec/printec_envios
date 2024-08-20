@@ -68,9 +68,9 @@
             document.getElementById('direccionContainer').style.display = (tipoRetiro !== '') ? 'block' : 'none';
             document.getElementById('agenciaContainer').style.display = (tipoRetiro !== '') ? 'block' : 'none';
             if (tipoRetiro === 'agencia') {
-                direccionLabel.textContent = 'Dirección Detallada: Ejemplo (sucursal de la agencia)';
+                direccionLabel.textContent = 'Dirección Detallada: Ejemplo (Ciudad - Sucursal)';
             } else {
-                direccionLabel.textContent = 'Dirección Detallada: Ejemplo (Av Moscú 854/Parcona/Ica/Ica)';
+                direccionLabel.textContent = 'Dirección Detallada: Ejemplo (Av Moscú 854-Parcona-Ica-Ica)';
             }
         }
 
@@ -168,7 +168,7 @@
             </select>
             
             <div id="direccionContainer" style="display: none;">
-                <label for="direccion" id="direccionLabel">Dirección Detallada: Ejemplo (Av Moscú 854/Parcona/Ica/Ica)</label>
+                <label for="direccion" id="direccionLabel">Dirección Detallada: Ejemplo (Av Moscú 854-Parcona-Ica-Ica)</label>
                 <input type="text" id="direccion" name="direccion">
             </div>
             

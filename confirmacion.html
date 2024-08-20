@@ -91,10 +91,19 @@
             </form>
         </div>
 
+        <!-- Mensaje para redirigir a WhatsApp style="display:none; "-->
+        <p>Para guardar su enlace de seguimiento, puede enviarse el siguiente mensaje a su WhatsApp:</p>
+        <a id="enlaceWhatsApp" href="#" style="text-decoration: none; display:none;" target="_blank">
+            <button class="whatsapp-button">
+                <i class="fab fa-whatsapp"></i> Enviar enlace a mi WhatsApp
+            </button>
+        </a>
+
+        <p>o puede copiar y pegar el enlace en un block de notas:</p>
         <!-- Botón para copiar la URL -->
         <div class="copy-container">
             <button class="copy-button" onclick="copyUrl()">
-                <i class="far fa-copy"></i> Copiar URL
+                <i class="far fa-copy"></i> Copiar enlace
             </button>
         </div>
 
@@ -125,6 +134,16 @@
                             document.getElementById('direccion').innerText = data.direccion || "No disponible";
                             document.getElementById('agencia').innerText = data.agencia;
                             document.getElementById('estado').innerText = data.estado;
+
+                            // mensaje de alamacenaminto en whatasapp
+                            var telefonoCliente = data.telefono;
+                            var text = window.location.href;
+                            var urlPedido = window.location.href;
+                            var mensajeWhatsApp = 'Enlace de seguimiento de pedido Printec: ' + urlPedido;
+                            var enlaceWhatsApp = 'https://wa.me/' + telefonoCliente + '?text=' + encodeURIComponent(mensajeWhatsApp);
+                             // Insertar el enlace de WhatsApp en el DOM
+                            document.getElementById('enlaceWhatsApp').href = enlaceWhatsApp;
+                            document.getElementById('enlaceWhatsApp').style.display = 'block';
 
                             if (data.compraMantenimiento === 'compra') {
                                 document.getElementById('productosContainer').style.display = 'block';
