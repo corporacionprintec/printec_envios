@@ -164,7 +164,7 @@ $conn->close();
                     <p><strong>Detalle del Mantenimiento:</strong> <?php echo isset($pedido['razonMantenimiento']) ? htmlspecialchars($pedido['razonMantenimiento']) : 'No especificado'; ?></p>
                 <?php endif; ?>
 
-                <p><strong>Comprobante de Pago:</strong> <a href="/printec_envios/php/uploads/<?php echo htmlspecialchars($pedido['comprobantePagoRuta']); ?>" target="_blank">Ver Comprobante de Pago</a></p>
+                <p><strong>Comprobante de Pago:</strong> <a href="/php/uploads/<?php echo htmlspecialchars($pedido['comprobantePagoRuta']); ?>" target="_blank">Ver Comprobante de Pago</a></p>
             </div>
 
             <!-- Formulario para enviar comprobante de envío y clave de envío -->
