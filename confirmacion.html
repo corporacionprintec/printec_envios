@@ -40,7 +40,6 @@
         .copy-button i {
             margin-right: 8px;
         }
-        /* Estilo del formulario para subir comprobante */
         .upload-comprobante-container {
             margin-top: 20px;
             text-align: center;
@@ -85,8 +84,8 @@
 
         <!-- Formulario para subir el comprobante de pago -->
         <div class="upload-comprobante-container">
-            <form id="upload-comprobante-form" action="php/subir_comprobante.php" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="id" value="" id="cliente_id">
+            <form id="upload-comprobante-form" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="id" value="" id="cliente_id_input">
                 <input type="file" name="comprobantePago" accept="image/*" required>
                 <input type="submit" value="Subir Comprobante de Pago">
             </form>
@@ -111,14 +110,13 @@
         function fetchClientData() {
             var urlParams = new URLSearchParams(window.location.search);
             var id = urlParams.get('id');
-            document.getElementById('cliente_id').innerText= id;
+            document.getElementById('cliente_id').innerText = id;
+            document.getElementById('cliente_id_input').value = id;
 
             if (id) {
-            console.log(id)
                 fetch('php/confirmacion.php?id=' + encodeURIComponent(id))
                     .then(response => response.json())
                     .then(data => {
-                        //console.log(data)
                         if (data && !data.error) {
                             document.getElementById('nombre').innerText = data.nombre;
                             document.getElementById('dni').innerText = data.dni;
@@ -139,7 +137,6 @@
                                 document.getElementById('detalleMantenimiento').innerText = data.razonMantenimiento;
                                 document.getElementById('estadoPedidoContainer').style.display = 'block';
 
-                                // Mostrar formulario para subir comprobante de pago
                                 document.querySelector('.upload-comprobante-container').style.display = 'block';
                             } else if (data.compraMantenimiento === 'mantenimiento-recoger') {
                                 document.getElementById('productosContainer').style.display = 'none';
@@ -150,7 +147,6 @@
                                 document.getElementById('comprobantePago').innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
                             }
 
-                            // Mostrar comprobante de envío y clave de envío
                             if (data.comprobanteEnvioRuta) {
                                 document.getElementById('comprobanteEnvio').innerHTML = '<a href="php/uploads/' + data.comprobanteEnvioRuta + '" target="_blank">Ver Comprobante de Envío</a>';
                             }
@@ -178,6 +174,30 @@
 
             alert('URL copiada al portapapeles');
         }
+
+        // Subir el comprobante de pago con AJAX y actualizar el contenido
+        document.getElementById('upload-comprobante-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+
+            fetch('php/subir_comprobante.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Comprobante de pago subido con éxito');
+                    document.getElementById('comprobantePago').innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
+                } else {
+                    alert('Error al subir el comprobante de pago');
+                }
+            })
+            .catch(error => {
+                console.error('Error al subir el comprobante:', error);
+                alert('Hubo un error al subir el comprobante de pago');
+            });
+        });
 
         // Ejecutar la función al cargar la página
         window.onload = fetchClientData;

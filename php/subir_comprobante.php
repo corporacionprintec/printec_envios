@@ -40,25 +40,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt = $conn->prepare($sql);
 
             if ($stmt === false) {
-                die('Error en la preparación de la consulta SQL: ' . $conn->error);
+                echo json_encode(['error' => 'Error en la preparación de la consulta SQL: ' . $conn->error]);
+                exit();
             }
 
             $stmt->bind_param("ss", $comprobantePagoRuta, $id);
 
             if ($stmt->execute()) {
-                // Redirigir de nuevo a la página de confirmación
-                header("Location: ..¿/confirmacion.html?id=" . urlencode($id));
-                exit();
+                // Retornar respuesta en JSON para ser manejada en el frontend
+                echo json_encode(['success' => true, 'comprobantePagoRuta' => $comprobantePagoRuta]);
             } else {
-                echo "Error al actualizar la base de datos: " . $stmt->error;
+                echo json_encode(['error' => 'Error al actualizar la base de datos: ' . $stmt->error]);
             }
 
             $stmt->close();
         } else {
-            echo "Error al subir el archivo.";
+            echo json_encode(['error' => 'Error al subir el archivo.']);
         }
     } else {
-        echo  json_encode(['error' => 'Cliente no encontrado']);
+        echo json_encode(['error' => 'Error al recibir el archivo.']);
     }
 
     $conn->close();
