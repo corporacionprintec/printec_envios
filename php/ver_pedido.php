@@ -139,6 +139,53 @@ $conn->close();
                 enviarButton.disabled = true;
             }
         }
+
+        // Función para imprimir el membrete
+        function printMembrete() {
+            var printWindow = window.open('', '', 'height=600,width=800');
+            var printDocument = printWindow.document;
+
+            printDocument.open();
+            printDocument.write('<html><head><title>Imprimir Membrete</title>');
+            printDocument.write('<style>');
+            printDocument.write('body { font-family: Arial, sans-serif; margin: 20px; padding: 0; }');
+            printDocument.write('h1 { font-size: 32px; margin-bottom: 20px; }');
+            printDocument.write('p { font-size: 27px; margin: 10px 0; line-height: 1.5; }');
+            printDocument.write('.container { max-width: 800px; margin: 0 auto; }');
+            printDocument.write('.logo { width: 200px; display: block; margin: 0 auto 20px; }');
+            printDocument.write('.remitente { padding: 10px; border-radius: 5px; margin-bottom: 20px; }');
+            printDocument.write('.destinatario { color: #dc3545; padding: 10px; border-radius: 5px; }'); // Rojo
+            printDocument.write('</style>');
+            printDocument.write('</head><body>');
+
+            // Logo de la empresa
+            printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
+
+            // Datos del Remitente
+            printDocument.write('<div class="container remitente">');
+            printDocument.write('<h1>Datos del Remitente</h1>');
+            printDocument.write('<p><strong>De:</strong> Eyter Yoel Rojas Sanchez</p>');
+            printDocument.write('<p><strong>Dirección:</strong> Calle Huanuco N201 Ica-Ica-Ica</p>');
+            printDocument.write('<p><strong>Cel:</strong> 966177851</p>');
+            printDocument.write('<p><strong>RUC/DNI:</strong> 75532635</p>');
+            printDocument.write('</div>');
+
+            // Datos del Destinatario
+            printDocument.write('<div class="container destinatario">');
+            printDocument.write('<h1>Datos del Destinatario</h1>');
+            printDocument.write('<p><strong>Nombre:</strong> ' + document.getElementById('nombre').innerText + '</p>');
+            printDocument.write('<p><strong>DNI:</strong> ' + document.getElementById('dni').innerText + '</p>');
+            printDocument.write('<p><strong>Teléfono:</strong> ' + document.getElementById('telefono').innerText + '</p>');
+            printDocument.write('<p><strong>Tipo de Envío:</strong> ' + document.getElementById('tipoEnvio').innerText + '</p>');
+            printDocument.write('<p><strong>Dirección:</strong> ' + document.getElementById('direccion').innerText + '</p>');
+            printDocument.write('<p><strong>Agencia:</strong> ' + document.getElementById('agencia').innerText + '</p>');
+
+            printDocument.write('</div>');
+            printDocument.write('</body></html>');
+            printDocument.close();
+
+            printWindow.print();
+        }
     </script>
 </head>
 <body>
@@ -149,12 +196,12 @@ $conn->close();
         <?php if ($pedido): ?>
             <div class="details">
                 <p class="highlight"><strong>ID:</strong> <?php echo htmlspecialchars($pedido['item']); ?></p>
-                <p><strong>Nombre:</strong> <?php echo htmlspecialchars($pedido['nombre']); ?></p>
-                <p><strong>DNI:</strong> <?php echo htmlspecialchars($pedido['dni']); ?></p>
-                <p><strong>Teléfono:</strong> <?php echo htmlspecialchars($pedido['telefono']); ?></p>
-                <p><strong>Tipo de Envío:</strong> <?php echo htmlspecialchars($pedido['envio']); ?></p>
-                <p><strong>Dirección:</strong> <?php echo htmlspecialchars($pedido['direccion']); ?></p>
-                <p><strong>Agencia:</strong> <?php echo htmlspecialchars($pedido['agencia']); ?></p>
+                <p><strong>Nombre:</strong> <span id="nombre"><?php echo htmlspecialchars($pedido['nombre']); ?></span></p>
+                <p><strong>DNI:</strong> <span id="dni"><?php echo htmlspecialchars($pedido['dni']); ?></span></p>
+                <p><strong>Teléfono:</strong> <span id="telefono"><?php echo htmlspecialchars($pedido['telefono']); ?></span></p>
+                <p><strong>Tipo de Envío:</strong> <span id="tipoEnvio"><?php echo htmlspecialchars($pedido['envio']); ?></span></p>
+                <p><strong>Dirección:</strong> <span id="direccion"><?php echo htmlspecialchars($pedido['direccion']); ?></span></p>
+                <p><strong>Agencia:</strong> <span id="agencia"><?php echo htmlspecialchars($pedido['agencia']); ?></span></p>
                 <p><strong>Estado:</strong> <?php echo htmlspecialchars($pedido['estado']); ?></p>
                 
                 <?php if ($pedido['compraMantenimiento'] == 'compra'): ?>
@@ -164,7 +211,13 @@ $conn->close();
                     <p><strong>Detalle del Mantenimiento:</strong> <?php echo isset($pedido['razonMantenimiento']) ? htmlspecialchars($pedido['razonMantenimiento']) : 'No especificado'; ?></p>
                 <?php endif; ?>
 
-                <p><strong>Comprobante de Pago:</strong> <a href="/php/uploads/<?php echo htmlspecialchars($pedido['comprobantePagoRuta']); ?>" target="_blank">Ver Comprobante de Pago</a></p>
+                <p><strong>Comprobante de Pago:</strong> 
+                    <?php if ($pedido['comprobantePagoRuta']): ?>
+                        <a href="/php/uploads/<?php echo htmlspecialchars($pedido['comprobantePagoRuta']); ?>" target="_blank">Ver Comprobante de Pago</a>
+                    <?php else: ?>
+                        No disponible
+                    <?php endif; ?>
+                </p>
             </div>
 
             <!-- Formulario para enviar comprobante de envío y clave de envío -->
@@ -180,6 +233,9 @@ $conn->close();
                 <input type="hidden" name="item" value="<?php echo htmlspecialchars($pedido['item']); ?>">
                 <button type="submit" id="enviarButton" class="btn" disabled>Enviar</button>
             </form>
+
+            <!-- Botón para imprimir el membrete -->
+            <button type="button" onclick="printMembrete()">Imprimir Membrete</button>
         <?php else: ?>
             <p>Pedido no encontrado.</p>
         <?php endif; ?>

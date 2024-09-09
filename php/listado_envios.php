@@ -14,8 +14,8 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Consulta SQL para seleccionar los datos y ordenarlos por 'item' en orden descendente
-$sql = "SELECT item, nombre, estado FROM clientes ORDER BY item DESC";
+// Consulta SQL para seleccionar tanto el 'item' como el 'id'
+$sql = "SELECT item, id, nombre, estado FROM clientes ORDER BY item DESC";
 $result = $conn->query($sql);
 ?>
 
@@ -79,21 +79,31 @@ $result = $conn->query($sql);
                     <th>Nombre</th>
                     <th>Estado</th>
                     <th>Acción</th>
+                    <th>Enlace de Confirmación</th> <!-- Nueva columna -->
                 </tr>
             </thead>
             <tbody>
                 <?php
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
+                        $item = $row['item']; // Mantiene el item numérico en la columna
+                        $id = $row['id']; // Usamos el id alfanumérico para el enlace
+                        $nombre = $row['nombre'];
+                        $estado = $row['estado'];
+
+                        // URL de confirmación generada dinámicamente usando el id (uid)
+                        $urlConfirmacion = "https://localhost/printec_envios/confirmacion.html?id=" . $id;
+
                         echo "<tr>";
-                        echo "<td>" . $row['item'] . "</td>";
-                        echo "<td>" . $row['nombre'] . "</td>";
-                        echo "<td>" . $row['estado'] . "</td>";
-                        echo '<td><a href="ver_pedido.php?id=' . $row['item'] . '">Ver Detalles</a></td>';
+                        echo "<td>" . $item . "</td>"; // Se muestra el 'item' en la columna de Items
+                        echo "<td>" . $nombre . "</td>";
+                        echo "<td>" . $estado . "</td>";
+                        echo '<td><a href="ver_pedido.php?id=' . $item . '">Ver Detalles</a></td>';
+                        echo '<td><a href="' . $urlConfirmacion . '" target="_blank">' . $urlConfirmacion . '</a></td>'; // Enlace usando el id
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='4'>No hay envíos</td></tr>";
+                    echo "<tr><td colspan='5'>No hay envíos</td></tr>";
                 }
                 $conn->close();
                 ?>
