@@ -14,8 +14,8 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Consulta SQL para seleccionar tanto el 'item' como el 'id'
-$sql = "SELECT item, id, nombre, estado FROM clientes ORDER BY item DESC";
+// Consulta SQL para seleccionar los campos junto con la fecha_creacion
+$sql = "SELECT item, id, nombre, estado, fecha_creacion FROM clientes ORDER BY item DESC";
 $result = $conn->query($sql);
 ?>
 
@@ -67,7 +67,26 @@ $result = $conn->query($sql);
         a:hover {
             text-decoration: underline;
         }
+        .copy-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
     </style>
+    <script>
+        // Función para copiar el enlace al portapapeles
+        function copyToClipboard(id) {
+            var copyText = document.getElementById(id);
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                alert("Enlace copiado al portapapeles");
+            }).catch(err => {
+                console.error('Error al copiar al portapapeles: ', err);
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -78,35 +97,39 @@ $result = $conn->query($sql);
                     <th>Items</th>
                     <th>Nombre</th>
                     <th>Estado</th>
+                    <th>Fecha de Creación</th> <!-- Nueva columna para la fecha -->
                     <th>Acción</th>
-                    <th>Enlace de Confirmación</th> <!-- Nueva columna -->
+                    <th>Copiar Enlace</th> <!-- Nueva columna -->
                 </tr>
             </thead>
             <tbody>
                 <?php
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                        $item = $row['item']; // Mantiene el item numérico en la columna
-                        $id = $row['id']; // Usamos el id alfanumérico para el enlace
+                        $item = $row['item']; 
+                        $id = $row['id']; 
                         $nombre = $row['nombre'];
                         $estado = $row['estado'];
+                        $fecha_creacion = $row['fecha_creacion']; // Usar fecha_creacion
 
-                        // URL de confirmación generada dinámicamente usando el id (uid)
+                        // URL de confirmación generada dinámicamente usando el id
                         $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $id;
 
                         echo "<tr>";
-                        echo "<td>" . $item . "</td>"; // Se muestra el 'item' en la columna de Items
+                        echo "<td>" . $item . "</td>";
                         echo "<td>" . $nombre . "</td>";
                         echo "<td>" . $estado . "</td>";
+                        echo "<td>" . $fecha_creacion . "</td>"; // Mostrar la fecha de creación
                         echo '<td><a href="ver_pedido.php?id=' . $item . '">Ver Detalles</a></td>';
-                        echo '<td><a href="' . $urlConfirmacion . '" target="_blank">' . $urlConfirmacion . '</a></td>'; // Enlace usando el id
+                        // Input oculto con el enlace y botón para copiar
+                        echo '<td><input type="hidden" id="link_' . $id . '" value="' . $urlConfirmacion . '">
+                        <button class="copy-btn" onclick="copyToClipboard(\'link_' . $id . '\')">Copiar enlace</button></td>';
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='5'>No hay envíos</td></tr>";
+                    echo "<tr><td colspan='6'>No hay envíos</td></tr>";
                 }
 
-                // Verificación antes de cerrar la conexión
                 if ($conn !== null && $conn->connect_error == null) {
                     $conn->close();
                 }
