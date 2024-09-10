@@ -1,8 +1,7 @@
 <?php
-// Establecer el tipo de contenido a JSON
 header('Content-Type: application/json');
 
-// Obtener la ID del cliente de la URL
+// Obtener el ID del cliente de la URL
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 
 if (!$id) {
@@ -10,7 +9,6 @@ if (!$id) {
     exit;
 }
 
-// Verificar si las variables de entorno están definidas (producción) o usar valores por defecto (desarrollo local)
 $servername = getenv('DB_HOST') ?: 'localhost';
 $username = getenv('DB_USER') ?: 'root';
 $password = getenv('DB_PASS') ?: '';
@@ -26,7 +24,7 @@ if ($conn->connect_error) {
     exit;
 }
 
-// Preparar la consulta
+// Cambia 'item' a 'id' en la consulta SQL
 $sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, compraMantenimiento, productos, productoMantenimiento, razonMantenimiento, comprobantePagoRuta, estado, comprobanteEnvioRuta, claveEnvio FROM clientes WHERE id = ?";
 $stmt = $conn->prepare($sql);
 
@@ -35,7 +33,7 @@ if ($stmt === false) {
     exit;
 }
 
-$stmt->bind_param("s", $id);
+$stmt->bind_param("s", $id);  // Usa 's' para cadenas
 $stmt->execute();
 $result = $stmt->get_result();
 
