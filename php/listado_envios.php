@@ -1,24 +1,3 @@
-<?php
-// Verificar si las variables de entorno están definidas (producción) o usar valores por defecto (desarrollo local)
-$servername = getenv('DB_HOST') ?: 'localhost';
-$username = getenv('DB_USER') ?: 'root';
-$password = getenv('DB_PASS') ?: '';
-$dbname = getenv('DB_NAME') ?: 'envios_clientes';
-$port = getenv('DB_PORT') ?: '3306';
-
-// Conexión a la base de datos
-$conn = new mysqli($servername, $username, $password, $dbname, $port);
-
-// Verificar la conexión
-if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
-}
-
-// Consulta SQL para seleccionar tanto el 'item' como el 'id'
-$sql = "SELECT item, id, nombre, estado FROM clientes ORDER BY item DESC";
-$result = $conn->query($sql);
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -92,7 +71,7 @@ $result = $conn->query($sql);
                         $estado = $row['estado'];
 
                         // URL de confirmación generada dinámicamente usando el id (uid)
-                        $urlConfirmacion = "https://localhost/printec_envios/confirmacion.html?id=" . $id;
+                        $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $id;
 
                         echo "<tr>";
                         echo "<td>" . $item . "</td>"; // Se muestra el 'item' en la columna de Items
