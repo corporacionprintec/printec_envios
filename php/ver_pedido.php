@@ -14,11 +14,11 @@ if ($conn->connect_error) {
     die(json_encode(['error' => 'Conexión fallida']));
 }
 
-// Obtener el ID del pedido desde la URL
+// Obtener el ID del pedido desde la URL (si está disponible)
 $item_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if ($item_id > 0) {
-    // Preparar la consulta
+    // Si se proporciona un ID, obtener solo ese pedido
     $sql = "SELECT * FROM clientes WHERE item = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $item_id);
@@ -31,10 +31,21 @@ if ($item_id > 0) {
     } else {
         echo json_encode(['error' => 'Pedido no encontrado']);
     }
-
     $stmt->close();
 } else {
-    echo json_encode(['error' => 'ID no válido']);
+    // Si no se proporciona un ID, obtener todos los pedidos
+    $sql = "SELECT * FROM clientes";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $pedidos = [];
+        while ($row = $result->fetch_assoc()) {
+            $pedidos[] = $row; // Guardar cada pedido en el array
+        }
+        echo json_encode($pedidos); // Devolver todos los pedidos
+    } else {
+        echo json_encode(['error' => 'No se encontraron pedidos']);
+    }
 }
 
 $conn->close();
