@@ -1,11 +1,12 @@
 <?php
-// Conectar a la base de datos
+// Verificar si las variables de entorno están definidas (producción) o usar valores por defecto (desarrollo local)
 $servername = getenv('DB_HOST') ?: 'localhost';
 $username = getenv('DB_USER') ?: 'root';
 $password = getenv('DB_PASS') ?: '';
 $dbname = getenv('DB_NAME') ?: 'envios_clientes';
 $port = getenv('DB_PORT') ?: '3306';
 
+// Conexión a la base de datos
 $conn = new mysqli($servername, $username, $password, $dbname, $port);
 
 // Verificar la conexión
@@ -13,7 +14,7 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Obtener el límite de registros seleccionados por el usuario (valor por defecto es 10)
+// Obtener el límite de registros seleccionados por el usuario (si no se selecciona, el valor por defecto es 10)
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
 
 // Consulta SQL con límite de resultados según la selección
@@ -28,9 +29,11 @@ $result = $conn->query($sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listado de Envíos</title>
     <style>
-        /* Estilos para la tabla y los botones */
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
         }
         .container {
             margin: 50px auto;
@@ -39,6 +42,10 @@ $result = $conn->query($sql);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
         }
         table {
             width: 100%;
@@ -53,6 +60,25 @@ $result = $conn->query($sql);
             background-color: #007bff;
             color: white;
         }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .copy-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        /* Estilos para el estado pendiente y enviado */
         .pendiente {
             color: red;
             font-weight: bold;
@@ -62,28 +88,45 @@ $result = $conn->query($sql);
             font-weight: bold;
         }
     </style>
+    <script>
+        // Función para copiar el enlace al portapapeles
+        function copyToClipboard(id) {
+            var copyText = document.getElementById(id);
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                alert("Enlace copiado al portapapeles");
+            }).catch(err => {
+                console.error('Error al copiar al portapapeles: ', err);
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="container">
         <h1>Listado de Envíos</h1>
 
+        <!-- Filtro de cantidad de registros a mostrar -->
         <form method="GET" action="">
             <label for="limit">Mostrar:</label>
             <select name="limit" id="limit" onchange="this.form.submit()">
                 <option value="10" <?php echo $limit == 10 ? 'selected' : ''; ?>>10</option>
                 <option value="20" <?php echo $limit == 20 ? 'selected' : ''; ?>>20</option>
-                <!-- Añadir más opciones si es necesario -->
+                <option value="50" <?php echo $limit == 50 ? 'selected' : ''; ?>>50</option>
+                <option value="100" <?php echo $limit == 100 ? 'selected' : ''; ?>>100</option>
+                <option value="500" <?php echo $limit == 500 ? 'selected' : ''; ?>>500</option>
+                <option value="1000" <?php echo $limit == 1000 ? 'selected' : ''; ?>>1000</option>
+                <option value="10000" <?php echo $limit == 10000 ? 'selected' : ''; ?>>10,000</option>
             </select>
         </form>
 
         <table>
             <thead>
                 <tr>
-                    <th>Item</th>
+                    <th>Items</th>
                     <th>Nombre</th>
                     <th>Estado</th>
-                    <th>Fecha de Creación</th>
+                    <th>Fecha de Creación</th> <!-- Nueva columna para la fecha -->
                     <th>Acción</th>
+                    <th>Copiar Enlace</th> <!-- Nueva columna -->
                 </tr>
             </thead>
             <tbody>
@@ -91,28 +134,36 @@ $result = $conn->query($sql);
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
                         $item = $row['item']; 
+                        $id = $row['id']; 
                         $nombre = $row['nombre'];
                         $estado = $row['estado'];
                         $fecha_creacion = $row['fecha_creacion'];
 
-                        // Definir clases de estado
-                        $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : 'enviado';
+                        // URL de confirmación generada dinámicamente usando el id
+                        $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $id;
+
+                        // Definir clase de estilo según el estado
+                        $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
 
                         echo "<tr>";
                         echo "<td>" . $item . "</td>";
                         echo "<td>" . $nombre . "</td>";
-                        echo '<td class="' . $estadoClass . '">' . $estado . '</td>';
+                        echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
                         echo "<td>" . $fecha_creacion . "</td>";
-                        // Enlace a ver los detalles del pedido, pasando el item como parámetro
-                        echo '<td><a href="ver_pedido.html?id=' . $item . '">Ver Detalles</a></td>';
+                        // Cambiar el enlace a ver_pedido.html con la URL correcta
+                        echo '<td><a href="https://printecenvios-production.up.railway.app/ver_pedido.html?id=' . $item . '">Ver Detalles</a></td>';
+                        echo '<td><input type="hidden" id="link_' . $id . '" value="' . $urlConfirmacion . '">
+                        <button class="copy-btn" onclick="copyToClipboard(\'link_' . $id . '\')">Copiar enlace</button></td>';
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='5'>No hay envíos</td></tr>";
+                    echo "<tr><td colspan='6'>No hay envíos</td></tr>";
                 }
 
-                // Cerrar la conexión
-                $conn->close();
+                // Cerrar la conexión a la base de datos
+                if ($conn !== null && $conn->connect_error == null) {
+                    $conn->close();
+                }
                 ?>
             </tbody>
         </table>
