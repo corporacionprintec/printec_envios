@@ -143,23 +143,26 @@
             const params = new URLSearchParams(window.location.search);
             const pedidoId = params.get('id');
             
-            fetch(`/php/obtener_detalles_pedido.php?id=${pedidoId}`)
+            fetch(`/php/ver_pedido.php?id=${pedidoId}`)
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    document.getElementById('item').innerText = data.pedido.item;
-                    document.getElementById('nombre').innerText = data.pedido.nombre;
-                    document.getElementById('dni').innerText = data.pedido.dni;
-                    document.getElementById('telefono').innerText = data.pedido.telefono;
-                    document.getElementById('tipoEnvio').innerText = data.pedido.tipo_envio;
-                    document.getElementById('direccion').innerText = data.pedido.direccion;
-                    document.getElementById('agencia').innerText = data.pedido.agencia;
-                    document.getElementById('estado').innerText = data.pedido.estado;
+                if (data.error) {
+                    alert('Error: ' + data.error);
                 } else {
-                    alert('No se encontraron detalles para el pedido.');
+                    // Colocar los datos del pedido en los elementos correspondientes
+                    document.getElementById('item').innerText = data.item;
+                    document.getElementById('nombre').innerText = data.nombre;
+                    document.getElementById('dni').innerText = data.dni;
+                    document.getElementById('telefono').innerText = data.telefono;
+                    document.getElementById('tipoEnvio').innerText = data.tipo_envio;
+                    document.getElementById('direccion').innerText = data.direccion;
+                    document.getElementById('agencia').innerText = data.agencia;
+                    document.getElementById('estado').innerText = data.estado;
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error al obtener los detalles del pedido:', error);
+            });
         }
 
         window.onload = cargarDetallesPedido;
