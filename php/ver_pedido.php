@@ -158,8 +158,8 @@ $conn->close();
             printDocument.write('</style>');
             printDocument.write('</head><body>');
 
-            // Logo de la empresa
-            printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
+            // Logo de la empresa (URL absoluta)
+            printDocument.write('<img src="https://printecenvios-production.up.railway.app/php/images_ventas/images.png" alt="Logo de la empresa" class="logo">');
 
             // Datos del Remitente
             printDocument.write('<div class="container remitente">');
@@ -191,7 +191,7 @@ $conn->close();
 <body>
     <div class="container">
         <!-- Logo de la empresa -->
-        <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
+        <img src="https://printecenvios-production.up.railway.app/php/images_ventas/images.png" alt="Logo de la empresa" class="logo">
         <h1>Detalles del Pedido</h1>
         <?php if ($pedido): ?>
             <div class="details">
