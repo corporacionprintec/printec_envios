@@ -37,8 +37,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("ssi", $comprobanteEnvioRuta, $claveEnvio, $item);
 
     if ($stmt->execute()) {
-        // Redirigir a la página de detalles del pedido con el estado actualizado
-        header("Location: ver_pedido.php?id=$item");
+        // Redirigir a la página de confirmación con el estado actualizado
+        header("Location: confirmacion.html?id=$item");
         exit();
     } else {
         echo "Error: " . $stmt->error;
