@@ -150,7 +150,8 @@ $result = $conn->query($sql);
                         echo "<td>" . $nombre . "</td>";
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
                         echo "<td>" . $fecha_creacion . "</td>";
-                        echo '<td><a href="ver_pedido.php?id=' . $item . '">Ver Detalles</a></td>';
+                        // Cambiar el enlace a ver_pedido.html
+                        echo '<td><a href="ver_pedido.html?id=' . $item . '">Ver Detalles</a></td>';
                         echo '<td><input type="hidden" id="link_' . $id . '" value="' . $urlConfirmacion . '">
                         <button class="copy-btn" onclick="copyToClipboard(\'link_' . $id . '\')">Copiar enlace</button></td>';
                         echo "</tr>";
