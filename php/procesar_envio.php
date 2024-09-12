@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($stmt->execute()) {
         // Redirigir a la página de confirmación con el estado actualizado
-        header("Location: confirmacion.html?id=$item");
+        header("Location: ../confirmacion.html?id=$item");
         exit();
     } else {
         echo "Error: " . $stmt->error;
