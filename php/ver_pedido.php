@@ -158,8 +158,8 @@ $conn->close();
             printDocument.write('</style>');
             printDocument.write('</head><body>');
 
-            // Logo de la empresa (URL absoluta)
-            printDocument.write('<img src="https://printecenvios-production.up.railway.app/php/images_ventas/images.png" alt="Logo de la empresa" class="logo">');
+            // Logo de la empresa (URL absoluta) con un evento onerror
+            printDocument.write('<img src="https://printecenvios-production.up.railway.app/php/images_ventas/images.png" alt="Logo de la empresa" class="logo" onerror="alert(\'Error al cargar el logo\')">');
 
             // Datos del Remitente
             printDocument.write('<div class="container remitente">');
