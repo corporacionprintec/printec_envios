@@ -15,10 +15,10 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $item = intval($_POST['item']);
+    $item = intval($_POST['item']); // Asegúrate de que este valor se está recibiendo correctamente
     $claveEnvio = $_POST['claveEnvio'];
 
-    // Verificar si el archivo fue subido correctamente
+    // Manejar la subida de la imagen
     $comprobanteEnvioRuta = '';
     if (isset($_FILES['comprobanteEnvio']) && $_FILES['comprobanteEnvio']['error'] == UPLOAD_ERR_OK) {
         $target_dir = "uploads/";
@@ -29,8 +29,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "Error al subir el archivo.";
             exit();
         }
-    } else {
-        echo "No se seleccionó ningún archivo.";
     }
 
     // Actualizar el pedido con el comprobante, clave de envío y estado
@@ -39,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("ssi", $comprobanteEnvioRuta, $claveEnvio, $item);
 
     if ($stmt->execute()) {
-        // Redirigir a la página de confirmación
+        // Redirigir a la página de confirmación con el item correcto
         header("Location: ../confirmacion.html?id=$item");
         exit();
     } else {
