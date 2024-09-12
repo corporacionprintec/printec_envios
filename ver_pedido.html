@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Pedido</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin: 50px auto;
+            max-width: 800px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+        }
+        .details {
+            text-align: left;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .logo {
+            width: 150px;
+            margin: 0 auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <img src="logo.png" alt="Logo de la empresa" class="logo">
+    <h1>Detalles del Pedido</h1>
+
+    <div class="details">
+        <p><strong>ID:</strong> <span id="pedidoId"></span></p>
+        <p><strong>Nombre:</strong> <span id="nombre"></span></p>
+        <p><strong>DNI:</strong> <span id="dni"></span></p>
+        <p><strong>Teléfono:</strong> <span id="telefono"></span></p>
+        <p><strong>Dirección:</strong> <span id="direccion"></span></p>
+        <p><strong>Agencia:</strong> <span id="agencia"></span></p>
+        <p><strong>Estado:</strong> <span id="estado"></span></p>
+    </div>
+</div>
+
+<script>
+    // Obtener el ID del pedido desde la URL
+    const params = new URLSearchParams(window.location.search);
+    const pedidoId = params.get('id');
+
+    // Verificar si se obtuvo el id correctamente
+    console.log("ID del pedido:", pedidoId);
+
+    // Usar Fetch API para obtener los datos del pedido
+    fetch(`https://printecenvios-production.up.railway.app/php/ver_pedido.php?id=${pedidoId}`)
+        .then(response => {
+            // Verificar si la respuesta es correcta
+            if (!response.ok) {
+                throw new Error('Error en la respuesta de la red');
+            }
+            return response.json(); // Parsear la respuesta a JSON
+        })
+        .then(data => {
+            // Mostrar la respuesta en la consola
+            console.log("Datos obtenidos:", data);
+
+            if (data.error) {
+                alert(data.error);
+            } else {
+                // Inyectar los datos en el HTML
+                document.getElementById('pedidoId').textContent = data.item;
+                document.getElementById('nombre').textContent = data.nombre;
+                document.getElementById('dni').textContent = data.dni;
+                document.getElementById('telefono').textContent = data.telefono;
+                document.getElementById('direccion').textContent = data.direccion;
+                document.getElementById('agencia').textContent = data.agencia;
+                document.getElementById('estado').textContent = data.estado;
+            }
+        })
+        .catch(error => {
+            console.error('Error al obtener el pedido:', error);
+            alert('Ocurrió un error al cargar los datos del pedido');
+        });
+</script>
+
+</body>
+</html>
