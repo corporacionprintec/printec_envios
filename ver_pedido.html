@@ -31,64 +31,166 @@
             margin: 0 auto;
             display: block;
         }
+        .input-group {
+            margin: 20px 0;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
     </style>
+    <script>
+        // Obtener el ID del pedido desde la URL
+        const params = new URLSearchParams(window.location.search);
+        const pedidoId = params.get('id');
+
+        // Verificar si se obtuvo el id correctamente
+        console.log("ID del pedido:", pedidoId);
+
+        // Usar Fetch API para obtener los datos del pedido
+        fetch(`https://printecenvios-production.up.railway.app/php/ver_pedido.php?id=${pedidoId}`)
+            .then(response => {
+                // Verificar si la respuesta es correcta
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta de la red');
+                }
+                return response.json(); // Parsear la respuesta a JSON
+            })
+            .then(data => {
+                // Mostrar la respuesta en la consola
+                console.log("Datos obtenidos:", data);
+
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    // Inyectar los datos en el HTML
+                    document.getElementById('pedidoId').textContent = data.item;
+                    document.getElementById('nombre').textContent = data.nombre;
+                    document.getElementById('dni').textContent = data.dni;
+                    document.getElementById('telefono').textContent = data.telefono;
+                    document.getElementById('direccion').textContent = data.direccion;
+                    document.getElementById('agencia').textContent = data.agencia;
+                    document.getElementById('estado').textContent = data.estado;
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener el pedido:', error);
+                alert('Ocurrió un error al cargar los datos del pedido');
+            });
+
+        // Función para habilitar el botón de envío solo cuando todos los campos estén completos
+        function enableButton() {
+            var comprobanteEnvio = document.getElementById('comprobanteEnvio').files.length > 0;
+            var claveEnvio = document.getElementById('claveEnvio').value;
+            var enviarButton = document.getElementById('enviarButton');
+
+            if (comprobanteEnvio && claveEnvio) {
+                enviarButton.disabled = false;
+            } else {
+                enviarButton.disabled = true;
+            }
+        }
+
+        // Función para imprimir el membrete
+        function printMembrete() {
+            var printWindow = window.open('', '', 'height=600,width=800');
+            var printDocument = printWindow.document;
+
+            printDocument.open();
+            printDocument.write('<html><head><title>Imprimir Membrete</title>');
+            printDocument.write('<style>');
+            printDocument.write('body { font-family: Arial, sans-serif; margin: 20px; padding: 0; }');
+            printDocument.write('h1 { font-size: 32px; margin-bottom: 20px; }');
+            printDocument.write('p { font-size: 27px; margin: 10px 0; line-height: 1.5; }');
+            printDocument.write('.container { max-width: 800px; margin: 0 auto; }');
+            printDocument.write('.logo { width: 200px; display: block; margin: 0 auto 20px; }');
+            printDocument.write('.remitente { padding: 10px; border-radius: 5px; margin-bottom: 20px; }');
+            printDocument.write('.destinatario { color: #dc3545; padding: 10px; border-radius: 5px; }'); // Rojo
+            printDocument.write('</style>');
+            printDocument.write('</head><body>');
+
+            // Logo de la empresa
+            printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
+
+            // Datos del Remitente
+            printDocument.write('<div class="container remitente">');
+            printDocument.write('<h1>Datos del Remitente</h1>');
+            printDocument.write('<p><strong>De:</strong> Eyter Yoel Rojas Sanchez</p>');
+            printDocument.write('<p><strong>Dirección:</strong> Calle Huanuco N201 Ica-Ica-Ica</p>');
+            printDocument.write('<p><strong>Cel:</strong> 966177851</p>');
+            printDocument.write('<p><strong>RUC/DNI:</strong> 75532635</p>');
+            printDocument.write('</div>');
+
+            // Datos del Destinatario
+            printDocument.write('<div class="container destinatario">');
+            printDocument.write('<h1>Datos del Destinatario</h1>');
+            printDocument.write('<p><strong>Nombre:</strong> ' + document.getElementById('nombre').innerText + '</p>');
+            printDocument.write('<p><strong>DNI:</strong> ' + document.getElementById('dni').innerText + '</p>');
+            printDocument.write('<p><strong>Teléfono:</strong> ' + document.getElementById('telefono').innerText + '</p>');
+            printDocument.write('<p><strong>Tipo de Envío:</strong> ' + document.getElementById('tipoEnvio').innerText + '</p>');
+            printDocument.write('<p><strong>Dirección:</strong> ' + document.getElementById('direccion').innerText + '</p>');
+            printDocument.write('<p><strong>Agencia:</strong> ' + document.getElementById('agencia').innerText + '</p>');
+
+            printDocument.write('</div>');
+            printDocument.write('</body></html>');
+            printDocument.close();
+
+            printWindow.print();
+        }
+    </script>
 </head>
 <body>
+    <div class="container">
+        <img src="logo.png" alt="Logo de la empresa" class="logo">
+        <h1>Detalles del Pedido</h1>
+        <div class="details">
+            <p><strong>ID:</strong> <span id="pedidoId"></span></p>
+            <p><strong>Nombre:</strong> <span id="nombre"></span></p>
+            <p><strong>DNI:</strong> <span id="dni"></span></p>
+            <p><strong>Teléfono:</strong> <span id="telefono"></span></p>
+            <p><strong>Dirección:</strong> <span id="direccion"></span></p>
+            <p><strong>Agencia:</strong> <span id="agencia"></span></p>
+            <p><strong>Estado:</strong> <span id="estado"></span></p>
+        </div>
 
-<div class="container">
-    <img src="logo.png" alt="Logo de la empresa" class="logo">
-    <h1>Detalles del Pedido</h1>
+        <!-- Formulario para enviar comprobante de envío y clave de envío -->
+        <form action="procesar_envio.php" method="post" enctype="multipart/form-data">
+            <div class="input-group">
+                <label for="comprobanteEnvio">Enviar Comprobante de Envío</label>
+                <input type="file" id="comprobanteEnvio" name="comprobanteEnvio" accept="image/*" onchange="enableButton()">
+            </div>
+            <div class="input-group">
+                <label for="claveEnvio">Clave de Envío</label>
+                <input type="text" id="claveEnvio" name="claveEnvio" onkeyup="enableButton()">
+            </div>
+            <input type="hidden" name="item" value="" id="hiddenItemId">
+            <button type="submit" id="enviarButton" class="btn" disabled>Enviar</button>
+        </form>
 
-    <div class="details">
-        <p><strong>ID:</strong> <span id="pedidoId"></span></p>
-        <p><strong>Nombre:</strong> <span id="nombre"></span></p>
-        <p><strong>DNI:</strong> <span id="dni"></span></p>
-        <p><strong>Teléfono:</strong> <span id="telefono"></span></p>
-        <p><strong>Dirección:</strong> <span id="direccion"></span></p>
-        <p><strong>Agencia:</strong> <span id="agencia"></span></p>
-        <p><strong>Estado:</strong> <span id="estado"></span></p>
+        <!-- Botón para imprimir el membrete -->
+        <button type="button" onclick="printMembrete()">Imprimir Membrete</button>
     </div>
-</div>
-
-<script>
-    // Obtener el ID del pedido desde la URL
-    const params = new URLSearchParams(window.location.search);
-    const pedidoId = params.get('id');
-
-    // Verificar si se obtuvo el id correctamente
-    console.log("ID del pedido:", pedidoId);
-
-    // Usar Fetch API para obtener los datos del pedido
-    fetch(`https://printecenvios-production.up.railway.app/php/ver_pedido.php?id=${pedidoId}`)
-        .then(response => {
-            // Verificar si la respuesta es correcta
-            if (!response.ok) {
-                throw new Error('Error en la respuesta de la red');
-            }
-            return response.json(); // Parsear la respuesta a JSON
-        })
-        .then(data => {
-            // Mostrar la respuesta en la consola
-            console.log("Datos obtenidos:", data);
-
-            if (data.error) {
-                alert(data.error);
-            } else {
-                // Inyectar los datos en el HTML
-                document.getElementById('pedidoId').textContent = data.item;
-                document.getElementById('nombre').textContent = data.nombre;
-                document.getElementById('dni').textContent = data.dni;
-                document.getElementById('telefono').textContent = data.telefono;
-                document.getElementById('direccion').textContent = data.direccion;
-                document.getElementById('agencia').textContent = data.agencia;
-                document.getElementById('estado').textContent = data.estado;
-            }
-        })
-        .catch(error => {
-            console.error('Error al obtener el pedido:', error);
-            alert('Ocurrió un error al cargar los datos del pedido');
-        });
-</script>
-
 </body>
 </html>
