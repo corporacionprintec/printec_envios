@@ -75,6 +75,15 @@ $result = $conn->query($sql);
             cursor: pointer;
             border-radius: 5px;
         }
+        /* Estilos para el estado pendiente y enviado */
+        .pendiente {
+            color: red;
+            font-weight: bold;
+        }
+        .enviado {
+            color: green;
+            font-weight: bold;
+        }
     </style>
     <script>
         // Función para copiar el enlace al portapapeles
@@ -110,18 +119,20 @@ $result = $conn->query($sql);
                         $id = $row['id']; 
                         $nombre = $row['nombre'];
                         $estado = $row['estado'];
-                        $fecha_creacion = $row['fecha_creacion']; // Usar fecha_creacion
+                        $fecha_creacion = $row['fecha_creacion'];
 
                         // URL de confirmación generada dinámicamente usando el id
                         $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $id;
 
+                        // Definir clase de estilo según el estado
+                        $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
+
                         echo "<tr>";
                         echo "<td>" . $item . "</td>";
                         echo "<td>" . $nombre . "</td>";
-                        echo "<td>" . $estado . "</td>";
-                        echo "<td>" . $fecha_creacion . "</td>"; // Mostrar la fecha de creación
+                        echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
+                        echo "<td>" . $fecha_creacion . "</td>";
                         echo '<td><a href="ver_pedido.php?id=' . $item . '">Ver Detalles</a></td>';
-                        // Input oculto con el enlace y botón para copiar
                         echo '<td><input type="hidden" id="link_' . $id . '" value="' . $urlConfirmacion . '">
                         <button class="copy-btn" onclick="copyToClipboard(\'link_' . $id . '\')">Copiar enlace</button></td>';
                         echo "</tr>";
@@ -130,6 +141,7 @@ $result = $conn->query($sql);
                     echo "<tr><td colspan='6'>No hay envíos</td></tr>";
                 }
 
+                // Cerrar la conexión a la base de datos
                 if ($conn !== null && $conn->connect_error == null) {
                     $conn->close();
                 }
