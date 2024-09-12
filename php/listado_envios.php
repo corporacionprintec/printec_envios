@@ -14,7 +14,7 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Consulta SQL para seleccionar los campos junto con la fecha_creacion
+// Consulta SQL para seleccionar todos los campos sin límite
 $sql = "SELECT item, id, nombre, estado, fecha_creacion FROM clientes ORDER BY item DESC";
 $result = $conn->query($sql);
 ?>
