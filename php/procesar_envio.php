@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $item = intval($_POST['item']);
     $claveEnvio = $_POST['claveEnvio'];
 
-    // Manejar la subida de la imagen
+    // Verificar si el archivo fue subido correctamente
     $comprobanteEnvioRuta = '';
     if (isset($_FILES['comprobanteEnvio']) && $_FILES['comprobanteEnvio']['error'] == UPLOAD_ERR_OK) {
         $target_dir = "uploads/";
@@ -29,15 +29,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "Error al subir el archivo.";
             exit();
         }
+    } else {
+        echo "No se seleccionó ningún archivo.";
     }
 
-    // Actualizar el pedido
+    // Actualizar el pedido con el comprobante, clave de envío y estado
     $sql = "UPDATE clientes SET comprobanteEnvioRuta = ?, claveEnvio = ?, estado = 'enviado' WHERE item = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssi", $comprobanteEnvioRuta, $claveEnvio, $item);
 
     if ($stmt->execute()) {
-        // Redirigir a la página de confirmación con el estado actualizado
+        // Redirigir a la página de confirmación
         header("Location: ../confirmacion.html?id=$item");
         exit();
     } else {
