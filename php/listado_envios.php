@@ -14,8 +14,11 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Consulta SQL para seleccionar todos los campos sin límite
-$sql = "SELECT item, id, nombre, estado, fecha_creacion FROM clientes ORDER BY item DESC";
+// Obtener el límite de registros seleccionados por el usuario (si no se selecciona, el valor por defecto es 10)
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+
+// Consulta SQL con límite de resultados según la selección
+$sql = "SELECT item, id, nombre, estado, fecha_creacion FROM clientes ORDER BY item DESC LIMIT $limit";
 $result = $conn->query($sql);
 ?>
 
@@ -100,6 +103,21 @@ $result = $conn->query($sql);
 <body>
     <div class="container">
         <h1>Listado de Envíos</h1>
+
+        <!-- Filtro de cantidad de registros a mostrar -->
+        <form method="GET" action="">
+            <label for="limit">Mostrar:</label>
+            <select name="limit" id="limit" onchange="this.form.submit()">
+                <option value="10" <?php echo $limit == 10 ? 'selected' : ''; ?>>10</option>
+                <option value="20" <?php echo $limit == 20 ? 'selected' : ''; ?>>20</option>
+                <option value="50" <?php echo $limit == 50 ? 'selected' : ''; ?>>50</option>
+                <option value="100" <?php echo $limit == 100 ? 'selected' : ''; ?>>100</option>
+                <option value="500" <?php echo $limit == 500 ? 'selected' : ''; ?>>500</option>
+                <option value="1000" <?php echo $limit == 1000 ? 'selected' : ''; ?>>1000</option>
+                <option value="10000" <?php echo $limit == 10000 ? 'selected' : ''; ?>>10,000</option>
+            </select>
+        </form>
+
         <table>
             <thead>
                 <tr>
