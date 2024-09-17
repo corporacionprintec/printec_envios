@@ -47,25 +47,9 @@
         }
 
         .logo-qr {
-            display: none; /* Ocultar en pantalla */
+            display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        /* Estilos para impresión */
-        @media print {
-            .logo-qr {
-                display: flex; /* Mostrar en la impresión */
-                justify-content: space-between;
-            }
-
-            .no-print {
-                display: none; /* Ocultar el contenido que no debe imprimirse */
-            }
-
-            .details {
-                page-break-inside: avoid;
-            }
         }
 
         .logo {
@@ -75,6 +59,23 @@
 
         .qr-code {
             width: 150px;
+        }
+
+        /* Estilos para impresión */
+        @media print {
+            .logo-qr {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .no-print {
+                display: none;
+            }
+
+            .details {
+                page-break-inside: avoid;
+            }
         }
 
         .input-group {
@@ -142,8 +143,8 @@
             printDocument.write('</style>');
             printDocument.write('</head><body>');
             printDocument.write('<div class="logo-qr">');
-            printDocument.write('<img src="codigo_printec.png" alt="Logo de la empresa" class="logo">');
-            printDocument.write('<img src="image.png" alt="Código QR" class="qr-code">');
+            printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
+            printDocument.write('<img src="images_ventas/codigo%20printec.png" alt="Código QR" class="qr-code">');
             printDocument.write('</div>');
             printDocument.write('<div class="container remitente">');
             printDocument.write('<h1>Datos del Remitente</h1>');
