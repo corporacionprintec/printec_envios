@@ -85,6 +85,20 @@
             background-color: #ccc;
             cursor: not-allowed;
         }
+
+        /* Estilos específicos para impresión */
+        @media print {
+            .qr {
+                display: block;
+                width: 150px;
+                margin: 20px auto;
+            }
+        }
+
+        /* Ocultar el código QR por defecto */
+        .qr {
+            display: none;
+        }
     </style>
     <script>
         function enableButton() {
@@ -111,11 +125,13 @@
             printDocument.write('p { font-size: 27px; margin: 10px 0; line-height: 1.5; }');
             printDocument.write('.container { max-width: 800px; margin: 0 auto; }');
             printDocument.write('.logo { width: 200px; display: block; margin: 0 auto 20px; }');
+            printDocument.write('.qr { display: block; width: 150px; margin: 20px auto; }');
             printDocument.write('.remitente { padding: 10px; border-radius: 5px; margin-bottom: 20px; }');
             printDocument.write('.destinatario { color: #dc3545; padding: 10px; border-radius: 5px; }');
             printDocument.write('</style>');
             printDocument.write('</head><body>');
             printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
+            printDocument.write('<img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">');
             printDocument.write('<div class="container remitente">');
             printDocument.write('<h1>Datos del Remitente</h1>');
             printDocument.write('<p><strong>De:</strong> Eyter Yoel Rojas Sanchez</p>');
@@ -172,6 +188,7 @@
     <div class="container">
         <!-- Logo de la empresa -->
         <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
+        
         <h1>Detalles del Pedido</h1>
         <div class="details">
             <p class="highlight"><strong>ID:</strong> <span id="item"></span></p>
