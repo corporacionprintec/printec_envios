@@ -1,3 +1,31 @@
+<?php
+// Verificar si las variables de entorno están definidas (producción) o usar valores por defecto (desarrollo local)
+$servername = getenv('DB_HOST') ?: 'localhost';
+$username = getenv('DB_USER') ?: 'root';
+$password = getenv('DB_PASS') ?: '';
+$dbname = getenv('DB_NAME') ?: 'envios_clientes';
+$port = getenv('DB_PORT') ?: '3306';
+
+// Conexión a la base de datos
+$conn = new mysqli($servername, $username, $password, $dbname, $port);
+
+// Verificar la conexión
+if ($conn->connect_error) {
+    die("Conexión fallida: " . $conn->connect_error);
+}
+
+// Obtener el límite de registros seleccionados por el usuario (si no se selecciona, el valor por defecto es 10)
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+
+// Consulta SQL con límite de resultados según la selección
+$sql = "SELECT item, id, nombre, estado, fecha_creacion FROM clientes ORDER BY item DESC LIMIT $limit";
+$result = $conn->query($sql);
+
+if (!$result) {
+    die("Error en la consulta: " . $conn->error);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,7 +41,7 @@
         }
         .container {
             margin: 50px auto;
-            max-width: 100%;
+            max-width: 800px;
             background-color: white;
             padding: 20px;
             border-radius: 10px;
@@ -23,11 +51,6 @@
             text-align: center;
             color: #333;
         }
-        /* Contenedor de la tabla para permitir scroll horizontal en dispositivos móviles */
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -36,7 +59,6 @@
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid #ddd;
-            white-space: nowrap; /* Evitar que el texto se rompa en varias líneas */
         }
         th {
             background-color: #007bff;
@@ -69,17 +91,6 @@
             color: green;
             font-weight: bold;
         }
-        /* Estilos específicos para pantallas pequeñas (móviles) */
-        @media screen and (max-width: 600px) {
-            th, td {
-                padding: 8px;
-                font-size: 12px;
-            }
-            .copy-btn {
-                padding: 6px 10px;
-                font-size: 12px;
-            }
-        }
     </style>
     <script>
         // Función para copiar el enlace al portapapeles
@@ -111,57 +122,55 @@
             </select>
         </form>
 
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Items</th>
-                        <th>Nombre</th>
-                        <th>Estado</th>
-                        <th>Fecha de Creación</th> <!-- Nueva columna para la fecha -->
-                        <th>Acción</th>
-                        <th>Copiar Enlace</th> <!-- Nueva columna -->
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    if ($result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) {
-                            $item = $row['item']; 
-                            $id = $row['id']; 
-                            $nombre = $row['nombre'];
-                            $estado = $row['estado'];
-                            $fecha_creacion = $row['fecha_creacion'];
+        <table>
+            <thead>
+                <tr>
+                    <th>Items</th>
+                    <th>Nombre</th>
+                    <th>Estado</th>
+                    <th>Fecha de Creación</th> <!-- Nueva columna para la fecha -->
+                    <th>Acción</th>
+                    <th>Copiar Enlace</th> <!-- Nueva columna -->
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $item = $row['item']; 
+                        $id = $row['id']; 
+                        $nombre = $row['nombre'];
+                        $estado = $row['estado'];
+                        $fecha_creacion = $row['fecha_creacion'];
 
-                            // URL de confirmación generada dinámicamente usando el id
-                            $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $id;
+                        // URL de confirmación generada dinámicamente usando el id
+                        $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $id;
 
-                            // Definir clase de estilo según el estado
-                            $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
+                        // Definir clase de estilo según el estado
+                        $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
 
-                            echo "<tr>";
-                            echo "<td>" . $item . "</td>";
-                            echo "<td>" . $nombre . "</td>";
-                            echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
-                            echo "<td>" . $fecha_creacion . "</td>";
-                            // Cambiar el enlace a ver_pedido.html con la URL correcta
-                            echo '<td><a href="https://printecenvios-production.up.railway.app/ver_pedido.html?id=' . $item . '">Ver Detalles</a></td>';
-                            echo '<td><input type="hidden" id="link_' . $id . '" value="' . $urlConfirmacion . '">
-                            <button class="copy-btn" onclick="copyToClipboard(\'link_' . $id . '\')">Copiar enlace</button></td>';
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='6'>No hay envíos</td></tr>";
+                        echo "<tr>";
+                        echo "<td>" . $item . "</td>";
+                        echo "<td>" . $nombre . "</td>";
+                        echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
+                        echo "<td>" . $fecha_creacion . "</td>";
+                        // Cambiar el enlace a ver_pedido.html con la URL correcta
+                        echo '<td><a href="https://printecenvios-production.up.railway.app/ver_pedido.html?id=' . $item . '">Ver Detalles</a></td>';
+                        echo '<td><input type="hidden" id="link_' . $id . '" value="' . $urlConfirmacion . '">
+                        <button class="copy-btn" onclick="copyToClipboard(\'link_' . $id . '\')">Copiar enlace</button></td>';
+                        echo "</tr>";
                     }
+                } else {
+                    echo "<tr><td colspan='6'>No hay envíos</td></tr>";
+                }
 
-                    // Cerrar la conexión a la base de datos
-                    if ($conn !== null && $conn->connect_error == null) {
-                        $conn->close();
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </div>
+                // Cerrar la conexión a la base de datos
+                if ($conn !== null && $conn->connect_error == null) {
+                    $conn->close();
+                }
+                ?>
+            </tbody>
+        </table>
     </div>
 </body>
 </html>
