@@ -24,6 +24,7 @@
             color: #333;
             font-size: 24px;
             margin-bottom: 20px;
+            clear: both;
         }
         .details {
             margin: 20px 0;
@@ -40,26 +41,27 @@
         .details p strong {
             color: #333;
         }
-        .details a {
-            color: #007bff;
-            text-decoration: none;
+        .logo {
+            width: 150px;
+            float: left;
         }
-        .details a:hover {
-            text-decoration: underline;
+        .qr {
+            width: 150px;
+            float: right;
         }
-        .details .highlight {
-            background-color: #f1f1f1;
+        .clearfix {
+            clear: both;
+        }
+        .remitente, .destinatario {
+            margin: 20px 0;
             padding: 10px;
             border-radius: 5px;
         }
-        .logo {
-            width: 150px;
-            margin-bottom: 20px;
+        .remitente {
+            background-color: #f1f1f1;
         }
-        .qr {
-            display: none; /* Ocultamos por defecto el código QR */
-            width: 150px;
-            margin: 20px auto;
+        .destinatario {
+            background-color: #e9ecef;
         }
         .input-group {
             margin: 20px 0;
@@ -94,7 +96,9 @@
         /* Estilos específicos para impresión */
         @media print {
             .qr {
-                display: block; /* El código QR se muestra al imprimir */
+                display: block;
+                width: 150px;
+                float: right;
             }
         }
     </style>
@@ -149,13 +153,25 @@
     <div class="container">
         <!-- Logo de la empresa -->
         <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
-
         <!-- Código QR (Solo se mostrará en la impresión) -->
         <img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">
 
+        <div class="clearfix"></div>
+
         <h1>Detalles del Pedido</h1>
-        <div class="details">
-            <p class="highlight"><strong>ID:</strong> <span id="item"></span></p>
+
+        <!-- Información del Remitente -->
+        <div class="remitente">
+            <h2>Datos del Remitente</h2>
+            <p><strong>De:</strong> Eyter Yoel Rojas Sanchez</p>
+            <p><strong>Dirección:</strong> Calle Huanuco N201 Ica-Ica-Ica</p>
+            <p><strong>Cel:</strong> 966177851</p>
+            <p><strong>RUC/DNI:</strong> 75532635</p>
+        </div>
+
+        <!-- Información del Cliente -->
+        <div class="destinatario">
+            <h2>Datos del Destinatario</h2>
             <p><strong>Nombre:</strong> <span id="nombre"></span></p>
             <p><strong>DNI:</strong> <span id="dni"></span></p>
             <p><strong>Teléfono:</strong> <span id="telefono"></span></p>
