@@ -18,11 +18,12 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            page-break-inside: avoid;
         }
         .header {
             position: relative;
             width: 100%;
-            height: 150px;
+            height: 180px; /* Aumentamos el espacio en el header */
             margin-bottom: 20px;
         }
         .logo {
@@ -41,6 +42,7 @@
             color: #333;
             font-size: 24px;
             margin-bottom: 20px;
+            clear: both;
             text-align: center;
         }
         .details {
@@ -50,7 +52,6 @@
             border-radius: 10px;
             text-align: left;
             font-size: 14px;
-            clear: both;
         }
         .details p {
             margin: 8px 0;
@@ -59,6 +60,13 @@
         }
         .details p strong {
             color: #333;
+        }
+        .details a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .details a:hover {
+            text-decoration: underline;
         }
         .details .highlight {
             background-color: #f1f1f1;
@@ -94,20 +102,6 @@
             background-color: #ccc;
             cursor: not-allowed;
         }
-
-        /* Estilos para que los datos del remitente solo aparezcan en la impresión */
-        @media print {
-            .remitente {
-                display: block;
-                margin-top: 150px; /* Ajustar para que empiece debajo del logo */
-                clear: both;
-            }
-        }
-
-        /* Ocultar los datos del remitente en la vista normal */
-        .remitente {
-            display: none;
-        }
     </style>
     <script>
         function enableButton() {
@@ -123,7 +117,44 @@
         }
 
         function printMembrete() {
-            window.print(); // Llama a la función de impresión nativa del navegador
+            var printWindow = window.open('', '', 'height=600,width=800');
+            var printDocument = printWindow.document;
+
+            printDocument.open();
+            printDocument.write('<html><head><title>Imprimir Membrete</title>');
+            printDocument.write('<style>');
+            printDocument.write('body { font-family: Arial, sans-serif; margin: 20px; padding: 0; }');
+            printDocument.write('h1 { font-size: 32px; margin-bottom: 20px; }');
+            printDocument.write('p { font-size: 27px; margin: 10px 0; line-height: 1.5; }');
+            printDocument.write('.container { max-width: 800px; margin: 0 auto; }');
+            printDocument.write('.logo { width: 150px; float: left; }');
+            printDocument.write('.qr { width: 150px; float: right; }');
+            printDocument.write('.remitente { padding: 10px; border-radius: 5px; margin-bottom: 20px; }');
+            printDocument.write('.destinatario { color: #dc3545; padding: 10px; border-radius: 5px; }');
+            printDocument.write('</style>');
+            printDocument.write('</head><body>');
+            printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
+            printDocument.write('<img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">');
+            printDocument.write('<div class="container remitente">');
+            printDocument.write('<h1>Datos del Remitente</h1>');
+            printDocument.write('<p><strong>De:</strong> Eyter Yoel Rojas Sanchez</p>');
+            printDocument.write('<p><strong>Dirección:</strong> Calle Huanuco N201 Ica-Ica-Ica</p>');
+            printDocument.write('<p><strong>Cel:</strong> 966177851</p>');
+            printDocument.write('<p><strong>RUC/DNI:</strong> 75532635</p>');
+            printDocument.write('</div>');
+            printDocument.write('<div class="container destinatario">');
+            printDocument.write('<h1>Datos del Destinatario</h1>');
+            printDocument.write('<p><strong>Nombre:</strong> ' + document.getElementById('nombre').innerText + '</p>');
+            printDocument.write('<p><strong>DNI:</strong> ' + document.getElementById('dni').innerText + '</p>');
+            printDocument.write('<p><strong>Teléfono:</strong> ' + document.getElementById('telefono').innerText + '</p>');
+            printDocument.write('<p><strong>Tipo de Envío:</strong> ' + document.getElementById('tipoEnvio').innerText + '</p>');
+            printDocument.write('<p><strong>Dirección:</strong> ' + document.getElementById('direccion').innerText + '</p>');
+            printDocument.write('<p><strong>Agencia:</strong> ' + document.getElementById('agencia').innerText + '</p>');
+            printDocument.write('</div>');
+            printDocument.write('</body></html>');
+            printDocument.close();
+
+            printWindow.print();
         }
 
         // Función para cargar detalles del pedido desde el servidor
@@ -165,15 +196,6 @@
             <img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">
         </div>
         
-        <!-- Datos del remitente, solo visibles al imprimir -->
-        <div class="remitente">
-            <h1>Datos del Remitente</h1>
-            <p><strong>De:</strong> Eyter Yoel Rojas Sanchez</p>
-            <p><strong>Dirección:</strong> Calle Huanuco N201 Ica-Ica-Ica</p>
-            <p><strong>Cel:</strong> 966177851</p>
-            <p><strong>RUC/DNI:</strong> 75532635</p>
-        </div>
-
         <h1>Detalles del Pedido</h1>
 
         <div class="details">
