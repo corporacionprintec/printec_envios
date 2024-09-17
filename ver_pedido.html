@@ -20,7 +20,6 @@
             border-radius: 10px;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
             text-align: center;
-            page-break-inside: avoid;
         }
 
         h1 {
@@ -48,9 +47,25 @@
         }
 
         .logo-qr {
-            display: flex;
+            display: none; /* Ocultar en pantalla */
             justify-content: space-between;
             align-items: center;
+        }
+
+        /* Estilos para impresión */
+        @media print {
+            .logo-qr {
+                display: flex; /* Mostrar en la impresión */
+                justify-content: space-between;
+            }
+
+            .no-print {
+                display: none; /* Ocultar el contenido que no debe imprimirse */
+            }
+
+            .details {
+                page-break-inside: avoid;
+            }
         }
 
         .logo {
@@ -184,11 +199,7 @@
 </head>
 <body>
     <div class="container">
-        <!-- Logo y QR de la empresa -->
-        <div class="logo-qr">
-            <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
-            <img src="images_ventas/codigo printec.png" alt="Código QR" class="qr-code">
-        </div>
+        <!-- Información del pedido sin logo ni QR visible en pantalla -->
         <h1>Detalles del Pedido</h1>
         <div class="details">
             <p class="highlight"><strong>ID:</strong> <span id="item"></span></p>
@@ -203,16 +214,16 @@
 
         <!-- Formulario para enviar comprobante de envío y clave de envío -->
         <form action="/php/procesar_envio.php" method="post" enctype="multipart/form-data">
-            <div class="input-group">
+            <div class="input-group no-print">
                 <label for="comprobanteEnvio">Enviar Comprobante de Envío</label>
                 <input type="file" id="comprobanteEnvio" name="comprobanteEnvio" accept="image/*" onchange="enableButton()">
             </div>
-            <div class="input-group">
+            <div class="input-group no-print">
                 <label for="claveEnvio">Clave de Envío</label>
                 <input type="text" id="claveEnvio" name="claveEnvio" onkeyup="enableButton()">
             </div>
             <input type="hidden" name="item" value="" id="hiddenItemId">
-            <button type="submit" id="enviarButton" class="btn" disabled>Enviar</button>
+            <button type="submit" id="enviarButton" class="btn no-print" disabled>Enviar</button>
         </form>
 
         <!-- Botón para imprimir el membrete -->
