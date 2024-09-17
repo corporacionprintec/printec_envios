@@ -21,28 +21,21 @@
             page-break-inside: avoid;
         }
         .header {
-            position: relative;
-            width: 100%;
-            height: 180px; /* Aumentamos el espacio en el header */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
         }
         .logo {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 150px;
         }
         .qr {
-            position: absolute;
-            top: 0;
-            right: 0;
             width: 150px;
         }
         h1 {
             color: #333;
             font-size: 24px;
             margin-bottom: 20px;
-            clear: both;
             text-align: center;
         }
         .details {
@@ -60,18 +53,6 @@
         }
         .details p strong {
             color: #333;
-        }
-        .details a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .details a:hover {
-            text-decoration: underline;
-        }
-        .details .highlight {
-            background-color: #f1f1f1;
-            padding: 10px;
-            border-radius: 5px;
         }
         .input-group {
             margin: 20px 0;
@@ -102,6 +83,19 @@
             background-color: #ccc;
             cursor: not-allowed;
         }
+
+        /* Estilos para que los datos del remitente solo aparezcan en la impresión */
+        @media print {
+            .remitente {
+                display: block;
+                margin-top: 20px;
+            }
+        }
+
+        /* Ocultar los datos del remitente en la vista normal */
+        .remitente {
+            display: none;
+        }
     </style>
     <script>
         function enableButton() {
@@ -129,12 +123,14 @@
             printDocument.write('.container { max-width: 800px; margin: 0 auto; }');
             printDocument.write('.logo { width: 150px; float: left; }');
             printDocument.write('.qr { width: 150px; float: right; }');
-            printDocument.write('.remitente { padding: 10px; border-radius: 5px; margin-bottom: 20px; }');
+            printDocument.write('.remitente { padding: 10px; border-radius: 5px; margin-bottom: 20px; clear: both; }');
             printDocument.write('.destinatario { color: #dc3545; padding: 10px; border-radius: 5px; }');
             printDocument.write('</style>');
             printDocument.write('</head><body>');
+            printDocument.write('<div class="header">');
             printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
             printDocument.write('<img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">');
+            printDocument.write('</div>');
             printDocument.write('<div class="container remitente">');
             printDocument.write('<h1>Datos del Remitente</h1>');
             printDocument.write('<p><strong>De:</strong> Eyter Yoel Rojas Sanchez</p>');
