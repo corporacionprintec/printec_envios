@@ -91,6 +91,34 @@ if (!$result) {
             color: green;
             font-weight: bold;
         }
+
+        /* Media queries para ajustar el diseño en pantallas pequeñas */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                max-width: 95%;
+            }
+            table {
+                width: 100%;
+                display: block;
+                overflow-x: auto; /* Permitir desplazamiento horizontal en pantallas pequeñas */
+                white-space: nowrap; /* Mantener las filas en una sola línea en móviles */
+            }
+            th, td {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            th, td {
+                font-size: 12px;
+                padding: 8px;
+            }
+            .copy-btn {
+                padding: 6px 10px;
+            }
+        }
     </style>
     <script>
         // Función para copiar el enlace al portapapeles
