@@ -2,13 +2,13 @@
 header('Content-Type: application/json');
 
 // Obtener el ID del cliente de la URL
-$id = isset($_GET['id']) ? (int)$_GET['id'] : null;
+$id = isset($_GET['id']) ? $_GET['id'] : null;
 
 if (!$id) {
     echo json_encode(['error' => 'ID no proporcionado']);
     exit;
 }
-
+;
 $servername = getenv('DB_HOST') ?: 'localhost';
 $username = getenv('DB_USER') ?: 'root';
 $password = getenv('DB_PASS') ?: '';
@@ -33,7 +33,7 @@ if ($stmt === false) {
     exit;
 }
 
-$stmt->bind_param("i", $id);  // Usa 'i' para enteros
+$stmt->bind_param("s", $id);  // Usa 's' para cadenas
 $stmt->execute();
 $result = $stmt->get_result();
 
