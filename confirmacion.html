@@ -139,6 +139,8 @@
                 fetch('php/confirmacion.php?id=' + encodeURIComponent(id))
                     .then(response => response.json())
                     .then(data => {
+                        console.log(data); // Depurar datos recibidos
+
                         if (data && !data.error) {
                             document.getElementById('nombre').innerText = data.nombre || "No disponible";
                             document.getElementById('dni').innerText = data.dni || "No disponible";

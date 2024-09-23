@@ -26,14 +26,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         
         // Mover el archivo subido a la carpeta de destino
         if (move_uploaded_file($_FILES['comprobantePago']['tmp_name'], $uploadFile)) {
-            // Actualizar la ruta del comprobante, la clave de envío y el estado a 'Enviado'
-            $sql = "UPDATE clientes SET comprobanteEnvioRuta = ?, claveEnvio = ?, estado = 'Enviado' WHERE item = ?";
+            // Guardar la ruta del comprobante y la clave de envío en la base de datos
+            $sql = "UPDATE clientes SET comprobanteEnvioRuta = ?, claveEnvio = ? WHERE item = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ssi", $uploadFile, $claveEnvio, $item_id);
 
             if ($stmt->execute()) {
-                // Redirigir a la lista de envíos
-                echo json_encode(['success' => true, 'redirect_url' => 'lista_envios.php']);
+                // Respuesta exitosa en formato JSON
+                echo json_encode(['success' => true, 'comprobantePagoRuta' => $uploadFile]);
             } else {
                 echo json_encode(['error' => 'Error al guardar en la base de datos: ' . $conn->error]);
             }
