@@ -105,6 +105,7 @@
             <form id="upload-comprobante-form" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="id" value="" id="cliente_id_input">
                 <input type="file" name="comprobantePago" accept="image/*" required>
+                <input type="text" name="claveEnvio" placeholder="Ingrese la clave de envío" required>
                 <input type="submit" value="Subir Comprobante de Pago" class="btn">
             </form>
         </div>
@@ -192,7 +193,7 @@
             alert('URL copiada al portapapeles');
         }
 
-        // Subir el comprobante de pago con AJAX y actualizar el contenido
+        // Subir el comprobante de pago con AJAX y redirigir a lista_envios.php
         document.getElementById('upload-comprobante-form').addEventListener('submit', function(e) {
             e.preventDefault();
             var formData = new FormData(this);
@@ -205,7 +206,7 @@
             .then(data => {
                 if (data.success) {
                     alert('Comprobante de pago subido con éxito');
-                    document.getElementById('comprobanteEnvio').innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
+                    window.location.href = data.redirect_url; // Redirigir a lista_envios.php
                 } else {
                     alert('Error al subir el comprobante de pago');
                 }
