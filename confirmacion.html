@@ -91,7 +91,7 @@
             </form>
         </div>
 
-        <!-- Mensaje para redirigir a WhatsApp style="display:none; "-->
+        <!-- Mensaje para redirigir a WhatsApp -->
         <p>Para guardar su enlace de seguimiento, puede enviarse el siguiente mensaje a su WhatsApp:</p>
         <a id="enlaceWhatsApp" href="#" style="text-decoration: none; display:none;" target="_blank">
             <button class="whatsapp-button">
@@ -135,9 +135,8 @@
                             document.getElementById('agencia').innerText = data.agencia;
                             document.getElementById('estado').innerText = data.estado;
 
-                            // mensaje de alamacenaminto en whatasapp
+                            // mensaje de alamacenaminto en WhatsApp
                             var telefonoCliente = data.telefono;
-                            var text = window.location.href;
                             var urlPedido = window.location.href;
                             var mensajeWhatsApp = 'Enlace de seguimiento de pedido Printec: ' + urlPedido;
                             var enlaceWhatsApp = 'https://wa.me/' + telefonoCliente + '?text=' + encodeURIComponent(mensajeWhatsApp);
