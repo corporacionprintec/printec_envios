@@ -43,11 +43,6 @@
             margin: 20px 0;
             text-align: left;
         }
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
         .input-group input[type="file"] {
             margin-bottom: 10px;
         }
@@ -144,6 +139,8 @@
                 fetch('php/confirmacion.php?id=' + encodeURIComponent(id))
                     .then(response => response.json())
                     .then(data => {
+                        console.log(data); // Depurar datos recibidos
+
                         if (data && !data.error) {
                             document.getElementById('nombre').innerText = data.nombre || "No disponible";
                             document.getElementById('dni').innerText = data.dni || "No disponible";
@@ -159,6 +156,7 @@
 
                             document.getElementById('claveEnvio').innerText = data.claveEnvio || "No disponible";
 
+                            // Enlace a WhatsApp con el número del cliente
                             var telefonoCliente = data.telefono;
                             var urlPedido = window.location.href;
                             var mensajeWhatsApp = 'Enlace de seguimiento de pedido Printec: ' + urlPedido;
