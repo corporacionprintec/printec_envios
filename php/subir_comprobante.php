@@ -20,31 +20,37 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $claveEnvio = $_POST['claveEnvio'];
 
     // Verificar que el archivo del comprobante fue subido correctamente
-    if (isset($_FILES['comprobantePago']) && $_FILES['comprobantePago']['error'] == UPLOAD_ERR_OK) {
-        $uploadDir = 'uploads/';
-        $uploadFile = $uploadDir . basename($_FILES['comprobantePago']['name']);
+    if (isset($_FILES['comprobanteEnvio']) && $_FILES['comprobanteEnvio']['error'] === UPLOAD_ERR_OK) {
+        $comprobante = $_FILES['comprobanteEnvio'];
         
-        // Mover el archivo subido a la carpeta de destino
-        if (move_uploaded_file($_FILES['comprobantePago']['tmp_name'], $uploadFile)) {
-            // Guardar la ruta del comprobante y la clave de envío en la base de datos
-            $sql = "UPDATE clientes SET comprobanteEnvioRuta = ?, claveEnvio = ? WHERE item = ?";
+        // Directorio donde se guardará el comprobante
+        $uploadDir = 'uploads/';
+        $comprobanteNombre = basename($comprobante['name']);
+        $uploadFilePath = $uploadDir . $comprobanteNombre;
+
+        // Mover el archivo a la carpeta destino
+        if (move_uploaded_file($comprobante['tmp_name'], $uploadFilePath)) {
+            
+            // Insertar los datos en la base de datos
+            $sql = "INSERT INTO envios (item_id, clave_envio, comprobante_ruta) VALUES (?, ?, ?)";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ssi", $uploadFile, $claveEnvio, $item_id);
+            $stmt->bind_param('iss', $item_id, $claveEnvio, $comprobanteNombre);
 
             if ($stmt->execute()) {
-                // Respuesta exitosa en formato JSON
-                echo json_encode(['success' => true, 'comprobantePagoRuta' => $uploadFile]);
+                // Redireccionar a listado_envios.php con la clave de envío
+                header("Location: listado_envios.php?claveEnvio=$claveEnvio");
+                exit();
             } else {
                 echo json_encode(['error' => 'Error al guardar en la base de datos: ' . $conn->error]);
             }
-
-            $stmt->close();
         } else {
-            echo json_encode(['error' => 'Error al mover el archivo subido']);
+            echo json_encode(['error' => 'Error al mover el archivo subido.']);
         }
     } else {
-        echo json_encode(['error' => 'Por favor, selecciona un archivo válido']);
+        echo json_encode(['error' => 'Error al subir el archivo del comprobante.']);
     }
+} else {
+    echo json_encode(['error' => 'Método de solicitud no válido.']);
 }
 
 $conn->close();
