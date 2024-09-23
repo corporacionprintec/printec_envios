@@ -15,15 +15,15 @@ if ($conn->connect_error) {
 }
 
 // Obtener el ID del cliente desde la URL
-$item_id = intval($_GET['id']);
+$item_id = isset($_GET['id']) ? $_GET['id'] : null;
 
-if ($item_id > 0) {
+if (!empty($item_id)) {
     // Preparar la consulta para obtener los detalles del cliente
     $sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, estado, comprobanteEnvioRuta, claveEnvio, compraMantenimiento, productos, productoMantenimiento, razonMantenimiento, comprobantePagoRuta 
             FROM clientes 
             WHERE item = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $item_id);
+    $stmt->bind_param("s", $item_id);  // Cambié el tipo de dato a "s" para cadenas de texto
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -37,7 +37,7 @@ if ($item_id > 0) {
 
     $stmt->close();
 } else {
-    echo json_encode(['error' => 'ID no válido']);
+    echo json_encode(['error' => 'ID no válido o no presente']);
 }
 
 $conn->close();
