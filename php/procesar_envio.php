@@ -47,9 +47,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Ejecutar la consulta
     if ($stmt->execute()) {
-        // Depuración: mostrar el valor de item
-        echo "El valor de item es: $item";  // Agregar esta línea temporalmente
-
         // Redirigir a la página de confirmación con el ID del pedido
         header("Location: ../confirmacion.html?id=$item");
         exit();
