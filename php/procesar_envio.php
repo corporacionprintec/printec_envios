@@ -19,6 +19,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $item = intval($_POST['item']); // Asegúrate de que el valor 'item' se recibe correctamente
     $claveEnvio = $_POST['claveEnvio'];
 
+    // Verificación de item (depuración)
+    if (!$item) {
+        echo "Error: item no recibido correctamente.";
+        exit();
+    }
+
     // Manejar la subida de la imagen (comprobante de envío)
     $comprobanteEnvioRuta = '';
     if (isset($_FILES['comprobanteEnvio']) && $_FILES['comprobanteEnvio']['error'] == UPLOAD_ERR_OK) {
@@ -41,6 +47,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Ejecutar la consulta
     if ($stmt->execute()) {
+        // Depuración: mostrar el valor de item
+        echo "El valor de item es: $item";  // Agregar esta línea temporalmente
+
         // Redirigir a la página de confirmación con el ID del pedido
         header("Location: ../confirmacion.html?id=$item");
         exit();

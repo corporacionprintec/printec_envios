@@ -173,6 +173,9 @@
                     document.getElementById('direccion').innerText = data.direccion;
                     document.getElementById('agencia').innerText = data.agencia;
                     document.getElementById('estado').innerText = data.estado;
+
+                    // Asignar el valor de 'item' al campo oculto
+                    document.getElementById('hiddenItemId').value = data.item;
                 }
             })
             .catch(error => {
