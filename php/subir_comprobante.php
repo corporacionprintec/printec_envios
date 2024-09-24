@@ -1,51 +1,66 @@
 <?php
-header('Content-Type: application/json');
+session_start(); // Inicia la sesión
 
-// Conectar a la base de datos
-$servername = getenv('DB_HOST') ?: 'localhost';
-$username = getenv('DB_USER') ?: 'root';
-$password = getenv('DB_PASS') ?: '';
-$dbname = getenv('DB_NAME') ?: 'envios_clientes';
-$port = getenv('DB_PORT') ?: '3306';
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Verificar si las variables de entorno están definidas (producción) o usar valores por defecto (desarrollo local)
+    $servername = getenv('DB_HOST') ?: 'localhost';
+    $username = getenv('DB_USER') ?: 'root';
+    $password = getenv('DB_PASS') ?: '';
+    $dbname = getenv('DB_NAME') ?: 'envios_clientes';
+    $port = getenv('DB_PORT') ?: '3306';
 
-$conn = new mysqli($servername, $username, $password, $dbname, $port);
+    // Conexión a la base de datos
+    $conn = new mysqli($servername, $username, $password, $dbname, $port);
 
-if ($conn->connect_error) {
-    die(json_encode(['error' => 'Conexión fallida: ' . $conn->connect_error]));
-}
+    // Verificar la conexión
+    if ($conn->connect_error) {
+        die("Conexión fallida: " . $conn->connect_error);
+    }
 
-// Verificar que el formulario se envió correctamente
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $item_id = intval($_POST['id']);
-    $claveEnvio = $_POST['claveEnvio'];
+    // Obtener ID del cliente
+    $id = $_POST['id'];
 
-    // Verificar que el archivo del comprobante fue subido correctamente
+    // Subir archivo de comprobante de pago
+    $comprobantePagoRuta = '';
     if (isset($_FILES['comprobantePago']) && $_FILES['comprobantePago']['error'] == UPLOAD_ERR_OK) {
-        $uploadDir = 'uploads/';
-        $uploadFile = $uploadDir . basename($_FILES['comprobantePago']['name']);
+        $target_dir = __DIR__ . "/uploads/";
+        $target_file = $target_dir . basename($_FILES["comprobantePago"]["name"]);
         
-        // Mover el archivo subido a la carpeta de destino
-        if (move_uploaded_file($_FILES['comprobantePago']['tmp_name'], $uploadFile)) {
-            // Guardar la ruta del comprobante y la clave de envío en la base de datos
-            $sql = "UPDATE clientes SET comprobanteEnvioRuta = ?, claveEnvio = ? WHERE item = ?";
+        // Verifica si la carpeta existe, si no, la crea
+        if (!file_exists($target_dir)) {
+            mkdir($target_dir, 0777, true);
+        }
+
+        // Mueve el archivo a la ubicación deseada
+        if (move_uploaded_file($_FILES["comprobantePago"]["tmp_name"], $target_file)) {
+            $comprobantePagoRuta = basename($_FILES["comprobantePago"]["name"]);
+
+            // Actualizar la base de datos con la ruta del comprobante
+            $sql = "UPDATE clientes SET comprobantePagoRuta = ? WHERE id = ?";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ssi", $uploadFile, $claveEnvio, $item_id);
+
+            if ($stmt === false) {
+                echo json_encode(['error' => 'Error en la preparación de la consulta SQL: ' . $conn->error]);
+                exit();
+            }
+
+            $stmt->bind_param("ss", $comprobantePagoRuta, $id);
 
             if ($stmt->execute()) {
-                // Respuesta exitosa en formato JSON
-                echo json_encode(['success' => true, 'comprobantePagoRuta' => $uploadFile]);
+                // Retornar respuesta en JSON para ser manejada en el frontend
+                echo json_encode(['success' => true, 'comprobantePagoRuta' => $comprobantePagoRuta]);
             } else {
-                echo json_encode(['error' => 'Error al guardar en la base de datos: ' . $conn->error]);
+                echo json_encode(['error' => 'Error al actualizar la base de datos: ' . $stmt->error]);
             }
 
             $stmt->close();
         } else {
-            echo json_encode(['error' => 'Error al mover el archivo subido']);
+            echo json_encode(['error' => 'Error al subir el archivo.']);
         }
     } else {
-        echo json_encode(['error' => 'Por favor, selecciona un archivo válido']);
+        echo json_encode(['error' => 'Error al recibir el archivo.']);
     }
-}
 
-$conn->close();
+    $conn->close();
+}
 ?>

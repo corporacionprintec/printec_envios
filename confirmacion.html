@@ -3,61 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmación de Envío</title>
+    <title>Confirmación</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-        }
-        .container {
-            margin: 50px auto;
-            max-width: 800px;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .logo {
-            width: 150px;
-        }
-        h1 {
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        p {
-            font-size: 18px;
-            color: #555;
-        }
-        p strong {
-            color: #333;
-        }
-        .input-group {
-            margin: 20px 0;
-            text-align: left;
-        }
-        .input-group input[type="file"] {
-            margin-bottom: 10px;
-        }
-        .btn {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .copy-container {
+        .gif-container {
             text-align: center;
             margin-top: 20px;
+        }
+        .whatsapp-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            z-index: 1000;
+        }
+        .copy-container {
+            margin-top: 20px;
+            text-align: center;
         }
         .copy-button {
             display: inline-flex;
@@ -69,63 +32,86 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
+            outline: none;
         }
         .copy-button:hover {
             background-color: #34495e;
         }
-        .whatsapp-icon {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
+        .copy-button i {
+            margin-right: 8px;
+        }
+        .upload-comprobante-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .upload-comprobante-container form {
+            display: inline-block;
+        }
+        .upload-comprobante-container input[type="file"] {
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
-        </div>
-        
+        <!-- Logo de la empresa -->
+        <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
         <h1>Confirmación de Envío</h1>
+        <p><span id="cliente_id" style="display: none;"></span></p>
+        <p><strong>Nombre y Apellido:</strong> <span id="nombre"></span></p>
+        <p><strong>DNI:</strong> <span id="dni"></span></p>
+        <p><strong>Teléfono:</strong> <span id="telefono"></span></p>
+        <p><strong>Tipo de Envío:</strong> <span id="envio"></span></p>
+        <p><strong>Dirección:</strong> <span id="direccion"></span></p>
+        <p><strong>Agencia:</strong> <span id="agencia"></span></p>
+        
+        <div id="productosContainer" style="display: none;">
+            <p><strong>Productos:</strong> <span id="productos"></span></p>
+        </div>
 
-        <p><strong>Nombre y Apellido:</strong> <span id="nombre">Cargando...</span></p>
-        <p><strong>DNI:</strong> <span id="dni">Cargando...</span></p>
-        <p><strong>Teléfono:</strong> <span id="telefono">Cargando...</span></p>
-        <p><strong>Tipo de Envío:</strong> <span id="envio">Cargando...</span></p>
-        <p><strong>Dirección:</strong> <span id="direccion">Cargando...</span></p>
-        <p><strong>Agencia:</strong> <span id="agencia">Cargando...</span></p>
-        <p><strong>Estado:</strong> <span id="estado">Pendiente</span></p>
+        <div id="mantenimientoContainer" style="display: none;">
+            <p><strong>Producto a Realizar Mantenimiento:</strong> <span id="productoMantenimiento"></span></p>
+            <p><strong>Detalle del Mantenimiento:</strong> <span id="detalleMantenimiento"></span></p>
+        </div>
 
-        <p><strong>Comprobante de Envío:</strong> <span id="comprobanteEnvio">No disponible</span></p>
-        <p><strong>Clave de Envío:</strong> <span id="claveEnvio">No disponible</span></p>
+        <div id="estadoPedidoContainer" style="display: none;">
+            <p><strong>Estado del Pedido:</strong> <span id="estado"></span></p>
+        </div>
 
-        <div class="input-group">
+        <p id="comprobantePago"></p>
+        <p><strong>Comprobante de Envío:</strong> <span id="comprobanteEnvio"></span></p>
+        <p><strong>Clave de Envío:</strong> <span id="claveEnvio"></span></p>
+
+        <!-- Formulario para subir el comprobante de pago -->
+        <div class="upload-comprobante-container">
             <form id="upload-comprobante-form" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="id" value="" id="cliente_id_input">
                 <input type="file" name="comprobantePago" accept="image/*" required>
-                <input type="submit" value="Subir Comprobante de Pago" class="btn">
+                <input type="submit" value="Subir Comprobante de Pago">
             </form>
         </div>
 
+        <!-- Mensaje para redirigir a WhatsApp style="display:none; "-->
         <p>Para guardar su enlace de seguimiento, puede enviarse el siguiente mensaje a su WhatsApp:</p>
-        <a id="enlaceWhatsApp" href="#" target="_blank" style="display:none;">
-            <button class="btn">
+        <a id="enlaceWhatsApp" href="#" style="text-decoration: none; display:none;" target="_blank">
+            <button class="whatsapp-button">
                 <i class="fab fa-whatsapp"></i> Enviar enlace a mi WhatsApp
             </button>
         </a>
-        <p>O puede copiar y pegar el enlace en un block de notas:</p>
 
+        <p>o puede copiar y pegar el enlace en un block de notas:</p>
+        <!-- Botón para copiar la URL -->
         <div class="copy-container">
             <button class="copy-button" onclick="copyUrl()">
                 <i class="far fa-copy"></i> Copiar enlace
             </button>
         </div>
-        
+
+        <!-- Icono de WhatsApp -->  
         <a href="https://wa.me/966177851" target="_blank">
             <img src="images_ventas/whatsapp.png" alt="WhatsApp" class="whatsapp-icon">
         </a>
+
     </div>
 
     <script>
@@ -133,48 +119,64 @@
         function fetchClientData() {
             var urlParams = new URLSearchParams(window.location.search);
             var id = urlParams.get('id');
+            document.getElementById('cliente_id').innerText = id;
             document.getElementById('cliente_id_input').value = id;
 
             if (id) {
                 fetch('php/confirmacion.php?id=' + encodeURIComponent(id))
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data); // Depurar datos recibidos
-
                         if (data && !data.error) {
-                            document.getElementById('nombre').innerText = data.nombre || "No disponible";
-                            document.getElementById('dni').innerText = data.dni || "No disponible";
-                            document.getElementById('telefono').innerText = data.telefono || "No disponible";
-                            document.getElementById('envio').innerText = data.envio || "No disponible";
+                            document.getElementById('nombre').innerText = data.nombre;
+                            document.getElementById('dni').innerText = data.dni;
+                            document.getElementById('telefono').innerText = data.telefono;
+                            document.getElementById('envio').innerText = data.envio;
                             document.getElementById('direccion').innerText = data.direccion || "No disponible";
-                            document.getElementById('agencia').innerText = data.agencia || "No disponible";
-                            document.getElementById('estado').innerText = data.estado || "Pendiente";
+                            document.getElementById('agencia').innerText = data.agencia;
+                            document.getElementById('estado').innerText = data.estado;
+
+                            // mensaje de alamacenaminto en whatasapp
+                            var telefonoCliente = data.telefono;
+                            var text = window.location.href;
+                            var urlPedido = window.location.href;
+                            var mensajeWhatsApp = 'Enlace de seguimiento de pedido Printec: ' + urlPedido;
+                            var enlaceWhatsApp = 'https://wa.me/' + telefonoCliente + '?text=' + encodeURIComponent(mensajeWhatsApp);
+                             // Insertar el enlace de WhatsApp en el DOM
+                            document.getElementById('enlaceWhatsApp').href = enlaceWhatsApp;
+                            document.getElementById('enlaceWhatsApp').style.display = 'block';
+
+                            if (data.compraMantenimiento === 'compra') {
+                                document.getElementById('productosContainer').style.display = 'block';
+                                document.getElementById('productos').innerText = data.productos;
+                                document.getElementById('mantenimientoContainer').style.display = 'none';
+                            } else if (data.compraMantenimiento === 'mantenimiento-envio') {
+                                document.getElementById('productosContainer').style.display = 'none';
+                                document.getElementById('mantenimientoContainer').style.display = 'block';
+                                document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento;
+                                document.getElementById('detalleMantenimiento').innerText = data.razonMantenimiento;
+                                document.getElementById('estadoPedidoContainer').style.display = 'block';
+
+                                document.querySelector('.upload-comprobante-container').style.display = 'block';
+                            } else if (data.compraMantenimiento === 'mantenimiento-recoger') {
+                                document.getElementById('productosContainer').style.display = 'none';
+                                document.getElementById('mantenimientoContainer').style.display = 'block';
+                                document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento;
+                                document.getElementById('detalleMantenimiento').innerText = data.razonMantenimiento;
+                                document.getElementById('estadoPedidoContainer').style.display = 'block';
+                                document.getElementById('comprobantePago').innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
+                            }
 
                             if (data.comprobanteEnvioRuta) {
                                 document.getElementById('comprobanteEnvio').innerHTML = '<a href="php/uploads/' + data.comprobanteEnvioRuta + '" target="_blank">Ver Comprobante de Envío</a>';
                             }
-
-                            document.getElementById('claveEnvio').innerText = data.claveEnvio || "No disponible";
-
-                            // Enlace a WhatsApp con el número del cliente
-                            var telefonoCliente = data.telefono;
-                            var urlPedido = window.location.href;
-                            var mensajeWhatsApp = 'Enlace de seguimiento de pedido Printec: ' + urlPedido;
-                            var enlaceWhatsApp = 'https://wa.me/' + telefonoCliente + '?text=' + encodeURIComponent(mensajeWhatsApp);
-                            document.getElementById('enlaceWhatsApp').href = enlaceWhatsApp;
-                            document.getElementById('enlaceWhatsApp').style.display = 'block';
-
+                            if (data.claveEnvio) {
+                                document.getElementById('claveEnvio').innerText = data.claveEnvio;
+                            }
                         } else {
                             console.error('Error:', data.error);
-                            alert('Error al cargar los datos del cliente: ' + data.error);
                         }
                     })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Error al cargar los datos del cliente');
-                    });
-            } else {
-                alert('ID de cliente no proporcionado');
+                    .catch(error => console.error('Error:', error));
             }
         }
 
@@ -205,7 +207,7 @@
             .then(data => {
                 if (data.success) {
                     alert('Comprobante de pago subido con éxito');
-                    document.getElementById('comprobanteEnvio').innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
+                    document.getElementById('comprobantePago').innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
                 } else {
                     alert('Error al subir el comprobante de pago');
                 }

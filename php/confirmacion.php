@@ -1,59 +1,49 @@
 <?php
 header('Content-Type: application/json');
 
-// Conectar a la base de datos
+// Obtener el ID del cliente de la URL
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+
+if (!$id) {
+    echo json_encode(['error' => 'ID no proporcionado']);
+    exit;
+}
+;
 $servername = getenv('DB_HOST') ?: 'localhost';
 $username = getenv('DB_USER') ?: 'root';
 $password = getenv('DB_PASS') ?: '';
 $dbname = getenv('DB_NAME') ?: 'envios_clientes';
 $port = getenv('DB_PORT') ?: '3306';
 
+// Conexión a la base de datos
 $conn = new mysqli($servername, $username, $password, $dbname, $port);
 
-// Verificar conexión a la base de datos
+// Verificar la conexión
 if ($conn->connect_error) {
-    die(json_encode(['error' => 'Conexión fallida: ' . $conn->connect_error]));
+    echo json_encode(['error' => 'Conexión fallida: ' . $conn->connect_error]);
+    exit;
 }
 
-// Obtener el ID del cliente desde la URL
-$item_id = isset($_GET['id']) ? $_GET['id'] : null;
+// Cambia 'item' a 'id' en la consulta SQL
+$sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, compraMantenimiento, productos, productoMantenimiento, razonMantenimiento, comprobantePagoRuta, estado, comprobanteEnvioRuta, claveEnvio FROM clientes WHERE id = ?";
+$stmt = $conn->prepare($sql);
 
-// Registrar el ID recibido en los logs para depurar
-error_log("ID recibido: " . $item_id);
+if ($stmt === false) {
+    echo json_encode(['error' => 'Error en la preparación de la consulta SQL: ' . $conn->error]);
+    exit;
+}
 
-if (!empty($item_id)) {
-    // Preparar la consulta para obtener los detalles del cliente
-    $sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, estado, comprobanteEnvioRuta, claveEnvio 
-            FROM clientes 
-            WHERE item = ?";
-    $stmt = $conn->prepare($sql);
-    
-    // Verificar si la consulta fue preparada correctamente
-    if (!$stmt) {
-        echo json_encode(['error' => 'Error en la preparación de la consulta: ' . $conn->error]);
-        exit;
-    }
+$stmt->bind_param("s", $id);  // Usa 's' para cadenas
+$stmt->execute();
+$result = $stmt->get_result();
 
-    // Vincular parámetros y ejecutar la consulta
-    $stmt->bind_param("s", $item_id); // Tipo 's' para cadenas
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    // Verificar si se encontraron resultados
-    if ($result->num_rows > 0) {
-        // Obtener los datos del cliente y enviarlos en formato JSON
-        $cliente = $result->fetch_assoc();
-        echo json_encode($cliente);
-    } else {
-        echo json_encode(['error' => 'Pedido no encontrado']);
-    }
-
-    // Cerrar el statement
-    $stmt->close();
+if ($result->num_rows > 0) {
+    $data = $result->fetch_assoc();
+    echo json_encode($data);
 } else {
-    echo json_encode(['error' => 'ID no válido o no presente']);
+    echo json_encode(['error' => 'Cliente no encontrado']);
 }
 
-// Cerrar la conexión a la base de datos
+$stmt->close();
 $conn->close();
 ?>
