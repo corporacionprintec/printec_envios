@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Ejecutar la consulta
     if ($stmt->execute()) {
-        // Redirigir a la página de confirmación con el ID del pedido
+        // Asegurarse de que la redirección sea correcta con el item adecuado en la URL
         header("Location: ../confirmacion.html?id=$item");
         exit();
     } else {
