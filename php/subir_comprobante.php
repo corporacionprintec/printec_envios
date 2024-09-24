@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // Guardar la ruta del comprobante y la clave de envío en la base de datos
             $sql = "UPDATE clientes SET comprobanteEnvioRuta = ?, claveEnvio = ? WHERE item = ?";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ssi", $uploadFile, $claveEnvio, $item_id);
+            $stmt->bind_param("ssi", $uploadFile, $claveEnvio, $id);
 
             if ($stmt->execute()) {
                 // Respuesta exitosa en formato JSON
