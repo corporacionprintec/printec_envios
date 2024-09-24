@@ -157,7 +157,7 @@
         function cargarDetallesPedido() {
             const params = new URLSearchParams(window.location.search);
             const pedidoId = params.get('id');
-            
+
             fetch(`/php/ver_pedido.php?id=${pedidoId}`)
             .then(response => response.json())
             .then(data => {
@@ -169,7 +169,7 @@
                     document.getElementById('nombre').innerText = data.nombre;
                     document.getElementById('dni').innerText = data.dni;
                     document.getElementById('telefono').innerText = data.telefono;
-                    document.getElementById('tipoEnvio').innerText = data.tipo_envio;
+                    document.getElementById('tipoEnvio').innerText = data.envio; // Cambio importante: uso de 'envio' en lugar de 'tipoEnvio'
                     document.getElementById('direccion').innerText = data.direccion;
                     document.getElementById('agencia').innerText = data.agencia;
                     document.getElementById('estado').innerText = data.estado;
