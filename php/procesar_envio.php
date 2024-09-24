@@ -16,7 +16,7 @@ if ($conn->connect_error) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Obtener los datos del formulario
-    $item = intval($_POST['item']); // Asegúrate de que el valor 'item' se recibe correctamente
+    $item = intval($_POST['item']); 
     $claveEnvio = $_POST['claveEnvio'];
 
     // Verificación de item (depuración)
@@ -47,9 +47,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Ejecutar la consulta
     if ($stmt->execute()) {
-        // Asegurarse de que la redirección sea correcta con el item adecuado en la URL
-        header("Location: ../confirmacion.html?id=$item");
-        exit();
+        // Aquí recuperamos el UID correspondiente al `item` y redirigimos usando el UID
+        $sql_id = "SELECT id FROM clientes WHERE item = ?";
+        $stmt_id = $conn->prepare($sql_id);
+        $stmt_id->bind_param("i", $item);
+        $stmt_id->execute();
+        $result = $stmt_id->get_result();
+
+        if ($result->num_rows > 0) {
+            $pedido = $result->fetch_assoc();
+            $uid = $pedido['id']; // Aquí obtenemos el UID
+            // Redirigir usando el UID
+            header("Location: ../confirmacion.html?id=$uid");
+            exit();
+        } else {
+            echo "Error: No se pudo encontrar el ID del pedido.";
+        }
     } else {
         // Mostrar error si algo falla
         echo "Error al actualizar el pedido: " . $stmt->error;
