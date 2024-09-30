@@ -108,7 +108,7 @@
         </div>
 
         <!-- Icono de WhatsApp -->  
-        <a href="https://wa.me/966177851" target="_blank">
+        <a href="https://wa.me/51966177851" target="_blank">
             <img src="images_ventas/whatsapp.png" alt="WhatsApp" class="whatsapp-icon">
         </a>
 
@@ -135,9 +135,8 @@
                             document.getElementById('agencia').innerText = data.agencia;
                             document.getElementById('estado').innerText = data.estado;
 
-                            // mensaje de alamacenaminto en whatasapp
+                            // mensaje de almacenamiento en WhatsApp
                             var telefonoCliente = data.telefono;
-                            var text = window.location.href;
                             var urlPedido = window.location.href;
                             var mensajeWhatsApp = 'Enlace de seguimiento de pedido Printec: ' + urlPedido;
                             var enlaceWhatsApp = 'https://wa.me/' + telefonoCliente + '?text=' + encodeURIComponent(mensajeWhatsApp);
