@@ -91,7 +91,7 @@
             </form>
         </div>
 
-        <!-- Mensaje para redirigir a WhatsApp style="display:none; "-->
+        <!-- Mensaje para redirigir a WhatsApp -->
         <p>Para guardar su enlace de seguimiento, puede enviarse el siguiente mensaje a su WhatsApp:</p>
         <a id="enlaceWhatsApp" href="#" style="text-decoration: none; display:none;" target="_blank">
             <button class="whatsapp-button">
@@ -129,18 +129,19 @@
                         if (data && !data.error) {
                             document.getElementById('nombre').innerText = data.nombre;
                             document.getElementById('dni').innerText = data.dni;
-                            document.getElementById('telefono').innerText = data.telefono;
+                            document.getElementById('telefono').innerText = data.telefono;  // Mostrar teléfono, pero no lo usaremos para redirección
                             document.getElementById('envio').innerText = data.envio;
                             document.getElementById('direccion').innerText = data.direccion || "No disponible";
                             document.getElementById('agencia').innerText = data.agencia;
                             document.getElementById('estado').innerText = data.estado;
 
-                            // mensaje de almacenamiento en WhatsApp
-                            var telefonoCliente = data.telefono;
+                            // Usar número fijo 51966177851 para la redirección a WhatsApp
+                            var telefonoFijo = '51966177851';
                             var urlPedido = window.location.href;
                             var mensajeWhatsApp = 'Enlace de seguimiento de pedido Printec: ' + encodeURIComponent(urlPedido);
-                            var enlaceWhatsApp = 'https://wa.me/' + telefonoCliente + '?text=' + mensajeWhatsApp;
-                             // Insertar el enlace de WhatsApp en el DOM
+                            var enlaceWhatsApp = 'https://wa.me/' + telefonoFijo + '?text=' + mensajeWhatsApp;
+
+                            // Insertar el enlace de WhatsApp en el DOM
                             document.getElementById('enlaceWhatsApp').href = enlaceWhatsApp;
                             document.getElementById('enlaceWhatsApp').style.display = 'block';
 
