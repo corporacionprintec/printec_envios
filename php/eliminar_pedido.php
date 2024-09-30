@@ -19,13 +19,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['item'])) {
     $item = intval($_POST['item']);  // Cambiar 'id' por 'item'
 
     // Eliminar el pedido de la base de datos
-    $sql = "DELETE FROM clientes WHERE item = ?";  // Cambiar 'id' por 'item'
+    $sql = "DELETE FROM clientes WHERE item = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $item);
     $stmt->execute();
 
+    // Verificar si se eliminó correctamente
     if ($stmt->affected_rows > 0) {
-        echo "Pedido eliminado correctamente";
+        // Redirigir de vuelta a la página de listado
+        $stmt->close();
+        $conn->close();
+        header("Location: listado_envios.php");
+        exit(); // Asegúrate de que el script se detenga después de redirigir
     } else {
         echo "Error al eliminar el pedido";
     }
@@ -33,10 +38,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['item'])) {
     // Cerrar la conexión
     $stmt->close();
     $conn->close();
-
-    // Redirigir de vuelta a la página de listado
-    header("Location: listado_envios.php");
-    exit();
 } else {
     echo "ID no válido";
 }
