@@ -18,7 +18,7 @@ if ($conn->connect_error) {
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
 
 // Consulta SQL con límite de resultados según la selección
-$sql = "SELECT item, id, nombre, estado, fecha_creacion FROM clientes ORDER BY item DESC LIMIT $limit";
+$sql = "SELECT item, nombre, estado, fecha_creacion FROM clientes ORDER BY item DESC LIMIT $limit";
 $result = $conn->query($sql);
 
 if (!$result) {
@@ -134,18 +134,17 @@ if (!$result) {
             });
         }
 
-        // Función para confirmar y eliminar un pedido
-        function eliminarPedido(id) {
+        // Función para confirmar y eliminar un pedido usando el campo item
+        function eliminarPedido(item) {
             if (confirm("¿Estás seguro de eliminar este pedido?")) {
-                // Redirigir a eliminar_pedido.php pasando el ID del pedido por POST
                 var form = document.createElement('form');
                 form.method = 'POST';
                 form.action = 'eliminar_pedido.php';
 
                 var input = document.createElement('input');
                 input.type = 'hidden';
-                input.name = 'id';
-                input.value = id;
+                input.name = 'item';
+                input.value = item;
 
                 form.appendChild(input);
                 document.body.appendChild(form);
@@ -181,7 +180,7 @@ if (!$result) {
                     <th>Fecha de Creación</th> <!-- Nueva columna para la fecha -->
                     <th>Acción</th>
                     <th>Copiar Enlace</th> <!-- Nueva columna -->
-                    <th>Eliminar</th> <!-- Nueva columna -->
+                    <th>Eliminar</th> <!-- Nueva columna para eliminar -->
                 </tr>
             </thead>
             <tbody>
@@ -189,13 +188,12 @@ if (!$result) {
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
                         $item = $row['item']; 
-                        $id = $row['id']; 
                         $nombre = $row['nombre'];
                         $estado = $row['estado'];
                         $fecha_creacion = $row['fecha_creacion'];
 
-                        // URL de confirmación generada dinámicamente usando el id
-                        $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $id;
+                        // URL de confirmación generada dinámicamente usando el campo 'item'
+                        $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?item=" . $item;
 
                         // Definir clase de estilo según el estado
                         $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
@@ -206,10 +204,10 @@ if (!$result) {
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
                         echo "<td>" . $fecha_creacion . "</td>";
                         // Cambiar el enlace a ver_pedido.html con la URL correcta
-                        echo '<td><a href="https://printecenvios-production.up.railway.app/ver_pedido.html?id=' . $item . '">Ver Detalles</a></td>';
-                        echo '<td><input type="hidden" id="link_' . $id . '" value="' . $urlConfirmacion . '">
-                        <button class="copy-btn" onclick="copyToClipboard(\'link_' . $id . '\')">Copiar enlace</button></td>';
-                        echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $id . ')">Eliminar</button></td>';
+                        echo '<td><a href="https://printecenvios-production.up.railway.app/ver_pedido.html?item=' . $item . '">Ver Detalles</a></td>';
+                        echo '<td><input type="hidden" id="link_' . $item . '" value="' . $urlConfirmacion . '">
+                        <button class="copy-btn" onclick="copyToClipboard(\'link_' . $item . '\')">Copiar enlace</button></td>';
+                        echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
                         echo "</tr>";
                     }
                 } else {
