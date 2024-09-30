@@ -1,6 +1,6 @@
 <?php
-// Verificar si se ha enviado el ID
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
+// Verificar si se ha enviado el item
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['item'])) {
     // Conectar a la base de datos
     $servername = getenv('DB_HOST') ?: 'localhost';
     $username = getenv('DB_USER') ?: 'root';
@@ -15,13 +15,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
         die("Conexión fallida: " . $conn->connect_error);
     }
 
-    // Obtener el ID
-    $id = intval($_POST['id']);
+    // Obtener el item
+    $item = intval($_POST['item']);  // Cambiar 'id' por 'item'
 
     // Eliminar el pedido de la base de datos
-    $sql = "DELETE FROM clientes WHERE id = ?";
+    $sql = "DELETE FROM clientes WHERE item = ?";  // Cambiar 'id' por 'item'
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id);
+    $stmt->bind_param("i", $item);
     $stmt->execute();
 
     if ($stmt->affected_rows > 0) {
