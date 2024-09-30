@@ -74,13 +74,16 @@ if (!$result) {
         a:hover {
             text-decoration: underline;
         }
-        .copy-btn {
+        .copy-btn, .delete-btn {
             background-color: #007bff;
             color: white;
             border: none;
             padding: 8px 12px;
             cursor: pointer;
             border-radius: 5px;
+        }
+        .delete-btn {
+            background-color: #dc3545;
         }
         /* Estilos para el estado pendiente y enviado */
         .pendiente {
@@ -130,6 +133,25 @@ if (!$result) {
                 console.error('Error al copiar al portapapeles: ', err);
             });
         }
+
+        // Función para confirmar y eliminar un pedido
+        function eliminarPedido(id) {
+            if (confirm("¿Estás seguro de eliminar este pedido?")) {
+                // Redirigir a eliminar_pedido.php pasando el ID del pedido por POST
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'eliminar_pedido.php';
+
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'id';
+                input.value = id;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
     </script>
 </head>
 <body>
@@ -159,6 +181,7 @@ if (!$result) {
                     <th>Fecha de Creación</th> <!-- Nueva columna para la fecha -->
                     <th>Acción</th>
                     <th>Copiar Enlace</th> <!-- Nueva columna -->
+                    <th>Eliminar</th> <!-- Nueva columna -->
                 </tr>
             </thead>
             <tbody>
@@ -186,10 +209,11 @@ if (!$result) {
                         echo '<td><a href="https://printecenvios-production.up.railway.app/ver_pedido.html?id=' . $item . '">Ver Detalles</a></td>';
                         echo '<td><input type="hidden" id="link_' . $id . '" value="' . $urlConfirmacion . '">
                         <button class="copy-btn" onclick="copyToClipboard(\'link_' . $id . '\')">Copiar enlace</button></td>';
+                        echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $id . ')">Eliminar</button></td>';
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='6'>No hay envíos</td></tr>";
+                    echo "<tr><td colspan='7'>No hay envíos</td></tr>";
                 }
 
                 // Cerrar la conexión a la base de datos
