@@ -15,13 +15,13 @@ if ($conn->connect_error) {
 }
 
 // Obtener el ID del pedido desde la URL
-$item_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$id = isset($_GET['id']) ? $_GET['id'] : '';
 
-if ($item_id > 0) {
-    // Preparar la consulta
-    $sql = "SELECT * FROM clientes WHERE item = ?";
+if (!empty($id)) {
+    // Preparar la consulta (ahora buscando por 'id' en lugar de 'item')
+    $sql = "SELECT * FROM clientes WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $item_id);
+    $stmt->bind_param("s", $id); // 'id' es tipo string
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -38,3 +38,4 @@ if ($item_id > 0) {
 }
 
 $conn->close();
+?>

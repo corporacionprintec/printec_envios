@@ -165,17 +165,17 @@
                     alert('Error: ' + data.error);
                 } else {
                     // Colocar los datos del pedido en los elementos correspondientes
-                    document.getElementById('item').innerText = data.item;
+                    document.getElementById('item').innerText = data.id;
                     document.getElementById('nombre').innerText = data.nombre;
                     document.getElementById('dni').innerText = data.dni;
                     document.getElementById('telefono').innerText = data.telefono;
-                    document.getElementById('tipoEnvio').innerText = data.envio; // Cambio importante: uso de 'envio' en lugar de 'tipoEnvio'
+                    document.getElementById('tipoEnvio').innerText = data.envio;
                     document.getElementById('direccion').innerText = data.direccion;
                     document.getElementById('agencia').innerText = data.agencia;
                     document.getElementById('estado').innerText = data.estado;
 
-                    // Asignar el valor de 'item' al campo oculto
-                    document.getElementById('hiddenItemId').value = data.item;
+                    // Asignar el valor de 'id' al campo oculto
+                    document.getElementById('hiddenItemId').value = data.id;
                 }
             })
             .catch(error => {
@@ -218,7 +218,7 @@
                 <label for="claveEnvio">Clave de Envío</label>
                 <input type="text" id="claveEnvio" name="claveEnvio" onkeyup="enableButton()">
             </div>
-            <input type="hidden" name="item" value="" id="hiddenItemId">
+            <input type="hidden" name="id" value="" id="hiddenItemId">
             <button type="submit" id="enviarButton" class="btn" disabled>Enviar</button>
         </form>
 
