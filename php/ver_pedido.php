@@ -13,14 +13,14 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Verificar si se ha enviado el ID
-if (isset($_GET['id'])) {
-    $id = $_GET['id'];
+// Verificar si se ha enviado el item
+if (isset($_GET['item'])) {
+    $item = $_GET['item'];
 
     // Consulta para obtener los detalles del pedido
-    $sql = "SELECT * FROM clientes WHERE id = ?";
+    $sql = "SELECT * FROM clientes WHERE item = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id);
+    $stmt->bind_param("i", $item);
     $stmt->execute();
     $result = $stmt->get_result();
 
