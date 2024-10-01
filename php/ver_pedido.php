@@ -14,14 +14,14 @@ if ($conn->connect_error) {
     die(json_encode(['error' => 'Conexión fallida']));
 }
 
-// Obtener el 'item' del pedido desde la URL
-$item = isset($_GET['item']) ? intval($_GET['item']) : 0;
+// Obtener el 'item' del pedido desde la URL (ahora permitimos cadenas)
+$item = isset($_GET['item']) ? $_GET['item'] : '';
 
-if ($item > 0) {
+if (!empty($item)) {
     // Preparar la consulta usando 'item'
     $sql = "SELECT * FROM clientes WHERE item = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $item);
+    $stmt->bind_param("s", $item);  // Cambiamos a "s" para cadenas de texto
     $stmt->execute();
     $result = $stmt->get_result();
 

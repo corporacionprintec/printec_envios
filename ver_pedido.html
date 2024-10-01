@@ -98,6 +98,7 @@
         }
     </style>
     <script>
+        // Habilitar botón de enviar solo si hay archivo de comprobante y clave de envío
         function enableButton() {
             var comprobanteEnvio = document.getElementById('comprobanteEnvio').files.length > 0;
             var claveEnvio = document.getElementById('claveEnvio').value;
@@ -110,6 +111,7 @@
             }
         }
 
+        // Función para imprimir el membrete
         function printMembrete() {
             var printWindow = window.open('', '', 'height=600,width=800');
             var printDocument = printWindow.document;

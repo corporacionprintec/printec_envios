@@ -1,5 +1,5 @@
 <?php
-// Verificar si se ha enviado el item
+// Verificar si se ha enviado el 'item' a través del método POST
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['item'])) {
     // Conectar a la base de datos
     $servername = getenv('DB_HOST') ?: 'localhost';
@@ -15,29 +15,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['item'])) {
         die("Conexión fallida: " . $conn->connect_error);
     }
 
-    // Obtener el item
+    // Obtener y validar el 'item'
     $item = intval($_POST['item']);  // Cambiar 'id' por 'item'
+    if ($item <= 0) {
+        die("ID de pedido no válido.");
+    }
 
     // Eliminar el pedido de la base de datos
     $sql = "DELETE FROM clientes WHERE item = ?";
     $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        die("Error en la preparación de la consulta: " . $conn->error);
+    }
     $stmt->bind_param("i", $item);
     $stmt->execute();
 
     // Verificar si se eliminó correctamente
     if ($stmt->affected_rows > 0) {
-        // Redirigir de vuelta a la página de listado
+        // Redirigir de vuelta a la página de listado con un mensaje de éxito
         $stmt->close();
         $conn->close();
-        header("Location: listado_envios.php");
-        exit(); // Asegúrate de que el script se detenga después de redirigir
+        header("Location: listado_envios.php?msg=success");
+        exit(); // Asegurarse de que el script se detenga después de redirigir
     } else {
-        echo "Error al eliminar el pedido";
+        echo "Error: No se pudo eliminar el pedido o el pedido no existe.";
     }
 
     // Cerrar la conexión
     $stmt->close();
     $conn->close();
 } else {
-    echo "ID no válido";
+    echo "ID no válido o no se envió correctamente.";
 }

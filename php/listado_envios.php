@@ -1,4 +1,9 @@
 <?php
+// Verificar si hay un mensaje de éxito en la URL
+if (isset($_GET['msg']) && $_GET['msg'] == 'success') {
+    echo "<div style='color: green; text-align: center;'>El pedido ha sido eliminado con éxito.</div>";
+}
+
 // Verificar si las variables de entorno están definidas (producción) o usar valores por defecto (desarrollo local)
 $servername = getenv('DB_HOST') ?: 'localhost';
 $username = getenv('DB_USER') ?: 'root';
@@ -177,7 +182,7 @@ if (!$result) {
                     <th>Items</th>
                     <th>Nombre</th>
                     <th>Estado</th>
-                    <th>Fecha de Creación</th> <!-- Nueva columna para la fecha -->
+                    <th>Fecha de Creación</th>
                     <th>Acción</th>
                     <th>Copiar Enlace</th> <!-- Nueva columna -->
                     <th>Eliminar</th> <!-- Nueva columna para eliminar -->
