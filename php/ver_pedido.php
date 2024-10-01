@@ -15,21 +15,21 @@ if ($conn->connect_error) {
 }
 
 // Obtener el 'item' del pedido desde la URL
-$item = isset($_GET['item']) ? intval($_GET['item']) : 0;  // Verifica que uses 'item' o 'id'
+$item = isset($_GET['item']) ? intval($_GET['item']) : 0; // Verifica que 'item' sea un número
 
 if ($item > 0) {
-    // Preparar la consulta usando 'item'
+    // Preparar la consulta
     $sql = "SELECT * FROM clientes WHERE item = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $item);  // Usa 'i' para enteros
+    $stmt->bind_param("i", $item);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $pedido = $result->fetch_assoc();
-        echo json_encode($pedido);
+        echo json_encode($pedido); // Devuelve el pedido encontrado
     } else {
-        echo json_encode(['error' => 'Pedido no encontrado']);
+        echo json_encode(['error' => 'Pedido no encontrado']); // En caso de no encontrar el pedido
     }
 
     $stmt->close();
