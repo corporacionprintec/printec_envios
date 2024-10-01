@@ -98,7 +98,6 @@
         }
     </style>
     <script>
-        // Habilitar botón de enviar solo si hay archivo de comprobante y clave de envío
         function enableButton() {
             var comprobanteEnvio = document.getElementById('comprobanteEnvio').files.length > 0;
             var claveEnvio = document.getElementById('claveEnvio').value;
@@ -111,7 +110,6 @@
             }
         }
 
-        // Función para imprimir el membrete
         function printMembrete() {
             var printWindow = window.open('', '', 'height=600,width=800');
             var printDocument = printWindow.document;
@@ -158,26 +156,26 @@
         // Función para cargar detalles del pedido desde el servidor
         function cargarDetallesPedido() {
             const params = new URLSearchParams(window.location.search);
-            const pedidoId = params.get('id');
+            const pedidoId = params.get('item'); // Asegúrate de que sea 'item' aquí
 
-            fetch(`/php/ver_pedido.php?id=${pedidoId}`)
+            fetch(`/php/ver_pedido.php?item=${pedidoId}`) // Asegúrate de que la URL esté correcta
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     alert('Error: ' + data.error);
                 } else {
                     // Colocar los datos del pedido en los elementos correspondientes
-                    document.getElementById('item').innerText = data.id;
+                    document.getElementById('item').innerText = data.item;
                     document.getElementById('nombre').innerText = data.nombre;
                     document.getElementById('dni').innerText = data.dni;
                     document.getElementById('telefono').innerText = data.telefono;
-                    document.getElementById('tipoEnvio').innerText = data.envio;
+                    document.getElementById('tipoEnvio').innerText = data.envio; // Cambio importante: uso de 'envio' en lugar de 'tipoEnvio'
                     document.getElementById('direccion').innerText = data.direccion;
                     document.getElementById('agencia').innerText = data.agencia;
                     document.getElementById('estado').innerText = data.estado;
 
-                    // Asignar el valor de 'id' al campo oculto
-                    document.getElementById('hiddenItemId').value = data.id;
+                    // Asignar el valor de 'item' al campo oculto
+                    document.getElementById('hiddenItemId').value = data.item;
                 }
             })
             .catch(error => {
@@ -220,7 +218,7 @@
                 <label for="claveEnvio">Clave de Envío</label>
                 <input type="text" id="claveEnvio" name="claveEnvio" onkeyup="enableButton()">
             </div>
-            <input type="hidden" name="id" value="" id="hiddenItemId">
+            <input type="hidden" name="item" value="" id="hiddenItemId">
             <button type="submit" id="enviarButton" class="btn" disabled>Enviar</button>
         </form>
 
