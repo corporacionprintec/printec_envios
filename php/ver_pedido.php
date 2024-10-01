@@ -15,7 +15,7 @@ if ($conn->connect_error) {
 }
 
 // Obtener el 'item' del pedido desde la URL
-$item = isset($_GET['item']) ? intval($_GET['item']) : 0; // Verifica que 'item' sea un número
+$item = isset($_GET['item']) ? intval($_GET['item']) : 0;
 
 if ($item > 0) {
     // Preparar la consulta
