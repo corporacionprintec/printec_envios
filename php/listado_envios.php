@@ -197,8 +197,11 @@ if (!$result) {
                         $estado = $row['estado'];
                         $fecha_creacion = $row['fecha_creacion'];
 
+                        // URL para ver detalles
+                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $item;
+
                         // URL de confirmación generada dinámicamente usando el campo 'id'
-                        $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id']; // Cambiado a id
+                        $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id'];
 
                         // Definir clase de estilo según el estado
                         $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
@@ -208,8 +211,8 @@ if (!$result) {
                         echo "<td>" . $nombre . "</td>";
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
                         echo "<td>" . $fecha_creacion . "</td>";
-                        // Cambiar el enlace a confirmacion.html con la URL correcta
-                        echo '<td><a href="https://printecenvios-production.up.railway.app/confirmacion.html?id=' . $row['id'] . '">Ver Detalles</a></td>'; // Asegúrate que el id esté correcto
+                        // Cambiar el enlace a ver_pedido.html con la URL correcta
+                        echo '<td><a href="' . $urlVerDetalles . '">Ver Detalles</a></td>';
                         echo '<td><input type="hidden" id="link_' . $item . '" value="' . $urlConfirmacion . '">
                         <button class="copy-btn" onclick="copyToClipboard(\'link_' . $item . '\')">Copiar enlace</button></td>';
                         echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
