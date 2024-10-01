@@ -156,11 +156,30 @@ if (!$result) {
                 form.submit();
             }
         }
+
+        // Función para filtrar la tabla por nombre
+        function filtrarTabla() {
+            var input = document.getElementById("buscador");
+            var filtro = input.value.toLowerCase();
+            var table = document.getElementById("tablaEnvios");
+            var tr = table.getElementsByTagName("tr");
+
+            for (var i = 1; i < tr.length; i++) { // Empezar en 1 para omitir el encabezado
+                var tdNombre = tr[i].getElementsByTagName("td")[1]; // Columna de nombre
+                if (tdNombre) {
+                    var txtValue = tdNombre.textContent || tdNombre.innerText;
+                    tr[i].style.display = txtValue.toLowerCase().indexOf(filtro) > -1 ? "" : "none";
+                }
+            }
+        }
     </script>
 </head>
 <body>
     <div class="container">
         <h1>Listado de Envíos</h1>
+
+        <!-- Buscador -->
+        <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="Buscar por nombre..." style="margin-bottom: 20px; padding: 10px; width: 100%; border: 1px solid #ddd; border-radius: 5px;">
 
         <!-- Filtro de cantidad de registros a mostrar -->
         <form method="GET" action="">
@@ -176,7 +195,7 @@ if (!$result) {
             </select>
         </form>
 
-        <table>
+        <table id="tablaEnvios">
             <thead>
                 <tr>
                     <th>Items</th>
