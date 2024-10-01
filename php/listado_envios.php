@@ -184,8 +184,8 @@ if (!$result) {
                     <th>Estado</th>
                     <th>Fecha de Creación</th>
                     <th>Acción</th>
-                    <th>Copiar Enlace</th> <!-- Nueva columna -->
-                    <th>Eliminar</th> <!-- Nueva columna para eliminar -->
+                    <th>Copiar Enlace</th>
+                    <th>Eliminar</th>
                 </tr>
             </thead>
             <tbody>
@@ -196,10 +196,9 @@ if (!$result) {
                         $nombre = $row['nombre'];
                         $estado = $row['estado'];
                         $fecha_creacion = $row['fecha_creacion'];
-                        $id = $row['id']; // Agregamos el ID aquí
 
-                        // URL de confirmación generada dinámicamente usando el ID
-                        $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $id;
+                        // URL de confirmación generada dinámicamente usando el campo 'id'
+                        $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id']; // Cambiado a id
 
                         // Definir clase de estilo según el estado
                         $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
@@ -209,8 +208,8 @@ if (!$result) {
                         echo "<td>" . $nombre . "</td>";
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
                         echo "<td>" . $fecha_creacion . "</td>";
-                        // Cambiar el enlace a confirmacion.html con el id correcto
-                        echo '<td><a href="https://printecenvios-production.up.railway.app/confirmacion.html?id=' . $id . '">Ver Detalles</a></td>';
+                        // Cambiar el enlace a confirmacion.html con la URL correcta
+                        echo '<td><a href="https://printecenvios-production.up.railway.app/confirmacion.html?id=' . $row['id'] . '">Ver Detalles</a></td>'; // Asegúrate que el id esté correcto
                         echo '<td><input type="hidden" id="link_' . $item . '" value="' . $urlConfirmacion . '">
                         <button class="copy-btn" onclick="copyToClipboard(\'link_' . $item . '\')">Copiar enlace</button></td>';
                         echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
