@@ -14,14 +14,14 @@ if ($conn->connect_error) {
     die(json_encode(['error' => 'Conexión fallida']));
 }
 
-// Obtener el ID del pedido desde la URL
-$id = isset($_GET['id']) ? $_GET['id'] : '';
+// Obtener el 'item' del pedido desde la URL
+$item = isset($_GET['item']) ? intval($_GET['item']) : 0;
 
-if (!empty($id)) {
-    // Preparar la consulta (ahora buscando por 'id' en lugar de 'item')
-    $sql = "SELECT * FROM clientes WHERE id = ?";
+if ($item > 0) {
+    // Preparar la consulta usando 'item'
+    $sql = "SELECT * FROM clientes WHERE item = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $id); // 'id' es tipo string
+    $stmt->bind_param("i", $item);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -34,7 +34,7 @@ if (!empty($id)) {
 
     $stmt->close();
 } else {
-    echo json_encode(['error' => 'ID no válido']);
+    echo json_encode(['error' => 'ID de pedido no válido']);
 }
 
 $conn->close();
