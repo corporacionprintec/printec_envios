@@ -1,7 +1,6 @@
 <?php
 header('Content-Type: application/json');
 
-// Conectar a la base de datos
 $servername = getenv('DB_HOST') ?: 'localhost';
 $username = getenv('DB_USER') ?: 'root';
 $password = getenv('DB_PASS') ?: '';
@@ -14,27 +13,25 @@ if ($conn->connect_error) {
     die(json_encode(['error' => 'Conexión fallida']));
 }
 
-// Obtener el 'item' del pedido desde la URL
-$item = isset($_GET['item']) ? intval($_GET['item']) : 0;
+$item_id = isset($_GET['item']) ? intval($_GET['item']) : 0;
 
-if ($item > 0) {
-    // Preparar la consulta
+if ($item_id > 0) {
     $sql = "SELECT * FROM clientes WHERE item = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $item);
+    $stmt->bind_param("i", $item_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $pedido = $result->fetch_assoc();
-        echo json_encode($pedido); // Devuelve el pedido encontrado
+        echo json_encode($pedido);
     } else {
-        echo json_encode(['error' => 'Pedido no encontrado']); // En caso de no encontrar el pedido
+        echo json_encode(['error' => 'Pedido no encontrado']);
     }
 
     $stmt->close();
 } else {
-    echo json_encode(['error' => 'ID de pedido no válido']);
+    echo json_encode(['error' => 'ID no válido']);
 }
 
 $conn->close();
