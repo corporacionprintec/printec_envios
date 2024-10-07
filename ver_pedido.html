@@ -98,11 +98,7 @@
             var claveEnvio = document.getElementById('claveEnvio').value;
             var enviarButton = document.getElementById('enviarButton');
 
-            if (comprobanteEnvio && claveEnvio) {
-                enviarButton.disabled = false;
-            } else {
-                enviarButton.disabled = true;
-            }
+            enviarButton.disabled = !(comprobanteEnvio && claveEnvio);
         }
 
         function printMembrete() {
@@ -149,7 +145,6 @@
             printWindow.print();
         }
 
-        // Función para cargar detalles del pedido desde el servidor
         function cargarDetallesPedido() {
             const params = new URLSearchParams(window.location.search);
             const pedidoId = params.get('item'); // Asegúrate de que sea 'item' aquí
@@ -168,7 +163,6 @@
                 if (data.error) {
                     alert('Error: ' + data.error);
                 } else {
-                    // Colocar los datos del pedido en los elementos correspondientes
                     document.getElementById('item').innerText = pedidoId;
                     document.getElementById('nombre').innerText = data.nombre || "No disponible";
                     document.getElementById('dni').innerText = data.dni || "No disponible";
@@ -178,11 +172,9 @@
                     document.getElementById('agencia').innerText = data.agencia || "No disponible";
                     document.getElementById('estado').innerText = data.estado || "No disponible";
 
-                    // Campos de mantenimiento
                     document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento || "No disponible";
-                    document.getElementById('detalleMantenimiento').innerText = data.compraMantenimiento || "No disponible";
+                    document.getElementById('detalleMantenimiento').innerText = data.razonMantenimiento || "No disponible";
 
-                    // Asignar el valor de 'item' al campo oculto
                     document.getElementById('hiddenItemId').value = pedidoId;
                 }
             })
