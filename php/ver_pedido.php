@@ -17,25 +17,39 @@ if ($conn->connect_error) {
 if (isset($_GET['item'])) {
     $item = $_GET['item'];
 
+    // Depuración: verificar el valor de $item
+    error_log("El valor de item es: " . $item);
+
     // Consulta para obtener los detalles del pedido
     $sql = "SELECT clientes.*, mantenimientos.producto, mantenimientos.detalle 
             FROM clientes 
             LEFT JOIN mantenimientos ON clientes.item = mantenimientos.item 
             WHERE clientes.item = ?";
+    
     $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error en la preparación de la consulta: " . $conn->error);
+        echo json_encode(['error' => 'Error en la consulta']);
+        exit;
+    }
+
     $stmt->bind_param("i", $item);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $pedido = $result->fetch_assoc();
-        echo json_encode($pedido);  // Imprimir directamente para verificar en el navegador
+        echo json_encode($pedido);
     } else {
+        // Depuración: no se encontró el pedido
+        error_log("No se encontró el pedido con el item: " . $item);
         echo json_encode(['error' => 'Pedido no encontrado']);
     }
 
     $stmt->close();
 } else {
+    // Depuración: no se pasó un parámetro válido
+    error_log("ID no válido");
     echo json_encode(['error' => 'ID no válido']);
 }
 

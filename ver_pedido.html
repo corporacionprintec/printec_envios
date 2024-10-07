@@ -161,6 +161,7 @@
             fetch(`/php/ver_pedido.php?item=${pedidoId}`)
             .then(response => {
                 if (!response.ok) {
+                    console.error('Error en la respuesta del servidor:', response.status);
                     throw new Error('Error en la respuesta de la API');
                 }
                 return response.json();
