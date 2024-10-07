@@ -25,11 +25,13 @@ if (isset($_GET['item'])) {
             FROM clientes 
             LEFT JOIN mantenimientos ON clientes.item = mantenimientos.item 
             WHERE clientes.item = ?";
-    
+
     $stmt = $conn->prepare($sql);
+    
+    // Si hay un error en la preparación de la consulta, mostrarlo
     if (!$stmt) {
         error_log("Error en la preparación de la consulta: " . $conn->error);
-        echo json_encode(['error' => 'Error en la consulta']);
+        echo json_encode(['error' => 'Error en la consulta: ' . $conn->error]);  // Mostrar error
         exit;
     }
 
