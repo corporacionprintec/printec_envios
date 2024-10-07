@@ -29,7 +29,7 @@ if (isset($_GET['item'])) {
 
     if ($result->num_rows > 0) {
         $pedido = $result->fetch_assoc();
-        echo json_encode($pedido);
+        echo json_encode($pedido);  // Imprimir directamente para verificar en el navegador
     } else {
         echo json_encode(['error' => 'Pedido no encontrado']);
     }

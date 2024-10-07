@@ -148,7 +148,6 @@
             printDocument.write('<p><strong>Producto a Realizar Mantenimiento:</strong> ' + document.getElementById('productoMantenimiento').innerText + '</p>');
             printDocument.write('<p><strong>Detalle del Mantenimiento:</strong> ' + document.getElementById('detalleMantenimiento').innerText + '</p>');
             printDocument.write('</div>');
-            printDocument.write('</body></html>');
             printDocument.close();
 
             printWindow.print();
@@ -159,9 +158,16 @@
             const params = new URLSearchParams(window.location.search);
             const pedidoId = params.get('item'); // Asegúrate de que sea 'item' aquí
 
-            fetch(`/php/ver_pedido.php?item=${pedidoId}`) // Asegúrate de que la URL esté correcta
-            .then(response => response.json())
+            fetch(`/php/ver_pedido.php?item=${pedidoId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta de la API');
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log("Datos recibidos:", data);  // Verificamos qué datos se reciben
+
                 if (data.error) {
                     alert('Error: ' + data.error);
                 } else {
@@ -185,6 +191,7 @@
             })
             .catch(error => {
                 console.error('Error al obtener los detalles del pedido:', error);
+                alert("Hubo un error al cargar los datos del pedido");
             });
         }
 
