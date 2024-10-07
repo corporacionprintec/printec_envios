@@ -20,10 +20,10 @@ if (isset($_GET['item'])) {
     // Consulta para obtener los detalles del pedido desde la tabla 'clientes'
     $sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, estado, productoMantenimiento, compraMantenimiento 
             FROM clientes 
-            WHERE item = ?";
-    
+            WHERE item = ?"; // Asegúrate de que 'item' sea el campo correcto
+
     $stmt = $conn->prepare($sql);
-    
+
     if (!$stmt) {
         echo json_encode(['error' => 'Error en la consulta: ' . $conn->error]);
         exit;
@@ -35,6 +35,15 @@ if (isset($_GET['item'])) {
 
     if ($result->num_rows > 0) {
         $pedido = $result->fetch_assoc();
+
+        // Verificar si los campos de mantenimiento están vacíos
+        if (empty($pedido['productoMantenimiento'])) {
+            $pedido['productoMantenimiento'] = 'No disponible';
+        }
+        if (empty($pedido['compraMantenimiento'])) {
+            $pedido['compraMantenimiento'] = 'No disponible';
+        }
+
         echo json_encode($pedido);
     } else {
         echo json_encode(['error' => 'Pedido no encontrado']);
