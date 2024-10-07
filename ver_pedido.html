@@ -145,6 +145,8 @@
             printDocument.write('<p><strong>Tipo de Envío:</strong> ' + document.getElementById('tipoEnvio').innerText + '</p>');
             printDocument.write('<p><strong>Dirección:</strong> ' + document.getElementById('direccion').innerText + '</p>');
             printDocument.write('<p><strong>Agencia:</strong> ' + document.getElementById('agencia').innerText + '</p>');
+            printDocument.write('<p><strong>Producto a Realizar Mantenimiento:</strong> ' + document.getElementById('productoMantenimiento').innerText + '</p>');
+            printDocument.write('<p><strong>Detalle del Mantenimiento:</strong> ' + document.getElementById('detalleMantenimiento').innerText + '</p>');
             printDocument.write('</div>');
             printDocument.write('</body></html>');
             printDocument.close();
@@ -168,10 +170,14 @@
                     document.getElementById('nombre').innerText = data.nombre;
                     document.getElementById('dni').innerText = data.dni;
                     document.getElementById('telefono').innerText = data.telefono;
-                    document.getElementById('tipoEnvio').innerText = data.envio; // Cambio importante: uso de 'envio' en lugar de 'tipoEnvio'
+                    document.getElementById('tipoEnvio').innerText = data.envio;
                     document.getElementById('direccion').innerText = data.direccion;
                     document.getElementById('agencia').innerText = data.agencia;
                     document.getElementById('estado').innerText = data.estado;
+
+                    // Nuevos campos agregados
+                    document.getElementById('productoMantenimiento').innerText = data.producto;
+                    document.getElementById('detalleMantenimiento').innerText = data.detalle;
 
                     // Asignar el valor de 'item' al campo oculto
                     document.getElementById('hiddenItemId').value = data.item;
@@ -205,6 +211,8 @@
             <p><strong>Dirección:</strong> <span id="direccion"></span></p>
             <p><strong>Agencia:</strong> <span id="agencia"></span></p>
             <p><strong>Estado:</strong> <span id="estado"></span></p>
+            <p><strong>Producto a Realizar Mantenimiento:</strong> <span id="productoMantenimiento"></span></p>
+            <p><strong>Detalle del Mantenimiento:</strong> <span id="detalleMantenimiento"></span></p>
         </div>
 
         <!-- Formulario para enviar comprobante de envío y clave de envío -->

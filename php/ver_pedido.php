@@ -18,7 +18,10 @@ if (isset($_GET['item'])) {
     $item = $_GET['item'];
 
     // Consulta para obtener los detalles del pedido
-    $sql = "SELECT * FROM clientes WHERE item = ?";
+    $sql = "SELECT clientes.*, mantenimientos.producto, mantenimientos.detalle 
+            FROM clientes 
+            LEFT JOIN mantenimientos ON clientes.item = mantenimientos.item 
+            WHERE clientes.item = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $item);
     $stmt->execute();
