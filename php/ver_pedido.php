@@ -24,9 +24,7 @@ if (isset($_GET['item'])) {
     
     $stmt = $conn->prepare($sql);
     
-    // Si hay un error en la preparación de la consulta, mostrarlo
     if (!$stmt) {
-        error_log("Error en la preparación de la consulta: " . $conn->error);
         echo json_encode(['error' => 'Error en la consulta: ' . $conn->error]);
         exit;
     }
@@ -39,13 +37,11 @@ if (isset($_GET['item'])) {
         $pedido = $result->fetch_assoc();
         echo json_encode($pedido);
     } else {
-        error_log("No se encontró el pedido con el item: " . $item);
         echo json_encode(['error' => 'Pedido no encontrado']);
     }
 
     $stmt->close();
 } else {
-    error_log("ID no válido");
     echo json_encode(['error' => 'ID no válido']);
 }
 

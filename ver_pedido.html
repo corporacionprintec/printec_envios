@@ -173,21 +173,21 @@
                     alert('Error: ' + data.error);
                 } else {
                     // Colocar los datos del pedido en los elementos correspondientes
-                    document.getElementById('item').innerText = data.item;
-                    document.getElementById('nombre').innerText = data.nombre;
-                    document.getElementById('dni').innerText = data.dni;
-                    document.getElementById('telefono').innerText = data.telefono;
-                    document.getElementById('tipoEnvio').innerText = data.envio;
-                    document.getElementById('direccion').innerText = data.direccion;
-                    document.getElementById('agencia').innerText = data.agencia;
-                    document.getElementById('estado').innerText = data.estado;
+                    document.getElementById('item').innerText = pedidoId;
+                    document.getElementById('nombre').innerText = data.nombre || "No disponible";
+                    document.getElementById('dni').innerText = data.dni || "No disponible";
+                    document.getElementById('telefono').innerText = data.telefono || "No disponible";
+                    document.getElementById('tipoEnvio').innerText = data.envio || "No disponible";
+                    document.getElementById('direccion').innerText = data.direccion || "No disponible";
+                    document.getElementById('agencia').innerText = data.agencia || "No disponible";
+                    document.getElementById('estado').innerText = data.estado || "No disponible";
 
-                    // Nuevos campos agregados
-                    document.getElementById('productoMantenimiento').innerText = data.producto;
-                    document.getElementById('detalleMantenimiento').innerText = data.detalle;
+                    // Campos de mantenimiento
+                    document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento || "No disponible";
+                    document.getElementById('detalleMantenimiento').innerText = data.compraMantenimiento || "No disponible";
 
                     // Asignar el valor de 'item' al campo oculto
-                    document.getElementById('hiddenItemId').value = data.item;
+                    document.getElementById('hiddenItemId').value = pedidoId;
                 }
             })
             .catch(error => {
