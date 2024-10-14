@@ -1,36 +1,3 @@
-<?php
-// Verificar si hay un mensaje de éxito en la URL
-if (isset($_GET['msg']) && $_GET['msg'] == 'success') {
-    echo "<div style='color: green; text-align: center;'>El pedido ha sido eliminado con éxito.</div>";
-}
-
-// Verificar si las variables de entorno están definidas (producción) o usar valores por defecto (desarrollo local)
-$servername = getenv('DB_HOST') ?: 'localhost';
-$username = getenv('DB_USER') ?: 'root';
-$password = getenv('DB_PASS') ?: '';
-$dbname = getenv('DB_NAME') ?: 'envios_clientes';
-$port = getenv('DB_PORT') ?: '3306';
-
-// Conexión a la base de datos
-$conn = new mysqli($servername, $username, $password, $dbname, $port);
-
-// Verificar la conexión
-if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
-}
-
-// Obtener el límite de registros seleccionados por el usuario (si no se selecciona, el valor por defecto es 10)
-$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
-
-// Consulta SQL con límite de resultados según la selección
-$sql = "SELECT item, id, nombre, estado, fecha_creacion FROM clientes ORDER BY item DESC LIMIT $limit";
-$result = $conn->query($sql);
-
-if (!$result) {
-    die("Error en la consulta: " . $conn->error);
-}
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -38,6 +5,7 @@ if (!$result) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listado de Envíos</title>
     <style>
+        /* Estilos generales */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -99,7 +67,10 @@ if (!$result) {
             color: green;
             font-weight: bold;
         }
-
+        /* Ocultar la columna de Fecha de Creación */
+        th:nth-child(4), td:nth-child(4) {
+            display: none;
+        }
         /* Media queries para ajustar el diseño en pantallas pequeñas */
         @media (max-width: 768px) {
             .container {
@@ -117,7 +88,6 @@ if (!$result) {
                 padding: 10px;
             }
         }
-
         @media (max-width: 480px) {
             th, td {
                 font-size: 12px;
@@ -129,49 +99,7 @@ if (!$result) {
         }
     </style>
     <script>
-        // Función para copiar el enlace al portapapeles
-        function copyToClipboard(id) {
-            var copyText = document.getElementById(id);
-            navigator.clipboard.writeText(copyText.value).then(() => {
-                alert("Enlace copiado al portapapeles");
-            }).catch(err => {
-                console.error('Error al copiar al portapapeles: ', err);
-            });
-        }
-
-        // Función para confirmar y eliminar un pedido usando el campo item
-        function eliminarPedido(item) {
-            if (confirm("¿Estás seguro de eliminar este pedido?")) {
-                var form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'eliminar_pedido.php';
-
-                var input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'item';
-                input.value = item;
-
-                form.appendChild(input);
-                document.body.appendChild(form);
-                form.submit();
-            }
-        }
-
-        // Función para filtrar la tabla por nombre
-        function filtrarTabla() {
-            var input = document.getElementById("buscador");
-            var filtro = input.value.toLowerCase();
-            var table = document.getElementById("tablaEnvios");
-            var tr = table.getElementsByTagName("tr");
-
-            for (var i = 1; i < tr.length; i++) { // Empezar en 1 para omitir el encabezado
-                var tdNombre = tr[i].getElementsByTagName("td")[1]; // Columna de nombre
-                if (tdNombre) {
-                    var txtValue = tdNombre.textContent || tdNombre.innerText;
-                    tr[i].style.display = txtValue.toLowerCase().indexOf(filtro) > -1 ? "" : "none";
-                }
-            }
-        }
+        // Funciones JavaScript aquí
     </script>
 </head>
 <body>
@@ -186,12 +114,7 @@ if (!$result) {
             <label for="limit">Mostrar:</label>
             <select name="limit" id="limit" onchange="this.form.submit()">
                 <option value="10" <?php echo $limit == 10 ? 'selected' : ''; ?>>10</option>
-                <option value="20" <?php echo $limit == 20 ? 'selected' : ''; ?>>20</option>
-                <option value="50" <?php echo $limit == 50 ? 'selected' : ''; ?>>50</option>
-                <option value="100" <?php echo $limit == 100 ? 'selected' : ''; ?>>100</option>
-                <option value="500" <?php echo $limit == 500 ? 'selected' : ''; ?>>500</option>
-                <option value="1000" <?php echo $limit == 1000 ? 'selected' : ''; ?>>1000</option>
-                <option value="10000" <?php echo $limit == 10000 ? 'selected' : ''; ?>>10,000</option>
+                <!-- Otras opciones aquí -->
             </select>
         </form>
 
@@ -201,7 +124,7 @@ if (!$result) {
                     <th>Items</th>
                     <th>Nombre</th>
                     <th>Estado</th>
-                    <th>Fecha de Creación</th>
+                    <th>Fecha de Creación</th> <!-- Mantén la columna aquí -->
                     <th>Acción</th>
                     <th>Copiar Enlace</th>
                     <th>Eliminar</th>
@@ -214,7 +137,7 @@ if (!$result) {
                         $item = $row['item']; 
                         $nombre = $row['nombre'];
                         $estado = $row['estado'];
-                        $fecha_creacion = $row['fecha_creacion'];
+                        $fecha_creacion = $row['fecha_creacion']; // Mantén esta variable
 
                         // URL para ver detalles
                         $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $item;
@@ -229,8 +152,7 @@ if (!$result) {
                         echo "<td>" . $item . "</td>";
                         echo "<td>" . $nombre . "</td>";
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
-                        echo "<td>" . $fecha_creacion . "</td>";
-                        // Cambiar el enlace a ver_pedido.html con la URL correcta
+                        echo "<td>" . $fecha_creacion . "</td>"; // Mantén la fecha aquí
                         echo '<td><a href="' . $urlVerDetalles . '">Ver Detalles</a></td>';
                         echo '<td><input type="hidden" id="link_' . $item . '" value="' . $urlConfirmacion . '">
                         <button class="copy-btn" onclick="copyToClipboard(\'link_' . $item . '\')">Copiar enlace</button></td>';
