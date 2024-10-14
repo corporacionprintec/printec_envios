@@ -147,7 +147,7 @@
 
         function cargarDetallesPedido() {
             const params = new URLSearchParams(window.location.search);
-            const pedidoId = params.get('item'); // Asegúrate de que sea 'item' aquí
+            const pedidoId = params.get('item');
 
             fetch(`/php/ver_pedido.php?item=${pedidoId}`)
             .then(response => {
@@ -158,7 +158,7 @@
                 return response.json();
             })
             .then(data => {
-                console.log("Datos recibidos:", data);  // Verificamos qué datos se reciben
+                console.log("Datos recibidos:", data);
 
                 if (data.error) {
                     alert('Error: ' + data.error);

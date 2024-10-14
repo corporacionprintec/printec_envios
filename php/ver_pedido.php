@@ -20,7 +20,7 @@ if (isset($_GET['item'])) {
     // Consulta para obtener los detalles del pedido desde la tabla 'clientes'
     $sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, estado, productoMantenimiento, razonMantenimiento 
             FROM clientes 
-            WHERE id = ?"; // Asegúrate de que 'id' sea el campo correcto que identifica el pedido
+            WHERE id = ?";
 
     $stmt = $conn->prepare($sql);
 
@@ -36,12 +36,11 @@ if (isset($_GET['item'])) {
     if ($result->num_rows > 0) {
         $pedido = $result->fetch_assoc();
         
-        // Verificar si los campos de mantenimiento están vacíos
-        if (empty($pedido['productoMantenimiento'])) {
-            $pedido['productoMantenimiento'] = 'No disponible';
-        }
-        if (empty($pedido['razonMantenimiento'])) {
-            $pedido['razonMantenimiento'] = 'No disponible';
+        // Verificar y asignar "No disponible" si algún campo está vacío
+        foreach ($pedido as $key => $value) {
+            if (empty($value)) {
+                $pedido[$key] = 'No disponible';
+            }
         }
 
         echo json_encode($pedido);
