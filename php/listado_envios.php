@@ -197,7 +197,8 @@ if (!$result) {
                     <th>Nombre</th>
                     <th>Estado</th>
                     <th>Fecha de Creación</th>
-                    <th>Acción</th>
+                    <th>Ver Detalles</th>
+                    <th>Ver Pedido</th>
                     <th>Eliminar</th>
                 </tr>
             </thead>
@@ -210,6 +211,9 @@ if (!$result) {
                         $estado = $row['estado'];
                         $fecha_creacion = $row['fecha_creacion'];
 
+                        // URL para ver detalles
+                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $item;
+
                         // URL de confirmación generada dinámicamente usando el campo 'id'
                         $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id'];
 
@@ -221,12 +225,13 @@ if (!$result) {
                         echo "<td>" . $nombre . "</td>";
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
                         echo "<td>" . $fecha_creacion . "</td>"; // Mantener la columna en el código pero oculta por CSS
-                        echo '<td><a href="' . $urlConfirmacion . '" class="copy-btn">Ver Pedido</a></td>';
+                        echo '<td><a href="' . $urlVerDetalles . '" class="btn">Ver Detalles</a></td>';
+                        echo '<td><a href="' . $urlConfirmacion . '" class="btn">Ver Pedido</a></td>';
                         echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='6'>No hay envíos</td></tr>";
+                    echo "<tr><td colspan='7'>No hay envíos</td></tr>";
                 }
 
                 // Cerrar la conexión a la base de datos
