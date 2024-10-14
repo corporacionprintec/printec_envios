@@ -134,11 +134,19 @@ if (!$result) {
         }
     </style>
     <script>
-        // Función para copiar el enlace al portapapeles
-        function copyToClipboard(id) {
+        // Función para copiar el enlace y cambiar el botón a "Ver Pedido"
+        function copyToClipboard(id, urlConfirmacion) {
             var copyText = document.getElementById(id);
+
+            // Copiar al portapapeles
             navigator.clipboard.writeText(copyText.value).then(() => {
-                alert("Enlace copiado al portapapeles");
+                // Cambiar el botón a "Ver Pedido"
+                var button = document.getElementById("btn_" + id);
+                button.innerText = "Ver Pedido";
+                button.onclick = function() {
+                    // Redirigir al cliente a la página de confirmación
+                    window.location.href = urlConfirmacion;
+                };
             }).catch(err => {
                 console.error('Error al copiar al portapapeles: ', err);
             });
@@ -206,7 +214,7 @@ if (!$result) {
                     <th>Items</th>
                     <th>Nombre</th>
                     <th>Estado</th>
-                    <th>Fecha de Creación</th> <!-- La columna sigue presente -->
+                    <th>Fecha de Creación</th>
                     <th>Acción</th>
                     <th>Copiar Enlace</th>
                     <th>Eliminar</th>
@@ -236,8 +244,10 @@ if (!$result) {
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
                         echo "<td>" . $fecha_creacion . "</td>"; // Mantener la columna en el código pero oculta por CSS
                         echo '<td><a href="' . $urlVerDetalles . '">Ver Detalles</a></td>';
-                        echo '<td><input type="hidden" id="link_' . $item . '" value="' . $urlConfirmacion . '">
-                        <button class="copy-btn" onclick="copyToClipboard(\'link_' . $item . '\')">Copiar enlace</button></td>';
+                        echo '<td>
+                        <input type="hidden" id="link_' . $item . '" value="' . $urlConfirmacion . '">
+                        <button class="copy-btn" id="btn_link_' . $item . '" onclick="copyToClipboard(\'link_' . $item . '\', \'' . $urlConfirmacion . '\')">Copiar enlace</button>
+                        </td>';
                         echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
                         echo "</tr>";
                     }
