@@ -13,14 +13,14 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Verificar si se ha enviado el item
+// Verificar si se ha enviado el UID (cambiar item por uid si este es el campo correcto)
 if (isset($_GET['item'])) {
-    $item = $_GET['item'];
+    $uid = $_GET['item'];
 
-    // Consulta para obtener los detalles del pedido desde la tabla 'clientes'
+    // Consulta para obtener los detalles del pedido desde la tabla 'clientes' usando el UID
     $sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, estado, productoMantenimiento, razonMantenimiento 
             FROM clientes 
-            WHERE id = ?";
+            WHERE uid = ?"; // Cambiar 'uid' por el campo adecuado en la base de datos
 
     $stmt = $conn->prepare($sql);
 
@@ -29,7 +29,8 @@ if (isset($_GET['item'])) {
         exit;
     }
 
-    $stmt->bind_param("i", $item);
+    // Vinculamos el UID como string
+    $stmt->bind_param("s", $uid);  // 's' indica que estamos esperando un string (UID)
     $stmt->execute();
     $result = $stmt->get_result();
 
