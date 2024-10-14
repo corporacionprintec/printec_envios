@@ -17,24 +17,23 @@ if ($conn->connect_error) {
 if (isset($_GET['item'])) {
     $item = $_GET['item'];
 
-    // Validar si el 'item' es un UUID válido (formato XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)
+    // Validar si el 'item' es un UUID o un número
     if (preg_match('/^[a-f0-9\-]{36}$/', $item)) {
-        // Si es un UUID, hacer la consulta por 'id'
+        // Si es un UUID, hacer la consulta por 'id' (UUID)
         $sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, estado, productoMantenimiento, razonMantenimiento 
                 FROM clientes 
                 WHERE id = ?";
-
         $stmt = $conn->prepare($sql);
-
-        if (!$stmt) {
-            echo json_encode(['error' => 'Error en la consulta: ' . $conn->error]);
-            exit;
-        }
-
         $stmt->bind_param("s", $item);  // 's' para UUID (string)
+    } elseif (is_numeric($item)) {
+        // Si es numérico, hacer la consulta por 'item' (número entero)
+        $sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, estado, productoMantenimiento, razonMantenimiento 
+                FROM clientes 
+                WHERE item = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $item);  // 'i' para integer (número entero)
     } else {
-        // Si no es un UUID, puedes manejar otro caso o devolver un error
-        echo json_encode(['error' => 'ID no válido o no es un UUID']);
+        echo json_encode(['error' => 'ID no válido']);
         exit;
     }
 
