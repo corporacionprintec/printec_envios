@@ -100,6 +100,11 @@ if (!$result) {
             font-weight: bold;
         }
 
+        /* Ocultar la columna de Fecha de Creación */
+        th:nth-child(4), td:nth-child(4) {
+            display: none;
+        }
+
         /* Media queries para ajustar el diseño en pantallas pequeñas */
         @media (max-width: 768px) {
             .container {
@@ -201,7 +206,7 @@ if (!$result) {
                     <th>Items</th>
                     <th>Nombre</th>
                     <th>Estado</th>
-                    <th>Fecha de Creación</th>
+                    <th>Fecha de Creación</th> <!-- La columna sigue presente -->
                     <th>Acción</th>
                     <th>Copiar Enlace</th>
                     <th>Eliminar</th>
@@ -229,8 +234,7 @@ if (!$result) {
                         echo "<td>" . $item . "</td>";
                         echo "<td>" . $nombre . "</td>";
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
-                        echo "<td>" . $fecha_creacion . "</td>";
-                        // Cambiar el enlace a ver_pedido.html con la URL correcta
+                        echo "<td>" . $fecha_creacion . "</td>"; // Mantener la columna en el código pero oculta por CSS
                         echo '<td><a href="' . $urlVerDetalles . '">Ver Detalles</a></td>';
                         echo '<td><input type="hidden" id="link_' . $item . '" value="' . $urlConfirmacion . '">
                         <button class="copy-btn" onclick="copyToClipboard(\'link_' . $item . '\')">Copiar enlace</button></td>';
