@@ -134,24 +134,6 @@ if (!$result) {
         }
     </style>
     <script>
-        // Función para copiar el enlace y cambiar el botón a "Ver Pedido"
-        function copyToClipboard(id, urlConfirmacion) {
-            var copyText = document.getElementById(id);
-
-            // Copiar al portapapeles
-            navigator.clipboard.writeText(copyText.value).then(() => {
-                // Cambiar el botón a "Ver Pedido"
-                var button = document.getElementById("btn_" + id);
-                button.innerText = "Ver Pedido";
-                button.onclick = function() {
-                    // Redirigir al cliente a la página de confirmación
-                    window.location.href = urlConfirmacion;
-                };
-            }).catch(err => {
-                console.error('Error al copiar al portapapeles: ', err);
-            });
-        }
-
         // Función para confirmar y eliminar un pedido usando el campo item
         function eliminarPedido(item) {
             if (confirm("¿Estás seguro de eliminar este pedido?")) {
@@ -216,7 +198,6 @@ if (!$result) {
                     <th>Estado</th>
                     <th>Fecha de Creación</th>
                     <th>Acción</th>
-                    <th>Copiar Enlace</th>
                     <th>Eliminar</th>
                 </tr>
             </thead>
@@ -229,9 +210,6 @@ if (!$result) {
                         $estado = $row['estado'];
                         $fecha_creacion = $row['fecha_creacion'];
 
-                        // URL para ver detalles
-                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $item;
-
                         // URL de confirmación generada dinámicamente usando el campo 'id'
                         $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id'];
 
@@ -243,16 +221,12 @@ if (!$result) {
                         echo "<td>" . $nombre . "</td>";
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
                         echo "<td>" . $fecha_creacion . "</td>"; // Mantener la columna en el código pero oculta por CSS
-                        echo '<td><a href="' . $urlVerDetalles . '">Ver Detalles</a></td>';
-                        echo '<td>
-                        <input type="hidden" id="link_' . $item . '" value="' . $urlConfirmacion . '">
-                        <button class="copy-btn" id="btn_link_' . $item . '" onclick="copyToClipboard(\'link_' . $item . '\', \'' . $urlConfirmacion . '\')">Copiar enlace</button>
-                        </td>';
+                        echo '<td><a href="' . $urlConfirmacion . '" class="copy-btn">Ver Pedido</a></td>';
                         echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='7'>No hay envíos</td></tr>";
+                    echo "<tr><td colspan='6'>No hay envíos</td></tr>";
                 }
 
                 // Cerrar la conexión a la base de datos
