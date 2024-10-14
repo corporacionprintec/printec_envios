@@ -13,30 +13,38 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Verificar si se ha enviado el UID
+// Verificar si se ha enviado el UID o un valor numérico
 if (isset($_GET['item'])) {
-    $id = $_GET['item'];  // Usar 'item' como identificador, pero en realidad estamos filtrando por 'id' que es el UUID
+    $item = $_GET['item'];
 
-    // Consulta para obtener los detalles del pedido desde la tabla 'clientes' usando el campo 'id' (UUID)
-    $sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, estado, productoMantenimiento, razonMantenimiento 
-            FROM clientes 
-            WHERE id = ?"; // Aquí cambiamos a 'id' que es el campo UUID
+    // Validar si el 'item' es un UUID válido (formato XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)
+    if (preg_match('/^[a-f0-9\-]{36}$/', $item)) {
+        // Si es un UUID, hacer la consulta por 'id'
+        $sql = "SELECT nombre, dni, telefono, envio, direccion, agencia, estado, productoMantenimiento, razonMantenimiento 
+                FROM clientes 
+                WHERE id = ?";
 
-    $stmt = $conn->prepare($sql);
+        $stmt = $conn->prepare($sql);
 
-    if (!$stmt) {
-        echo json_encode(['error' => 'Error en la consulta: ' . $conn->error]);
+        if (!$stmt) {
+            echo json_encode(['error' => 'Error en la consulta: ' . $conn->error]);
+            exit;
+        }
+
+        $stmt->bind_param("s", $item);  // 's' para UUID (string)
+    } else {
+        // Si no es un UUID, puedes manejar otro caso o devolver un error
+        echo json_encode(['error' => 'ID no válido o no es un UUID']);
         exit;
     }
 
-    // Vinculamos el UUID como string
-    $stmt->bind_param("s", $id);  // 's' indica que estamos esperando un string (UUID)
+    // Ejecutar la consulta y obtener el resultado
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $pedido = $result->fetch_assoc();
-        
+
         // Verificar y asignar "No disponible" si algún campo está vacío
         foreach ($pedido as $key => $value) {
             if (empty($value)) {
