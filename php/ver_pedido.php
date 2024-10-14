@@ -56,4 +56,3 @@ if (isset($_GET['item'])) {
 
 $conn->close();
 ?>
-.
