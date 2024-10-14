@@ -135,13 +135,17 @@
             printDocument.write('<p><strong>Tipo de Retiro:</strong> ' + document.getElementById('tipoRetiro').value + '</p>');
             printDocument.write('<p><strong>Dirección:</strong> ' + document.getElementById('direccion').value + '</p>');
             printDocument.write('<p><strong>Agencia:</strong> ' + document.getElementById('agencia').value + '</p>');
-
             printDocument.write('</div>');
             printDocument.write('</body></html>');
             printDocument.close();
 
             printWindow.print();
         }
+
+        // Convertir el campo de "Nombre y Apellido" a mayúsculas mientras se escribe
+        document.getElementById('nombre').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
     </script>
 </head>
 <body>
@@ -152,7 +156,7 @@
         <form id="customer-form" action="php/guardar_clientes.php" method="POST" enctype="multipart/form-data">
             <!-- Campos del formulario -->
             <label for="nombre">Nombre y Apellido:</label>
-            <input type="text" id="nombre" name="nombre" required>
+            <input type="text" id="nombre" name="nombre" style="text-transform: uppercase;" required>
             
             <label for="dni">DNI:</label>
             <input type="text" id="dni" name="dni" required>
