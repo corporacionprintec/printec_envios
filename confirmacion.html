@@ -123,7 +123,7 @@
             document.getElementById('cliente_id_input').value = id;
 
             if (id) {
-                fetch('php/confirmacion.php?id=' + encodeURIComponent(id))
+                fetch('/php/confirmacion.php?id=' + encodeURIComponent(id))
                     .then(response => response.json())
                     .then(data => {
                         if (data && !data.error) {
@@ -163,11 +163,11 @@
                                 document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento;
                                 document.getElementById('detalleMantenimiento').innerText = data.razonMantenimiento;
                                 document.getElementById('estadoPedidoContainer').style.display = 'block';
-                                document.getElementById('comprobantePago').innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
+                                document.getElementById('comprobantePago').innerHTML = '<a href="/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
                             }
 
                             if (data.comprobanteEnvioRuta) {
-                                document.getElementById('comprobanteEnvio').innerHTML = '<a href="php/uploads/' + data.comprobanteEnvioRuta + '" target="_blank">Ver Comprobante de Envío</a>';
+                                document.getElementById('comprobanteEnvio').innerHTML = '<a href="/uploads/' + data.comprobanteEnvioRuta + '" target="_blank">Ver Comprobante de Envío</a>';
                             }
                             if (data.claveEnvio) {
                                 document.getElementById('claveEnvio').innerText = data.claveEnvio;
@@ -199,7 +199,7 @@
             e.preventDefault();
             var formData = new FormData(this);
 
-            fetch('php/subir_comprobante.php', {
+            fetch('/php/subir_comprobante.php', {
                 method: 'POST',
                 body: formData
             })
@@ -207,7 +207,7 @@
             .then(data => {
                 if (data.success) {
                     alert('Comprobante de pago subido con éxito');
-                    document.getElementById('comprobantePago').innerHTML = '<a href="php/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
+                    document.getElementById('comprobantePago').innerHTML = '<a href="/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
                 } else {
                     alert('Error al subir el comprobante de pago');
                 }
