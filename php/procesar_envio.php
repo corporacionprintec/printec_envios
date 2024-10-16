@@ -28,12 +28,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Manejar la subida de la imagen (comprobante de envío)
     $comprobanteEnvioRuta = '';
     if (isset($_FILES['comprobanteEnvio']) && $_FILES['comprobanteEnvio']['error'] == UPLOAD_ERR_OK) {
-        $target_dir = "uploads/";  // Directorio donde se guardará el archivo
+        $target_dir = "../uploads/";  // Directorio donde se guardará el archivo, asegurarse de que está fuera de php/
         $target_file = $target_dir . basename($_FILES["comprobanteEnvio"]["name"]);
         
         // Mover el archivo subido al directorio deseado
         if (move_uploaded_file($_FILES["comprobanteEnvio"]["tmp_name"], $target_file)) {
-            $comprobanteEnvioRuta = $target_file;  // Guardar la ruta completa del archivo
+            $comprobanteEnvioRuta = "uploads/" . basename($_FILES["comprobanteEnvio"]["name"]);  // Guardar solo el nombre del archivo para la URL
         } else {
             echo "Error al subir el archivo.";
             exit();
