@@ -28,12 +28,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Manejar la subida de la imagen (comprobante de envío)
     $comprobanteEnvioRuta = '';
     if (isset($_FILES['comprobanteEnvio']) && $_FILES['comprobanteEnvio']['error'] == UPLOAD_ERR_OK) {
-        $target_dir = "uploads/";  // Directorio donde se guardará el archivo
-        $target_file = $target_dir . basename($_FILES["comprobanteEnvio"]["name"]);
+        $target_dir = "../uploads/";  // Directorio donde se guardará el archivo
+        $file_name = basename($_FILES["comprobanteEnvio"]["name"]);
+        $target_file = $target_dir . $file_name;
         
         // Mover el archivo subido al directorio deseado
         if (move_uploaded_file($_FILES["comprobanteEnvio"]["tmp_name"], $target_file)) {
-            $comprobanteEnvioRuta = $target_file;  // Guardar la ruta completa del archivo
+            $comprobanteEnvioRuta = "uploads/" . $file_name;  // Guardar solo la ruta relativa correcta para la base de datos
         } else {
             echo "Error al subir el archivo.";
             exit();
@@ -42,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Actualizar la base de datos con la información del envío
     $sql = "UPDATE clientes SET comprobanteEnvioRuta = ?, claveEnvio = ?, estado = 'enviado' WHERE item = ?";
-    $stmt = $conn->prepare($sql);   
+    $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssi", $comprobanteEnvioRuta, $claveEnvio, $item);
 
     // Ejecutar la consulta
