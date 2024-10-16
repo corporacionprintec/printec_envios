@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Manejar la subida de la imagen (comprobante de envío)
     $comprobanteEnvioRuta = '';
     if (isset($_FILES['comprobanteEnvio']) && $_FILES['comprobanteEnvio']['error'] == UPLOAD_ERR_OK) {
-        $target_dir = "uploads/";  // Directorio donde se guardará el archivo fuera de php/
+        $target_dir = "../uploads/";  // Directorio donde se guardará el archivo fuera de 'php/'
         $target_file = $target_dir . basename($_FILES["comprobanteEnvio"]["name"]);
         
         // Mover el archivo subido al directorio deseado
