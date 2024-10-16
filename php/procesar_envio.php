@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // Mover el archivo subido al directorio deseado
         if (move_uploaded_file($_FILES["comprobanteEnvio"]["tmp_name"], $target_file)) {
-            $comprobanteEnvioRuta = basename($_FILES["comprobanteEnvio"]["name"]);  // Guardar solo el nombre del archivo
+            $comprobanteEnvioRuta = $target_file;  // Guardar la ruta completa del archivo
         } else {
             echo "Error al subir el archivo.";
             exit();
