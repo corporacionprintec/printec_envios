@@ -199,6 +199,7 @@ if (isset($_GET['guardar_contacto'])) {
                     <th>Items</th>
                     <th>Nombre</th>
                     <th>Teléfono</th>
+                    <th>Estado</th>
                     <th>Fecha de Creación</th>
                     <th>Guardar Contacto</th>
                     <th>Ver Detalles</th>
@@ -229,6 +230,7 @@ if (isset($_GET['guardar_contacto'])) {
                         echo "<td>" . $item . "</td>";
                         echo "<td>" . $nombre . "</td>";
                         echo "<td>" . $telefono . "</td>";
+                        echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
                         echo "<td>" . $fecha_creacion . "</td>"; 
 
                         // Botón para guardar contacto
@@ -245,7 +247,7 @@ if (isset($_GET['guardar_contacto'])) {
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='7'>No hay envíos</td></tr>";
+                    echo "<tr><td colspan='8'>No hay envíos</td></tr>";
                 }
 
                 // Cerrar la conexión a la base de datos
@@ -294,5 +296,3 @@ if (isset($_GET['guardar_contacto'])) {
     </script>
 </body>
 </html>
-
-
