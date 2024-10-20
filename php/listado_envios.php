@@ -1,3 +1,66 @@
+<?php
+// Verificar si hay un mensaje de éxito en la URL
+if (isset($_GET['msg']) && $_GET['msg'] == 'success') {
+    echo "<div style='color: green; text-align: center;'>El pedido ha sido eliminado con éxito.</div>";
+}
+
+// Verificar si las variables de entorno están definidas (producción) o usar valores por defecto (desarrollo local)
+$servername = getenv('DB_HOST') ?: 'localhost';
+$username = getenv('DB_USER') ?: 'root';
+$password = getenv('DB_PASS') ?: '';
+$dbname = getenv('DB_NAME') ?: 'envios_clientes';
+$port = getenv('DB_PORT') ?: '3306';
+
+// Conexión a la base de datos
+$conn = new mysqli($servername, $username, $password, $dbname, $port);
+
+// Verificar la conexión
+if ($conn->connect_error) {
+    die("Conexión fallida: " . $conn->connect_error);
+}
+
+// Obtener el límite de registros seleccionados por el usuario (si no se selecciona, el valor por defecto es 10)
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+
+// Consulta SQL con límite de resultados según la selección
+$sql = "SELECT item, id, nombre, telefono, estado FROM clientes ORDER BY item DESC LIMIT $limit";
+$result = $conn->query($sql);
+
+if (!$result) {
+    die("Error en la consulta: " . $conn->error);
+}
+
+// Función para crear el archivo VCF
+function generarVCF($nombre, $telefono) {
+    // Asegurarse de que el número no contenga espacios ni guiones
+    $telefono = preg_replace('/[^0-9]/', '', $telefono);
+
+    // Nombre del archivo VCF basado en el nombre del cliente
+    $filename = $nombre . ".vcf";
+    $filename = str_replace(' ', '_', $filename); // Quitar espacios del nombre
+
+    // Generar el contenido del archivo VCF
+    $contenidoVCF = "BEGIN:VCARD\r\n";
+    $contenidoVCF .= "VERSION:3.0\r\n";
+    $contenidoVCF .= "FN:" . $nombre . "\r\n";
+    $contenidoVCF .= "TEL;TYPE=CELL:" . $telefono . "\r\n";
+    $contenidoVCF .= "END:VCARD\r\n";
+
+    // Crear el archivo VCF y forzar su descarga
+    header('Content-Type: text/vcard');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    echo $contenidoVCF;
+}
+
+// Comprobar si se ha solicitado la generación de un contacto
+if (isset($_GET['guardar_contacto'])) {
+    $nombre = $_GET['nombre'];
+    $telefono = $_GET['telefono'];
+    generarVCF($nombre, $telefono);
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -46,31 +109,11 @@
         a:hover {
             text-decoration: underline;
         }
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .contact-btn {
+        .copy-btn, .delete-btn, .contact-btn {
             background-color: #28a745; /* Verde para Guardar Contacto */
             color: white;
             border: none;
-            padding: 10px 16px; /* Más grande */
-            cursor: pointer;
-            border-radius: 8px; /* Bordes más redondeados */
-            text-align: center;
-            display: inline-block;
-            width: 100%;
-            margin-bottom: 5px;
-            font-size: 16px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para darle más énfasis */
-        }
-        .copy-btn, .delete-btn {
             padding: 8px;
-            background-color: #17a2b8;
-            color: white;
-            border: none;
             cursor: pointer;
             border-radius: 5px;
             text-align: center;
@@ -80,6 +123,15 @@
         }
         .delete-btn {
             background-color: #dc3545;
+        }
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .contact-btn, .copy-btn {
+            width: 100%;
         }
 
         /* Estilos para el estado pendiente y enviado */
@@ -108,10 +160,6 @@
                 font-size: 14px;
                 padding: 10px;
             }
-            .contact-btn, .copy-btn, .delete-btn {
-                font-size: 14px;
-                padding: 10px;
-            }
         }
 
         @media (max-width: 480px) {
@@ -119,9 +167,8 @@
                 font-size: 12px;
                 padding: 8px;
             }
-            .contact-btn, .copy-btn, .delete-btn {
-                font-size: 12px;
-                padding: 8px;
+            .copy-btn {
+                padding: 6px 10px;
             }
         }
     </style>
