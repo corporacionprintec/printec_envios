@@ -30,6 +30,15 @@
         }
         .qr {
             width: 150px;
+            display: block;
+            margin-bottom: 10px; /* Añadido para separar el QR del texto */
+        }
+        .escanear {
+            color: black;
+            font-size: 20px;
+            text-align: center;
+            margin-top: 10px;
+            display: block; /* Asegura que sea un bloque debajo del QR */
         }
         h1 {
             color: #333;
@@ -113,17 +122,17 @@
             printDocument.write('p { font-size: 27px; margin: 10px 0; line-height: 1.5; }');
             printDocument.write('.container { max-width: 800px; margin: 0 auto; }');
             printDocument.write('.logo { width: 150px; float: left; }');
-            printDocument.write('.qr { width: 150px; float: right; }');
+            printDocument.write('.qr { width: 150px; float: right; margin-bottom: 10px; }');
+            printDocument.write('.escanear { color: black; font-size: 20px; text-align: right; margin-top: 10px; }');
             printDocument.write('.remitente { padding: 10px; border-radius: 5px; margin-bottom: 20px; clear: both; }');
             printDocument.write('.destinatario { color: #dc3545; padding: 10px; border-radius: 5px; }');
-            printDocument.write('.escanear { color: black; font-size: 20px; text-align: center; margin-top: 20px; }');  // Cambiar color a negro
             printDocument.write('</style>');
             printDocument.write('</head><body>');
             printDocument.write('<div class="header">');
             printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
-            printDocument.write('<div><img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr"></div>');
+            printDocument.write('<img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">');
+            printDocument.write('<div class="escanear">ESCANEA Y DESCUBRE</div>');  // Mueve el texto a la derecha
             printDocument.write('</div>');
-            printDocument.write('<div class="escanear">ESCANEA Y DESCUBRE</div>');  // Añadir texto con estilo en negro
             printDocument.write('<div class="container remitente">');
             printDocument.write('<h1>Datos del Remitente</h1>');
             printDocument.write('<p><strong>De:</strong> Eyter Yoel Rojas Sanchez</p>');
@@ -191,10 +200,8 @@
     <div class="container">
         <div class="header">
             <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
-            <div>
-                <img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">
-                <p style="text-align: center;">ESCANEA Y DESCUBRE</p>
-            </div>
+            <img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">
+            <div class="escanear">ESCANEA Y DESCUBRE</div>
         </div>
         
         <h1>Detalles del Pedido</h1>
