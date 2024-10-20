@@ -76,7 +76,7 @@ if (isset($_GET['guardar_contacto'])) {
         }
         .container {
             margin: 50px auto;
-            max-width: 800px;
+            max-width: 1000px;
             background-color: white;
             padding: 20px;
             border-radius: 10px;
@@ -113,17 +113,25 @@ if (isset($_GET['guardar_contacto'])) {
             background-color: #28a745; /* Verde para Guardar Contacto */
             color: white;
             border: none;
-            padding: 8px 12px;
+            padding: 8px;
             cursor: pointer;
             border-radius: 5px;
-            margin-right: 5px;
+            text-align: center;
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 5px;
         }
         .delete-btn {
             background-color: #dc3545;
         }
         .btn-group {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .contact-btn, .copy-btn {
+            width: 100%;
         }
 
         /* Estilos para el estado pendiente y enviado */
