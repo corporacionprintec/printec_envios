@@ -46,7 +46,7 @@ if (!$result) {
         }
         .container {
             margin: 50px auto;
-            max-width: 800px;
+            max-width: 1200px;
             background-color: white;
             padding: 20px;
             border-radius: 10px;
@@ -59,6 +59,7 @@ if (!$result) {
         table {
             width: 100%;
             border-collapse: collapse;
+            overflow-x: auto;
         }
         th, td {
             padding: 12px;
@@ -79,7 +80,7 @@ if (!$result) {
         a:hover {
             text-decoration: underline;
         }
-        .copy-btn, .delete-btn {
+        .copy-btn, .delete-btn, .contact-btn {
             background-color: #007bff;
             color: white;
             border: none;
@@ -90,6 +91,17 @@ if (!$result) {
         .delete-btn {
             background-color: #dc3545;
         }
+        .contact-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .contact-btn:hover {
+            background-color: #218838;
+        }
         /* Estilos para el estado pendiente y enviado */
         .pendiente {
             color: red;
@@ -99,30 +111,15 @@ if (!$result) {
             color: green;
             font-weight: bold;
         }
-
-        /* Ocultar la columna de Fecha de Creación */
-        th:nth-child(4), td:nth-child(4) {
-            display: none;
-        }
-
-        /* Estilo para el botón de guardar contacto */
-        .save-contact-btn {
-            background-color: #28a745;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 5px;
-            text-decoration: none;
-        }
-
-        /* Media queries para ajustar el diseño en pantallas pequeñas */
+        /* Ajustes responsivos */
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
                 max-width: 95%;
             }
             table {
-                width: 100%;
                 display: block;
+                width: 100%;
                 overflow-x: auto;
                 white-space: nowrap;
             }
@@ -131,14 +128,14 @@ if (!$result) {
                 padding: 10px;
             }
         }
-
         @media (max-width: 480px) {
             th, td {
                 font-size: 12px;
                 padding: 8px;
             }
-            .copy-btn {
+            .contact-btn, .copy-btn, .delete-btn {
                 padding: 6px 10px;
+                font-size: 12px;
             }
         }
     </style>
@@ -177,22 +174,15 @@ if (!$result) {
             }
         }
 
-        // Función para copiar el enlace del pedido
-        function copyToClipboard(id, urlConfirmacion) {
-            var copyText = document.getElementById(id);
-
-            // Copiar al portapapeles
-            navigator.clipboard.writeText(copyText.value).then(() => {
-                // Cambiar el botón a "Ver Pedido"
-                var button = document.getElementById("btn_" + id);
-                button.innerText = "Ver Pedido";
-                button.onclick = function() {
-                    // Redirigir al cliente a la página de confirmación
-                    window.location.href = urlConfirmacion;
-                };
-            }).catch(err => {
-                console.error('Error al copiar al portapapeles: ', err);
-            });
+        // Función para generar el archivo .vcf para guardar el contacto
+        function guardarContacto(nombre, telefono) {
+            const vcfData = 
+                `BEGIN:VCARD\nVERSION:3.0\nFN:${nombre}\nTEL:${telefono}\nEND:VCARD`;
+            const blob = new Blob([vcfData], { type: 'text/vcard' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${nombre.replace(/\s/g, '_')}.vcf`;
+            link.click();
         }
     </script>
 </head>
@@ -223,7 +213,6 @@ if (!$result) {
                     <th>Items</th>
                     <th>Nombre</th>
                     <th>Teléfono</th>
-                    <th>Estado</th>
                     <th>Fecha de Creación</th>
                     <th>Guardar Contacto</th>
                     <th>Ver Detalles</th>
@@ -250,23 +239,19 @@ if (!$result) {
                         // Definir clase de estilo según el estado
                         $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
 
-                        // URL para guardar contacto como vCard
-                        $urlVcard = "generar_vcard.php?nombre=" . urlencode($nombre) . "&telefono=" . urlencode($telefono);
-
                         echo "<tr>";
                         echo "<td>" . $item . "</td>";
                         echo "<td>" . $nombre . "</td>";
                         echo "<td>" . $telefono . "</td>";
-                        echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
                         echo "<td>" . $fecha_creacion . "</td>";
-                        echo '<td><a href="' . $urlVcard . '" class="save-contact-btn">Guardar Contacto</a></td>';
+                        echo "<td><button class='contact-btn' onclick=\"guardarContacto('$nombre', '$telefono')\">Guardar Contacto</button></td>";
                         echo '<td><a href="' . $urlVerDetalles . '" class="btn">Ver Detalles</a></td>';
                         echo '<td><a href="' . $urlConfirmacion . '" class="btn">Ver Pedido</a></td>';
                         echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='9'>No hay envíos</td></tr>";
+                    echo "<tr><td colspan='7'>No hay envíos</td></tr>";
                 }
 
                 // Cerrar la conexión a la base de datos
