@@ -23,7 +23,7 @@ if ($conn->connect_error) {
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
 
 // Consulta SQL con límite de resultados según la selección
-$sql = "SELECT item, id, nombre, estado, fecha_creacion FROM clientes ORDER BY item DESC LIMIT $limit";
+$sql = "SELECT item, id, nombre, telefono, estado, fecha_creacion FROM clientes ORDER BY item DESC LIMIT $limit";
 $result = $conn->query($sql);
 
 if (!$result) {
@@ -105,6 +105,15 @@ if (!$result) {
             display: none;
         }
 
+        /* Estilo para el botón de guardar contacto */
+        .save-contact-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
         /* Media queries para ajustar el diseño en pantallas pequeñas */
         @media (max-width: 768px) {
             .container {
@@ -114,8 +123,8 @@ if (!$result) {
             table {
                 width: 100%;
                 display: block;
-                overflow-x: auto; /* Permitir desplazamiento horizontal en pantallas pequeñas */
-                white-space: nowrap; /* Mantener las filas en una sola línea en móviles */
+                overflow-x: auto;
+                white-space: nowrap;
             }
             th, td {
                 font-size: 14px;
@@ -195,10 +204,10 @@ if (!$result) {
                 <tr>
                     <th>Items</th>
                     <th>Nombre</th>
+                    <th>Teléfono</th>
                     <th>Estado</th>
                     <th>Fecha de Creación</th>
-                    <th>Ver Detalles</th>
-                    <th>Ver Pedido</th>
+                    <th>Guardar Contacto</th>
                     <th>Eliminar</th>
                 </tr>
             </thead>
@@ -208,25 +217,24 @@ if (!$result) {
                     while ($row = $result->fetch_assoc()) {
                         $item = $row['item']; 
                         $nombre = $row['nombre'];
+                        $telefono = $row['telefono'];
                         $estado = $row['estado'];
                         $fecha_creacion = $row['fecha_creacion'];
-
-                        // URL para ver detalles
-                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $item;
-
-                        // URL de confirmación generada dinámicamente usando el campo 'id'
-                        $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id'];
 
                         // Definir clase de estilo según el estado
                         $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
 
                         echo "<tr>";
-                        echo "<td>" . $item . "</td>";
-                        echo "<td>" . $nombre . "</td>";
-                        echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
-                        echo "<td>" . $fecha_creacion . "</td>"; // Mantener la columna en el código pero oculta por CSS
-                        echo '<td><a href="' . $urlVerDetalles . '" class="btn">Ver Detalles</a></td>';
-                        echo '<td><a href="' . $urlConfirmacion . '" class="btn">Ver Pedido</a></td>';
+                        echo "<td>{$item}</td>";
+                        echo "<td>{$nombre}</td>";
+                        echo "<td>{$telefono}</td>";
+                        echo '<td class="' . $estadoClass . '">' . $estado . '</td>';
+                        echo "<td>{$fecha_creacion}</td>";
+                        
+                        // Agregar el botón de guardar contacto
+                        echo '<td><a class="save-contact-btn" href="generar_vcard.php?nombre=' . urlencode($nombre) . '&telefono=' . urlencode($telefono) . '">Guardar Contacto</a></td>';
+                        
+                        // Botón para eliminar
                         echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
                         echo "</tr>";
                     }
