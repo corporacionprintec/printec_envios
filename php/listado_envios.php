@@ -29,6 +29,36 @@ $result = $conn->query($sql);
 if (!$result) {
     die("Error en la consulta: " . $conn->error);
 }
+
+// Función para crear el archivo VCF
+function generarVCF($nombre, $telefono) {
+    // Asegurarse de que el número no contenga espacios ni guiones
+    $telefono = preg_replace('/[^0-9]/', '', $telefono);
+
+    // Nombre del archivo VCF basado en el nombre del cliente
+    $filename = $nombre . ".vcf";
+    $filename = str_replace(' ', '_', $filename); // Quitar espacios del nombre
+
+    // Generar el contenido del archivo VCF
+    $contenidoVCF = "BEGIN:VCARD\r\n";
+    $contenidoVCF .= "VERSION:3.0\r\n";
+    $contenidoVCF .= "FN:" . $nombre . "\r\n";
+    $contenidoVCF .= "TEL;TYPE=CELL:" . $telefono . "\r\n";
+    $contenidoVCF .= "END:VCARD\r\n";
+
+    // Crear el archivo VCF y forzar su descarga
+    header('Content-Type: text/vcard');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    echo $contenidoVCF;
+}
+
+// Comprobar si se ha solicitado la generación de un contacto
+if (isset($_GET['guardar_contacto'])) {
+    $nombre = $_GET['nombre'];
+    $telefono = $_GET['telefono'];
+    generarVCF($nombre, $telefono);
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -46,7 +76,7 @@ if (!$result) {
         }
         .container {
             margin: 50px auto;
-            max-width: 1200px;
+            max-width: 800px;
             background-color: white;
             padding: 20px;
             border-radius: 10px;
@@ -59,7 +89,6 @@ if (!$result) {
         table {
             width: 100%;
             border-collapse: collapse;
-            overflow-x: auto;
         }
         th, td {
             padding: 12px;
@@ -81,27 +110,22 @@ if (!$result) {
             text-decoration: underline;
         }
         .copy-btn, .delete-btn, .contact-btn {
-            background-color: #007bff;
+            background-color: #28a745; /* Verde para Guardar Contacto */
             color: white;
             border: none;
             padding: 8px 12px;
             cursor: pointer;
             border-radius: 5px;
+            margin-right: 5px;
         }
         .delete-btn {
             background-color: #dc3545;
         }
-        .contact-btn {
-            background-color: #28a745;
-            color: white;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
         }
-        .contact-btn:hover {
-            background-color: #218838;
-        }
+
         /* Estilos para el estado pendiente y enviado */
         .pendiente {
             color: red;
@@ -111,80 +135,35 @@ if (!$result) {
             color: green;
             font-weight: bold;
         }
-        /* Ajustes responsivos */
+
+        /* Media queries para pantallas pequeñas */
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
                 max-width: 95%;
             }
             table {
-                display: block;
                 width: 100%;
-                overflow-x: auto;
-                white-space: nowrap;
+                display: block;
+                overflow-x: auto; /* Permitir desplazamiento horizontal en pantallas pequeñas */
+                white-space: nowrap; /* Mantener las filas en una sola línea en móviles */
             }
             th, td {
                 font-size: 14px;
                 padding: 10px;
             }
         }
+
         @media (max-width: 480px) {
             th, td {
                 font-size: 12px;
                 padding: 8px;
             }
-            .contact-btn, .copy-btn, .delete-btn {
+            .copy-btn {
                 padding: 6px 10px;
-                font-size: 12px;
             }
         }
     </style>
-    <script>
-        // Función para confirmar y eliminar un pedido usando el campo item
-        function eliminarPedido(item) {
-            if (confirm("¿Estás seguro de eliminar este pedido?")) {
-                var form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'eliminar_pedido.php';
-
-                var input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'item';
-                input.value = item;
-
-                form.appendChild(input);
-                document.body.appendChild(form);
-                form.submit();
-            }
-        }
-
-        // Función para filtrar la tabla por nombre
-        function filtrarTabla() {
-            var input = document.getElementById("buscador");
-            var filtro = input.value.toLowerCase();
-            var table = document.getElementById("tablaEnvios");
-            var tr = table.getElementsByTagName("tr");
-
-            for (var i = 1; i < tr.length; i++) { // Empezar en 1 para omitir el encabezado
-                var tdNombre = tr[i].getElementsByTagName("td")[1]; // Columna de nombre
-                if (tdNombre) {
-                    var txtValue = tdNombre.textContent || tdNombre.innerText;
-                    tr[i].style.display = txtValue.toLowerCase().indexOf(filtro) > -1 ? "" : "none";
-                }
-            }
-        }
-
-        // Función para generar el archivo .vcf para guardar el contacto
-        function guardarContacto(nombre, telefono) {
-            const vcfData = 
-                `BEGIN:VCARD\nVERSION:3.0\nFN:${nombre}\nTEL:${telefono}\nEND:VCARD`;
-            const blob = new Blob([vcfData], { type: 'text/vcard' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${nombre.replace(/\s/g, '_')}.vcf`;
-            link.click();
-        }
-    </script>
 </head>
 <body>
     <div class="container">
@@ -201,9 +180,6 @@ if (!$result) {
                 <option value="20" <?php echo $limit == 20 ? 'selected' : ''; ?>>20</option>
                 <option value="50" <?php echo $limit == 50 ? 'selected' : ''; ?>>50</option>
                 <option value="100" <?php echo $limit == 100 ? 'selected' : ''; ?>>100</option>
-                <option value="500" <?php echo $limit == 500 ? 'selected' : ''; ?>>500</option>
-                <option value="1000" <?php echo $limit == 1000 ? 'selected' : ''; ?>>1000</option>
-                <option value="10000" <?php echo $limit == 10000 ? 'selected' : ''; ?>>10,000</option>
             </select>
         </form>
 
@@ -243,10 +219,18 @@ if (!$result) {
                         echo "<td>" . $item . "</td>";
                         echo "<td>" . $nombre . "</td>";
                         echo "<td>" . $telefono . "</td>";
-                        echo "<td>" . $fecha_creacion . "</td>";
-                        echo "<td><button class='contact-btn' onclick=\"guardarContacto('$nombre', '$telefono')\">Guardar Contacto</button></td>";
-                        echo '<td><a href="' . $urlVerDetalles . '" class="btn">Ver Detalles</a></td>';
-                        echo '<td><a href="' . $urlConfirmacion . '" class="btn">Ver Pedido</a></td>';
+                        echo "<td>" . $fecha_creacion . "</td>"; 
+
+                        // Botón para guardar contacto
+                        echo '<td><a href="listado_envios.php?guardar_contacto=1&nombre=' . urlencode($nombre) . '&telefono=' . urlencode($telefono) . '" class="contact-btn">Guardar Contacto</a></td>';
+
+                        // Botón para ver detalles
+                        echo '<td><a href="' . $urlVerDetalles . '" class="copy-btn">Ver Detalles</a></td>';
+                        
+                        // Botón para ver pedido
+                        echo '<td><a href="' . $urlConfirmacion . '" class="copy-btn">Ver Pedido</a></td>';
+                        
+                        // Botón para eliminar pedido
                         echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
                         echo "</tr>";
                     }
@@ -262,5 +246,41 @@ if (!$result) {
             </tbody>
         </table>
     </div>
+
+    <script>
+        // Función para confirmar y eliminar un pedido usando el campo item
+        function eliminarPedido(item) {
+            if (confirm("¿Estás seguro de eliminar este pedido?")) {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'eliminar_pedido.php';
+
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'item';
+                input.value = item;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Función para filtrar la tabla por nombre
+        function filtrarTabla() {
+            var input = document.getElementById("buscador");
+            var filtro = input.value.toLowerCase();
+            var table = document.getElementById("tablaEnvios");
+            var tr = table.getElementsByTagName("tr");
+
+            for (var i = 1; i < tr.length; i++) { // Empezar en 1 para omitir el encabezado
+                var tdNombre = tr[i].getElementsByTagName("td")[1]; // Columna de nombre
+                if (tdNombre) {
+                    var txtValue = tdNombre.textContent || tdNombre.innerText;
+                    tr[i].style.display = txtValue.toLowerCase().indexOf(filtro) > -1 ? "" : "none";
+                }
+            }
+        }
+    </script>
 </body>
 </html>
