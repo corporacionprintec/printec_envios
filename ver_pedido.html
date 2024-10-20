@@ -121,7 +121,7 @@
             printDocument.write('</head><body>');
             printDocument.write('<div class="header">');
             printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
-            printDocument.write('<img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">');
+            printDocument.write('<div><img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr"></div>');
             printDocument.write('</div>');
             printDocument.write('<div class="escanear">ESCANEA Y DESCUBRE</div>');  // Añadir texto con estilo en negro
             printDocument.write('<div class="container remitente">');
@@ -191,7 +191,10 @@
     <div class="container">
         <div class="header">
             <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
-            <img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">
+            <div>
+                <img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">
+                <p style="text-align: center;">ESCANEA Y DESCUBRE</p>
+            </div>
         </div>
         
         <h1>Detalles del Pedido</h1>
