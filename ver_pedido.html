@@ -24,22 +24,20 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            position: relative;
         }
         .logo {
             width: 150px;
         }
+        .qr-container {
+            text-align: center;
+        }
         .qr {
             width: 150px;
-            position: absolute;
-            top: 0;
-            right: 0;
         }
-        .escanear {
-            text-align: center;
+        .escanear-text {
             color: black;
-            margin-top: 160px; /* Ajusta el valor según sea necesario */
-            font-weight: bold;
+            font-size: 16px;
+            margin-top: 10px;
         }
         h1 {
             color: #333;
@@ -93,6 +91,10 @@
             cursor: not-allowed;
         }
         @media print {
+            .header {
+                display: flex;
+                justify-content: space-between;
+            }
             .remitente {
                 display: block;
                 margin-top: 20px;
@@ -123,17 +125,19 @@
             printDocument.write('p { font-size: 27px; margin: 10px 0; line-height: 1.5; }');
             printDocument.write('.container { max-width: 800px; margin: 0 auto; }');
             printDocument.write('.logo { width: 150px; float: left; }');
-            printDocument.write('.qr { width: 150px; float: right; }');
-            printDocument.write('.escanear { text-align: center; color: black; margin-top: 10px; }');  // Cambiar color a negro y ajustar la posición
+            printDocument.write('.qr-container { float: right; text-align: center; }');
+            printDocument.write('.qr { width: 150px; }');
+            printDocument.write('.escanear-text { color: black; font-size: 20px; margin-top: 10px; }');
             printDocument.write('.remitente { padding: 10px; border-radius: 5px; margin-bottom: 20px; clear: both; }');
             printDocument.write('.destinatario { color: #dc3545; padding: 10px; border-radius: 5px; }');
             printDocument.write('</style>');
             printDocument.write('</head><body>');
             printDocument.write('<div class="header">');
             printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
+            printDocument.write('<div class="qr-container">');
             printDocument.write('<img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">');
-            printDocument.write('<div class="escanear">ESCANEA Y DESCUBRE</div>');  // Añadir texto debajo del QR
-            printDocument.write('</div>');
+            printDocument.write('<div class="escanear-text">ESCANEA Y DESCUBRE</div>');
+            printDocument.write('</div></div>');
             printDocument.write('<div class="container remitente">');
             printDocument.write('<h1>Datos del Remitente</h1>');
             printDocument.write('<p><strong>De:</strong> Eyter Yoel Rojas Sanchez</p>');
@@ -149,6 +153,7 @@
             printDocument.write('<p><strong>Tipo de Envío:</strong> ' + document.getElementById('tipoEnvio').innerText + '</p>');
             printDocument.write('<p><strong>Dirección:</strong> ' + document.getElementById('direccion').innerText + '</p>');
             printDocument.write('<p><strong>Agencia:</strong> ' + document.getElementById('agencia').innerText + '</p>');
+            printDocument.write('</div>');
             printDocument.close();
 
             printWindow.print();
@@ -200,8 +205,10 @@
     <div class="container">
         <div class="header">
             <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
-            <img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">
-            <div class="escanear">ESCANEA Y DESCUBRE</div>
+            <div class="qr-container">
+                <img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">
+                <div class="escanear-text">ESCANEA Y DESCUBRE</div>
+            </div>
         </div>
         
         <h1>Detalles del Pedido</h1>
