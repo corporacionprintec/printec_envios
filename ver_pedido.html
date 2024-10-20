@@ -30,6 +30,7 @@
         }
         .qr {
             width: 150px;
+            text-align: center;
         }
         h1 {
             color: #333;
@@ -91,6 +92,14 @@
         .remitente {
             display: none;
         }
+
+        .scan-text {
+            text-align: center;
+            font-size: 16px;
+            color: #dc3545;
+            font-weight: bold;
+            margin-top: 10px;
+        }
     </style>
     <script>
         function enableButton() {
@@ -113,14 +122,17 @@
             printDocument.write('p { font-size: 27px; margin: 10px 0; line-height: 1.5; }');
             printDocument.write('.container { max-width: 800px; margin: 0 auto; }');
             printDocument.write('.logo { width: 150px; float: left; }');
-            printDocument.write('.qr { width: 150px; float: right; }');
+            printDocument.write('.qr { width: 150px; float: right; text-align: center; }');
             printDocument.write('.remitente { padding: 10px; border-radius: 5px; margin-bottom: 20px; clear: both; }');
             printDocument.write('.destinatario { color: #dc3545; padding: 10px; border-radius: 5px; }');
             printDocument.write('</style>');
             printDocument.write('</head><body>');
             printDocument.write('<div class="header">');
             printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
+            printDocument.write('<div class="qr">');
             printDocument.write('<img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">');
+            printDocument.write('<p class="scan-text">ESCANEA Y DESCUBRE</p>'); // Agregar la frase debajo del QR
+            printDocument.write('</div>');
             printDocument.write('</div>');
             printDocument.write('<div class="container remitente">');
             printDocument.write('<h1>Datos del Remitente</h1>');
@@ -189,7 +201,10 @@
     <div class="container">
         <div class="header">
             <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
-            <img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">
+            <div class="qr">
+                <img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">
+                <p class="scan-text">ESCANEA Y DESCUBRE</p> <!-- Frase añadida debajo del QR -->
+            </div>
         </div>
         
         <h1>Detalles del Pedido</h1>
