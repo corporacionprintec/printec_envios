@@ -23,7 +23,7 @@ if ($conn->connect_error) {
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
 
 // Consulta SQL con límite de resultados según la selección
-$sql = "SELECT item, id, nombre, telefono, estado, fecha_creacion FROM clientes ORDER BY item DESC LIMIT $limit";
+$sql = "SELECT item, id, nombre, telefono, estado FROM clientes ORDER BY item DESC LIMIT $limit";
 $result = $conn->query($sql);
 
 if (!$result) {
@@ -200,7 +200,6 @@ if (isset($_GET['guardar_contacto'])) {
                     <th>Nombre</th>
                     <th>Teléfono</th>
                     <th>Estado</th>
-                    <th>Fecha de Creación</th>
                     <th>Guardar Contacto</th>
                     <th>Ver Detalles</th>
                     <th>Ver Pedido</th>
@@ -215,7 +214,6 @@ if (isset($_GET['guardar_contacto'])) {
                         $nombre = $row['nombre'];
                         $telefono = $row['telefono'];
                         $estado = $row['estado'];
-                        $fecha_creacion = $row['fecha_creacion'];
 
                         // URL para ver detalles
                         $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $item;
@@ -231,7 +229,6 @@ if (isset($_GET['guardar_contacto'])) {
                         echo "<td>" . $nombre . "</td>";
                         echo "<td>" . $telefono . "</td>";
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
-                        echo "<td>" . $fecha_creacion . "</td>"; 
 
                         // Botón para guardar contacto
                         echo '<td><a href="listado_envios.php?guardar_contacto=1&nombre=' . urlencode($nombre) . '&telefono=' . urlencode($telefono) . '" class="contact-btn">Guardar Contacto</a></td>';
