@@ -28,9 +28,18 @@
         .logo {
             width: 150px;
         }
+        .qr-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
         .qr {
             width: 150px;
-            text-align: center;
+        }
+        .qr-text {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #dc3545;
         }
         h1 {
             color: #333;
@@ -84,21 +93,12 @@
             cursor: not-allowed;
         }
         @media print {
-            .remitente {
-                display: block;
-                margin-top: 20px;
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
             }
-        }
-        .remitente {
-            display: none;
-        }
-
-        .scan-text {
-            text-align: center;
-            font-size: 16px;
-            color: #dc3545;
-            font-weight: bold;
-            margin-top: 10px;
         }
     </style>
     <script>
@@ -122,16 +122,18 @@
             printDocument.write('p { font-size: 27px; margin: 10px 0; line-height: 1.5; }');
             printDocument.write('.container { max-width: 800px; margin: 0 auto; }');
             printDocument.write('.logo { width: 150px; float: left; }');
-            printDocument.write('.qr { width: 150px; float: right; text-align: center; }');
+            printDocument.write('.qr-container { text-align: center; float: right; }');
+            printDocument.write('.qr { width: 150px; }');
+            printDocument.write('.qr-text { margin-top: 10px; font-size: 18px; font-weight: bold; color: #dc3545; }');
             printDocument.write('.remitente { padding: 10px; border-radius: 5px; margin-bottom: 20px; clear: both; }');
             printDocument.write('.destinatario { color: #dc3545; padding: 10px; border-radius: 5px; }');
             printDocument.write('</style>');
             printDocument.write('</head><body>');
             printDocument.write('<div class="header">');
             printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
-            printDocument.write('<div class="qr">');
+            printDocument.write('<div class="qr-container">');
             printDocument.write('<img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">');
-            printDocument.write('<p class="scan-text">ESCANEA Y DESCUBRE</p>'); // Agregar la frase debajo del QR
+            printDocument.write('<div class="qr-text">ESCANEA Y DESCUBRE</div>');
             printDocument.write('</div>');
             printDocument.write('</div>');
             printDocument.write('<div class="container remitente">');
@@ -201,9 +203,9 @@
     <div class="container">
         <div class="header">
             <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
-            <div class="qr">
+            <div class="qr-container">
                 <img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">
-                <p class="scan-text">ESCANEA Y DESCUBRE</p> <!-- Frase añadida debajo del QR -->
+                <div class="qr-text">ESCANEA Y DESCUBRE</div>
             </div>
         </div>
         
