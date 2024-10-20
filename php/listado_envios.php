@@ -176,6 +176,24 @@ if (!$result) {
                 }
             }
         }
+
+        // Función para copiar el enlace del pedido
+        function copyToClipboard(id, urlConfirmacion) {
+            var copyText = document.getElementById(id);
+
+            // Copiar al portapapeles
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                // Cambiar el botón a "Ver Pedido"
+                var button = document.getElementById("btn_" + id);
+                button.innerText = "Ver Pedido";
+                button.onclick = function() {
+                    // Redirigir al cliente a la página de confirmación
+                    window.location.href = urlConfirmacion;
+                };
+            }).catch(err => {
+                console.error('Error al copiar al portapapeles: ', err);
+            });
+        }
     </script>
 </head>
 <body>
@@ -208,6 +226,8 @@ if (!$result) {
                     <th>Estado</th>
                     <th>Fecha de Creación</th>
                     <th>Guardar Contacto</th>
+                    <th>Ver Detalles</th>
+                    <th>Ver Pedido</th>
                     <th>Eliminar</th>
                 </tr>
             </thead>
@@ -221,25 +241,32 @@ if (!$result) {
                         $estado = $row['estado'];
                         $fecha_creacion = $row['fecha_creacion'];
 
+                        // URL para ver detalles
+                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $item;
+
+                        // URL de confirmación generada dinámicamente usando el campo 'id'
+                        $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id'];
+
                         // Definir clase de estilo según el estado
                         $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
 
+                        // URL para guardar contacto como vCard
+                        $urlVcard = "generar_vcard.php?nombre=" . urlencode($nombre) . "&telefono=" . urlencode($telefono);
+
                         echo "<tr>";
-                        echo "<td>{$item}</td>";
-                        echo "<td>{$nombre}</td>";
-                        echo "<td>{$telefono}</td>";
-                        echo '<td class="' . $estadoClass . '">' . $estado . '</td>';
-                        echo "<td>{$fecha_creacion}</td>";
-                        
-                        // Agregar el botón de guardar contacto
-                        echo '<td><a class="save-contact-btn" href="generar_vcard.php?nombre=' . urlencode($nombre) . '&telefono=' . urlencode($telefono) . '">Guardar Contacto</a></td>';
-                        
-                        // Botón para eliminar
+                        echo "<td>" . $item . "</td>";
+                        echo "<td>" . $nombre . "</td>";
+                        echo "<td>" . $telefono . "</td>";
+                        echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
+                        echo "<td>" . $fecha_creacion . "</td>";
+                        echo '<td><a href="' . $urlVcard . '" class="save-contact-btn">Guardar Contacto</a></td>';
+                        echo '<td><a href="' . $urlVerDetalles . '" class="btn">Ver Detalles</a></td>';
+                        echo '<td><a href="' . $urlConfirmacion . '" class="btn">Ver Pedido</a></td>';
                         echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='7'>No hay envíos</td></tr>";
+                    echo "<tr><td colspan='9'>No hay envíos</td></tr>";
                 }
 
                 // Cerrar la conexión a la base de datos
