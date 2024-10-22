@@ -41,48 +41,22 @@ function generarVCF($nombre, $telefono) {
     $contenidoVCF .= "TEL;TYPE=CELL:" . $telefono . "\r\n";
     $contenidoVCF .= "END:VCARD\r\n";
 
-    // Crear el archivo VCF y forzar su descarga
-    file_put_contents('/mnt/data/' . $filename, $contenidoVCF);
+    // Descargar el archivo VCF
+    header('Content-Type: text/vcard');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    echo $contenidoVCF;
 }
 
-// Crear un archivo zip con todos los contactos
-$zip = new ZipArchive();
-$zipFilename = "/mnt/data/contactos.zip";
-
-if ($zip->open($zipFilename, ZipArchive::CREATE) !== TRUE) {
-    exit("No se puede abrir el archivo ZIP\n");
-}
-
+// Generar y descargar cada archivo VCF
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $nombre = $row['nombre'];
         $telefono = $row['telefono'];
-        $nombreCompleto = $nombre . " - CEE A TODOS LOS CONTACTOS";
 
-        // Generar el archivo VCF para cada contacto
-        $telefonoFormateado = preg_replace('/[^0-9]/', '', $telefono);
-        $filename = str_replace(' ', '_', $nombreCompleto) . ".vcf";
-
-        // Generar el contenido del archivo VCF
-        $contenidoVCF = "BEGIN:VCARD\r\n";
-        $contenidoVCF .= "VERSION:3.0\r\n";
-        $contenidoVCF .= "FN:" . $nombreCompleto . "\r\n";
-        $contenidoVCF .= "TEL;TYPE=CELL:" . $telefonoFormateado . "\r\n";
-        $contenidoVCF .= "END:VCARD\r\n";
-
-        // Agregar el archivo VCF al archivo ZIP
-        $zip->addFromString($filename, $contenidoVCF);
+        // Generar y descargar el archivo VCF para cada contacto
+        generarVCF($nombre, $telefono);
     }
 }
-
-$zip->close();
-
-// Descargar el archivo ZIP
-header('Content-Type: application/zip');
-header('Content-Disposition: attachment; filename="contactos.zip"');
-header('Content-Length: ' . filesize($zipFilename));
-
-readfile($zipFilename);
 
 // Cerrar la conexión a la base de datos
 $conn->close();
