@@ -153,7 +153,6 @@
             printDocument.write('<p><strong>Tipo de Envío:</strong> ' + document.getElementById('tipoEnvio').innerText + '</p>');
             printDocument.write('<p><strong>Dirección:</strong> ' + document.getElementById('direccion').innerText + '</p>');
             printDocument.write('<p><strong>Agencia:</strong> ' + document.getElementById('agencia').innerText + '</p>');
-            printDocument.write('</div>');
             printDocument.close();
 
             printWindow.print();
@@ -226,7 +225,7 @@
             <p><strong>Detalle del Mantenimiento:</strong> <span id="detalleMantenimiento"></span></p>
         </div>
 
-        <form action="/php/procesar_envio.php" method="post" enctype="multipart/form-data">
+        <form action="subir_comprobante_drive.php" method="post" enctype="multipart/form-data">
             <div class="input-group">
                 <label for="comprobanteEnvio">Enviar Comprobante de Envío</label>
                 <input type="file" id="comprobanteEnvio" name="comprobanteEnvio" accept="image/*" onchange="enableButton()">
