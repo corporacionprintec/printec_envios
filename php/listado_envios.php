@@ -30,38 +30,22 @@ if (!$result) {
     die("Error en la consulta: " . $conn->error);
 }
 
-// Función para crear el archivo VCF con todos los contactos
-function generarVCF($clientes) {
-    $filename = "todos_los_contactos.vcf";
-    $contenidoVCF = "";
-
-    foreach ($clientes as $cliente) {
-        // Generar el contenido del archivo VCF por cada cliente
-        $contenidoVCF .= "BEGIN:VCARD\r\n";
-        $contenidoVCF .= "VERSION:3.0\r\n";
-        $contenidoVCF .= "FN:" . $cliente['nombre'] . "\r\n";
-        $contenidoVCF .= "TEL;TYPE=CELL:" . $cliente['telefono'] . "\r\n";
-        $contenidoVCF .= "END:VCARD\r\n";
-    }
-
-    // Crear el archivo VCF y forzar su descarga
+// Función para crear el archivo VCF
+function generarVCF($nombre, $telefono) {
+    $telefono = preg_replace('/[^0-9]/', '', $telefono); // Asegurar que solo haya números
+    $filename = str_replace(' ', '_', $nombre) . ".vcf"; // Nombre del archivo VCF
+    $contenidoVCF = "BEGIN:VCARD\r\nVERSION:3.0\r\nFN:$nombre\r\nTEL;TYPE=CELL:$telefono\r\nEND:VCARD\r\n";
+    
+    // Forzar la descarga del archivo
     header('Content-Type: text/vcard');
     header('Content-Disposition: attachment; filename="' . $filename . '"');
     echo $contenidoVCF;
 }
 
-// Si se solicita guardar todos los contactos
-if (isset($_GET['guardar_todos_contactos'])) {
-    $clientes = [];
-
-    // Obtener todos los clientes de la consulta
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $clientes[] = ['nombre' => $row['nombre'], 'telefono' => $row['telefono']];
-        }
-    }
-
-    generarVCF($clientes);
+if (isset($_GET['guardar_contacto'])) {
+    $nombre = $_GET['nombre'];
+    $telefono = $_GET['telefono'];
+    generarVCF($nombre, $telefono);
     exit();
 }
 ?>
@@ -115,7 +99,7 @@ if (isset($_GET['guardar_todos_contactos'])) {
             text-decoration: underline;
         }
         .copy-btn, .delete-btn {
-            background-color: #28a745;
+            background-color: #17a2b8;
             color: white;
             border: none;
             padding: 8px;
@@ -135,12 +119,23 @@ if (isset($_GET['guardar_todos_contactos'])) {
             align-items: center;
             justify-content: center;
         }
-
-        /* Ocultar columna de teléfono */
-        .telefono-col {
-            display: none;
+        .copy-btn {
+            width: 100%;
         }
-
+        /* Botón Guardar Todos los Contactos */
+        .save-all-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px; /* Tamaño reducido */
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px; /* Tamaño de fuente más pequeño */
+            display: block;
+            margin: 0 auto 20px auto;
+            width: auto;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
         /* Estilos para el estado pendiente y enviado */
         .pendiente {
             color: red;
@@ -150,7 +145,6 @@ if (isset($_GET['guardar_todos_contactos'])) {
             color: green;
             font-weight: bold;
         }
-
         /* Media queries para pantallas pequeñas */
         @media (max-width: 768px) {
             .container {
@@ -160,19 +154,12 @@ if (isset($_GET['guardar_todos_contactos'])) {
             table {
                 width: 100%;
                 display: block;
-                overflow-x: auto;
+                overflow-x: auto; /* Permitir desplazamiento horizontal */
                 white-space: nowrap;
             }
             th, td {
                 font-size: 14px;
                 padding: 10px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            th, td {
-                font-size: 12px;
-                padding: 8px;
             }
             .copy-btn {
                 padding: 6px 10px;
@@ -183,12 +170,7 @@ if (isset($_GET['guardar_todos_contactos'])) {
 <body>
     <div class="container">
         <h1>Listado de Envíos</h1>
-
-        <!-- Botón para guardar todos los contactos -->
-        <form method="GET" action="">
-            <input type="hidden" name="guardar_todos_contactos" value="1">
-            <button type="submit" class="copy-btn">Guardar Todos los Contactos</button>
-        </form>
+        <button class="save-all-btn" onclick="guardarTodosLosContactos()">Guardar Todos los Contactos</button>
 
         <!-- Buscador -->
         <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="Buscar por nombre..." style="margin-bottom: 20px; padding: 10px; width: 100%; border: 1px solid #ddd; border-radius: 5px;">
@@ -211,7 +193,6 @@ if (isset($_GET['guardar_todos_contactos'])) {
                 <tr>
                     <th>Items</th>
                     <th>Nombre</th>
-                    <th class="telefono-col">Teléfono</th> <!-- Oculto -->
                     <th>Estado</th>
                     <th>Ver Detalles</th>
                     <th>Ver Pedido</th>
@@ -224,39 +205,25 @@ if (isset($_GET['guardar_todos_contactos'])) {
                     while ($row = $result->fetch_assoc()) {
                         $item = $row['item']; 
                         $nombre = $row['nombre'];
-                        $telefono = $row['telefono'];
                         $estado = $row['estado'];
 
-                        // URL para ver detalles
                         $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $item;
-
-                        // URL de confirmación generada dinámicamente usando el campo 'id'
                         $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id'];
-
-                        // Definir clase de estilo según el estado
                         $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
 
                         echo "<tr>";
                         echo "<td>" . $item . "</td>";
                         echo "<td>" . $nombre . "</td>";
-                        echo "<td class='telefono-col'>" . $telefono . "</td>"; // Oculto
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>';
-
-                        // Botón para ver detalles
                         echo '<td><a href="' . $urlVerDetalles . '" class="copy-btn">Ver Detalles</a></td>';
-                        
-                        // Botón para ver pedido
                         echo '<td><a href="' . $urlConfirmacion . '" class="copy-btn">Ver Pedido</a></td>';
-                        
-                        // Botón para eliminar pedido
                         echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='8'>No hay envíos</td></tr>";
+                    echo "<tr><td colspan='6'>No hay envíos</td></tr>";
                 }
 
-                // Cerrar la conexión a la base de datos
                 if ($conn !== null && $conn->connect_error == null) {
                     $conn->close();
                 }
@@ -266,38 +233,47 @@ if (isset($_GET['guardar_todos_contactos'])) {
     </div>
 
     <script>
-        // Función para confirmar y eliminar un pedido usando el campo item
         function eliminarPedido(item) {
             if (confirm("¿Estás seguro de eliminar este pedido?")) {
                 var form = document.createElement('form');
                 form.method = 'POST';
                 form.action = 'eliminar_pedido.php';
-
                 var input = document.createElement('input');
                 input.type = 'hidden';
                 input.name = 'item';
                 input.value = item;
-
                 form.appendChild(input);
                 document.body.appendChild(form);
                 form.submit();
             }
         }
 
-        // Función para filtrar la tabla por nombre
         function filtrarTabla() {
             var input = document.getElementById("buscador");
             var filtro = input.value.toLowerCase();
             var table = document.getElementById("tablaEnvios");
             var tr = table.getElementsByTagName("tr");
 
-            for (var i = 1; i < tr.length; i++) { // Empezar en 1 para omitir el encabezado
-                var tdNombre = tr[i].getElementsByTagName("td")[1]; // Columna de nombre
+            for (var i = 1; i < tr.length; i++) {
+                var tdNombre = tr[i].getElementsByTagName("td")[1];
                 if (tdNombre) {
                     var txtValue = tdNombre.textContent || tdNombre.innerText;
                     tr[i].style.display = txtValue.toLowerCase().indexOf(filtro) > -1 ? "" : "none";
                 }
             }
+        }
+
+        function guardarTodosLosContactos() {
+            <?php
+            $sqlContactos = "SELECT nombre, telefono FROM clientes";
+            $resultContactos = $conn->query($sqlContactos);
+
+            if ($resultContactos->num_rows > 0) {
+                while ($contacto = $resultContactos->fetch_assoc()) {
+                    echo "window.location.href = 'listado_envios.php?guardar_contacto=1&nombre=" . urlencode($contacto['nombre']) . "&telefono=" . urlencode($contacto['telefono']) . "';";
+                }
+            }
+            ?>
         }
     </script>
 </body>
