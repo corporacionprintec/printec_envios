@@ -28,7 +28,7 @@ function generarVCF($nombre, $telefono) {
     $telefono = preg_replace('/[^0-9]/', '', $telefono);
 
     // Agregar el texto adicional al nombre
-    $nombreCompleto = $nombre . " - CEE A TODOS LOS CONTACTOS";
+    $nombreCompleto = $nombre . " - CEE";
 
     // Nombre del archivo VCF basado en el nombre del cliente
     $filename = $nombreCompleto . ".vcf";
