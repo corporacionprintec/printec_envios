@@ -22,41 +22,34 @@ if (!$result) {
     die("Error en la consulta: " . $conn->error);
 }
 
-// Función para crear el archivo VCF para cada contacto
-function generarVCF($nombre, $telefono) {
-    // Asegurarse de que el número no contenga espacios ni guiones
-    $telefono = preg_replace('/[^0-9]/', '', $telefono);
+// Comenzar a crear el contenido del archivo VCF unificado
+$contenidoVCF = "";
 
-    // Agregar el texto adicional al nombre
-    $nombreCompleto = $nombre . " - CEE";
-
-    // Nombre del archivo VCF basado en el nombre del cliente
-    $filename = $nombreCompleto . ".vcf";
-    $filename = str_replace(' ', '_', $filename); // Quitar espacios del nombre
-
-    // Generar el contenido del archivo VCF
-    $contenidoVCF = "BEGIN:VCARD\r\n";
-    $contenidoVCF .= "VERSION:3.0\r\n";
-    $contenidoVCF .= "FN:" . $nombreCompleto . "\r\n";
-    $contenidoVCF .= "TEL;TYPE=CELL:" . $telefono . "\r\n";
-    $contenidoVCF .= "END:VCARD\r\n";
-
-    // Descargar el archivo VCF
-    header('Content-Type: text/vcard');
-    header('Content-Disposition: attachment; filename="' . $filename . '"');
-    echo $contenidoVCF;
-}
-
-// Generar y descargar cada archivo VCF
+// Crear la vCard para cada contacto y agregarla al archivo unificado
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $nombre = $row['nombre'];
-        $telefono = $row['telefono'];
+        $telefono = preg_replace('/[^0-9]/', '', $row['telefono']); // Limpiar el número de teléfono
 
-        // Generar y descargar el archivo VCF para cada contacto
-        generarVCF($nombre, $telefono);
+        // Agregar el texto "CEE A TODOS LOS CONTACTOS"
+        $nombreCompleto = $nombre . " - CEE ";
+
+        // Generar el contenido de la vCard para este contacto
+        $contenidoVCF .= "BEGIN:VCARD\r\n";
+        $contenidoVCF .= "VERSION:3.0\r\n";
+        $contenidoVCF .= "FN:" . $nombreCompleto . "\r\n";
+        $contenidoVCF .= "TEL;TYPE=CELL:" . $telefono . "\r\n";
+        $contenidoVCF .= "END:VCARD\r\n";
     }
 }
+
+// Nombre del archivo VCF unificado
+$filename = "todos_los_contactos.vcf";
+
+// Forzar la descarga del archivo VCF
+header('Content-Type: text/vcard');
+header('Content-Disposition: attachment; filename="' . $filename . '"');
+echo $contenidoVCF;
 
 // Cerrar la conexión a la base de datos
 $conn->close();
