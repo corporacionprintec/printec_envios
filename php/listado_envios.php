@@ -29,37 +29,6 @@ $result = $conn->query($sql);
 if (!$result) {
     die("Error en la consulta: " . $conn->error);
 }
-
-// Función para crear el archivo VCF
-function generarVCF($nombre, $telefono) {
-    // Asegurarse de que el número no contenga espacios ni guiones, solo números
-    $telefono = preg_replace('/[^0-9]/', '', $telefono);
-
-    // Nombre del archivo VCF basado en el nombre del cliente
-    $filename = $nombre . ".vcf";
-    $filename = str_replace(' ', '_', $filename); // Reemplazar espacios por guiones bajos en el nombre del archivo
-
-    // Generar el contenido del archivo VCF
-    $contenidoVCF = "BEGIN:VCARD\r\n";
-    $contenidoVCF .= "VERSION:3.0\r\n";
-    $contenidoVCF .= "FN:" . $nombre . "\r\n"; // Agregar el nombre
-    $contenidoVCF .= "TEL;TYPE=CELL:" . $telefono . "\r\n"; // Agregar el número de teléfono correctamente
-    $contenidoVCF .= "END:VCARD\r\n";
-
-    // Crear el archivo VCF y forzar su descarga
-    header('Content-Type: text/vcard');
-    header('Content-Disposition: attachment; filename="' . $filename . '"');
-    echo $contenidoVCF;
-}
-
-// Comprobar si se ha solicitado la generación de un contacto
-if (isset($_GET['guardar_contacto'])) {
-    $nombre = $_GET['nombre'];
-    $telefono = $_GET['telefono'];
-    generarVCF($nombre, $telefono);
-    exit();
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -82,6 +51,7 @@ if (isset($_GET['guardar_contacto'])) {
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         h1 {
             text-align: center;
@@ -110,8 +80,8 @@ if (isset($_GET['guardar_contacto'])) {
         a:hover {
             text-decoration: underline;
         }
-        .copy-btn, .delete-btn, .contact-btn {
-            background-color: #28a745; /* Verde para Guardar Contacto */
+        .copy-btn, .delete-btn {
+            background-color: #17a2b8;
             color: white;
             border: none;
             padding: 8px;
@@ -125,16 +95,18 @@ if (isset($_GET['guardar_contacto'])) {
         .delete-btn {
             background-color: #dc3545;
         }
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        .guardar-contactos-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
         }
-        .contact-btn, .copy-btn {
-            width: 100%;
-        }
-
         /* Estilos para el estado pendiente y enviado */
         .pendiente {
             color: red;
@@ -144,7 +116,6 @@ if (isset($_GET['guardar_contacto'])) {
             color: green;
             font-weight: bold;
         }
-
         /* Media queries para pantallas pequeñas */
         @media (max-width: 768px) {
             .container {
@@ -154,22 +125,22 @@ if (isset($_GET['guardar_contacto'])) {
             table {
                 width: 100%;
                 display: block;
-                overflow-x: auto; /* Permitir desplazamiento horizontal en pantallas pequeñas */
-                white-space: nowrap; /* Mantener las filas en una sola línea en móviles */
+                overflow-x: auto;
+                white-space: nowrap;
             }
             th, td {
                 font-size: 14px;
                 padding: 10px;
             }
         }
-
         @media (max-width: 480px) {
             th, td {
                 font-size: 12px;
                 padding: 8px;
             }
-            .copy-btn {
-                padding: 6px 10px;
+            .copy-btn, .delete-btn, .guardar-contactos-btn {
+                font-size: 12px;
+                padding: 8px;
             }
         }
     </style>
@@ -177,9 +148,8 @@ if (isset($_GET['guardar_contacto'])) {
 <body>
     <div class="container">
         <h1>Listado de Envíos</h1>
-
         <!-- Botón para guardar todos los contactos -->
-        <button class="contact-btn" onclick="guardarTodosContactos()">Guardar Todos los Contactos</button>
+        <a href="guardar_todos_contactos.php" class="guardar-contactos-btn">Guardar Todos los Contactos</a>
 
         <!-- Buscador -->
         <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="Buscar por nombre..." style="margin-bottom: 20px; padding: 10px; width: 100%; border: 1px solid #ddd; border-radius: 5px;">
@@ -214,7 +184,6 @@ if (isset($_GET['guardar_contacto'])) {
                     while ($row = $result->fetch_assoc()) {
                         $item = $row['item']; 
                         $nombre = $row['nombre'];
-                        $telefono = $row['telefono'];
                         $estado = $row['estado'];
 
                         // URL para ver detalles
@@ -287,11 +256,6 @@ if (isset($_GET['guardar_contacto'])) {
                     tr[i].style.display = txtValue.toLowerCase().indexOf(filtro) > -1 ? "" : "none";
                 }
             }
-        }
-
-        // Función para guardar todos los contactos
-        function guardarTodosContactos() {
-            window.location.href = 'guardar_todos_contactos.php';
         }
     </script>
 </body>
