@@ -1,70 +1,56 @@
 <?php
-require 'vendor/autoload.php'; // Incluye la librería de Google API
 
-session_start(); // Necesario para manejar las sesiones en PHP
+require 'vendor/autoload.php';
 
-function obtenerClienteGoogle() {
-    $client = new Google_Client();
-    $client->setAuthConfig('client_secret_200770608361-vn8spggg4bfoj3chlg2diaqducnib9eq.apps.googleusercontent.com.json');
-    $client->setRedirectUri('http://localhost/subir_comprobante_drive.php'); // Cambiar según tu URL
-    $client->addScope(Google_Service_Drive::DRIVE_FILE);
-    $client->setAccessType('offline');
-    $client->setPrompt('select_account consent');
+use Google\Client;
+use Google\Service\Drive;
 
-    // Verificar si ya tenemos un token guardado en sesión
-    if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
-        $client->setAccessToken($_SESSION['access_token']);
-    } else {
-        if (!isset($_GET['code'])) {
-            // Si no tenemos el código de autenticación, generamos la URL para autenticarse con Google
-            $authUrl = $client->createAuthUrl();
-            header('Location: ' . filter_var($authUrl, FILTER_SANITIZE_URL));
-            exit;
-        } else {
-            // Intercambiamos el código por un token de acceso
-            $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-            $_SESSION['access_token'] = $token;
-            $client->setAccessToken($token);
-        }
-    }
+// Ruta del archivo JSON de credenciales
+$credentialsPath = 'client_secret_200770608361-vn8spggg4bfoj3chlg2diaqducnib9eq.apps.googleusercontent.com.json';
 
-    // Si el token ha expirado, lo refrescamos
-    if ($client->isAccessTokenExpired()) {
-        $refreshTokenSaved = $client->getRefreshToken();
-        $client->fetchAccessTokenWithRefreshToken($refreshTokenSaved);
-        $_SESSION['access_token'] = $client->getAccessToken();
-    }
-
-    return $client;
+// Verificar si el archivo fue enviado
+if (!isset($_FILES['comprobanteEnvio']) || $_FILES['comprobanteEnvio']['error'] !== UPLOAD_ERR_OK) {
+    die('Error al subir el archivo.');
 }
 
-function subirArchivo($nombreArchivo, $rutaArchivo, $tipoMime) {
-    $client = obtenerClienteGoogle();
-    $service = new Google_Service_Drive($client);
+// Iniciar el cliente de Google
+$client = new Client();
+$client->setAuthConfig($credentialsPath);
+$client->addScope(Drive::DRIVE_FILE);
+$client->setAccessType('offline');
 
-    $fileMetadata = new Google_Service_Drive_DriveFile(array(
-        'name' => $nombreArchivo,
-        'parents' => array("ID_DE_TU_CARPETA_EN_DRIVE") // Cambia por el ID de la carpeta destino
-    ));
-
-    $content = file_get_contents($rutaArchivo);
-
-    $file = $service->files->create($fileMetadata, array(
-        'data' => $content,
-        'mimeType' => $tipoMime,
-        'uploadType' => 'multipart',
-        'fields' => 'id'
-    ));
-
-    printf("Archivo subido con ID: %s\n", $file->id);
+// Redirigir al usuario para autorización OAuth si es necesario
+if (!isset($_SESSION['access_token']) && !isset($_GET['code'])) {
+    $authUrl = $client->createAuthUrl();
+    header('Location: ' . filter_var($authUrl, FILTER_SANITIZE_URL));
+    exit();
 }
 
-// Comprobamos si se ha enviado el formulario de subida
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['comprobanteEnvio'])) {
-    $nombreArchivo = $_FILES['comprobanteEnvio']['name'];
-    $rutaArchivo = $_FILES['comprobanteEnvio']['tmp_name'];
-    $tipoMime = $_FILES['comprobanteEnvio']['type'];
-
-    subirArchivo($nombreArchivo, $rutaArchivo, $tipoMime);
+// Intercambiar código por token de acceso
+if (isset($_GET['code'])) {
+    $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+    $_SESSION['access_token'] = $token;
+} else {
+    $client->setAccessToken($_SESSION['access_token']);
 }
-?>
+
+// Subir el archivo a Google Drive
+$driveService = new Drive($client);
+
+// Crear archivo en Drive
+$fileMetadata = new Drive\File([
+    'name' => $_FILES['comprobanteEnvio']['name'],
+    'parents' => ['1t3ueZ7y0cAy4jhAyZCrzPkuse3O2lLkw'] // ID de la carpeta de destino en Google Drive
+]);
+
+$content = file_get_contents($_FILES['comprobanteEnvio']['tmp_name']);
+$file = $driveService->files->create($fileMetadata, [
+    'data' => $content,
+    'mimeType' => $_FILES['comprobanteEnvio']['type'],
+    'uploadType' => 'multipart',
+    'fields' => 'id'
+]);
+
+// Mostrar el ID del archivo subido
+echo 'Archivo subido con éxito. ID del archivo: ' . $file->id;
+
