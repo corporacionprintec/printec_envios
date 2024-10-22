@@ -30,21 +30,19 @@ if (!$result) {
     die("Error en la consulta: " . $conn->error);
 }
 
-// Función para crear el archivo VCF
-function generarVCF($nombre, $telefono) {
-    // Asegurarse de que el número no contenga espacios ni guiones
-    $telefono = preg_replace('/[^0-9]/', '', $telefono);
+// Función para crear el archivo VCF con todos los contactos
+function generarVCF($clientes) {
+    $filename = "todos_los_contactos.vcf";
+    $contenidoVCF = "";
 
-    // Nombre del archivo VCF basado en el nombre del cliente
-    $filename = $nombre . ".vcf";
-    $filename = str_replace(' ', '_', $filename); // Quitar espacios del nombre
-
-    // Generar el contenido del archivo VCF
-    $contenidoVCF = "BEGIN:VCARD\r\n";
-    $contenidoVCF .= "VERSION:3.0\r\n";
-    $contenidoVCF .= "FN:" . $nombre . "\r\n";
-    $contenidoVCF .= "TEL;TYPE=CELL:" . $telefono . "\r\n";
-    $contenidoVCF .= "END:VCARD\r\n";
+    foreach ($clientes as $cliente) {
+        // Generar el contenido del archivo VCF por cada cliente
+        $contenidoVCF .= "BEGIN:VCARD\r\n";
+        $contenidoVCF .= "VERSION:3.0\r\n";
+        $contenidoVCF .= "FN:" . $cliente['nombre'] . "\r\n";
+        $contenidoVCF .= "TEL;TYPE=CELL:" . $cliente['telefono'] . "\r\n";
+        $contenidoVCF .= "END:VCARD\r\n";
+    }
 
     // Crear el archivo VCF y forzar su descarga
     header('Content-Type: text/vcard');
@@ -52,11 +50,18 @@ function generarVCF($nombre, $telefono) {
     echo $contenidoVCF;
 }
 
-// Comprobar si se ha solicitado la generación de un contacto
-if (isset($_GET['guardar_contacto'])) {
-    $nombre = $_GET['nombre'];
-    $telefono = $_GET['telefono'];
-    generarVCF($nombre, $telefono);
+// Si se solicita guardar todos los contactos
+if (isset($_GET['guardar_todos_contactos'])) {
+    $clientes = [];
+
+    // Obtener todos los clientes de la consulta
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $clientes[] = ['nombre' => $row['nombre'], 'telefono' => $row['telefono']];
+        }
+    }
+
+    generarVCF($clientes);
     exit();
 }
 ?>
@@ -109,8 +114,8 @@ if (isset($_GET['guardar_contacto'])) {
         a:hover {
             text-decoration: underline;
         }
-        .copy-btn, .delete-btn, .contact-btn {
-            background-color: #28a745; /* Verde para Guardar Contacto */
+        .copy-btn, .delete-btn {
+            background-color: #28a745;
             color: white;
             border: none;
             padding: 8px;
@@ -130,8 +135,10 @@ if (isset($_GET['guardar_contacto'])) {
             align-items: center;
             justify-content: center;
         }
-        .contact-btn, .copy-btn {
-            width: 100%;
+
+        /* Ocultar columna de teléfono */
+        .telefono-col {
+            display: none;
         }
 
         /* Estilos para el estado pendiente y enviado */
@@ -153,8 +160,8 @@ if (isset($_GET['guardar_contacto'])) {
             table {
                 width: 100%;
                 display: block;
-                overflow-x: auto; /* Permitir desplazamiento horizontal en pantallas pequeñas */
-                white-space: nowrap; /* Mantener las filas en una sola línea en móviles */
+                overflow-x: auto;
+                white-space: nowrap;
             }
             th, td {
                 font-size: 14px;
@@ -177,6 +184,12 @@ if (isset($_GET['guardar_contacto'])) {
     <div class="container">
         <h1>Listado de Envíos</h1>
 
+        <!-- Botón para guardar todos los contactos -->
+        <form method="GET" action="">
+            <input type="hidden" name="guardar_todos_contactos" value="1">
+            <button type="submit" class="copy-btn">Guardar Todos los Contactos</button>
+        </form>
+
         <!-- Buscador -->
         <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="Buscar por nombre..." style="margin-bottom: 20px; padding: 10px; width: 100%; border: 1px solid #ddd; border-radius: 5px;">
 
@@ -198,9 +211,8 @@ if (isset($_GET['guardar_contacto'])) {
                 <tr>
                     <th>Items</th>
                     <th>Nombre</th>
-                    <th>Teléfono</th>
+                    <th class="telefono-col">Teléfono</th> <!-- Oculto -->
                     <th>Estado</th>
-                    <th>Guardar Contacto</th>
                     <th>Ver Detalles</th>
                     <th>Ver Pedido</th>
                     <th>Eliminar</th>
@@ -227,11 +239,8 @@ if (isset($_GET['guardar_contacto'])) {
                         echo "<tr>";
                         echo "<td>" . $item . "</td>";
                         echo "<td>" . $nombre . "</td>";
-                        echo "<td>" . $telefono . "</td>";
-                        echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
-
-                        // Botón para guardar contacto
-                        echo '<td><a href="listado_envios.php?guardar_contacto=1&nombre=' . urlencode($nombre) . '&telefono=' . urlencode($telefono) . '" class="contact-btn">Guardar Contacto</a></td>';
+                        echo "<td class='telefono-col'>" . $telefono . "</td>"; // Oculto
+                        echo '<td class="' . $estadoClass . '">' . $estado . '</td>';
 
                         // Botón para ver detalles
                         echo '<td><a href="' . $urlVerDetalles . '" class="copy-btn">Ver Detalles</a></td>';
