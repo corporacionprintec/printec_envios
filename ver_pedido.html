@@ -90,19 +90,6 @@
             background-color: #ccc;
             cursor: not-allowed;
         }
-        @media print {
-            .header {
-                display: flex;
-                justify-content: space-between;
-            }
-            .remitente {
-                display: block;
-                margin-top: 20px;
-            }
-        }
-        .remitente {
-            display: none;
-        }
     </style>
     <script>
         function enableButton() {
@@ -111,51 +98,6 @@
             var enviarButton = document.getElementById('enviarButton');
 
             enviarButton.disabled = !(comprobanteEnvio && claveEnvio);
-        }
-
-        function printMembrete() {
-            var printWindow = window.open('', '', 'height=600,width=800');
-            var printDocument = printWindow.document;
-
-            printDocument.open();
-            printDocument.write('<html><head><title>Imprimir Membrete</title>');
-            printDocument.write('<style>');
-            printDocument.write('body { font-family: Arial, sans-serif; margin: 20px; padding: 0; }');
-            printDocument.write('h1 { font-size: 32px; margin-bottom: 20px; }');
-            printDocument.write('p { font-size: 27px; margin: 10px 0; line-height: 1.5; }');
-            printDocument.write('.container { max-width: 800px; margin: 0 auto; }');
-            printDocument.write('.logo { width: 150px; float: left; }');
-            printDocument.write('.qr-container { float: right; text-align: center; }');
-            printDocument.write('.qr { width: 150px; }');
-            printDocument.write('.escanear-text { color: black; font-size: 20px; margin-top: 10px; }');
-            printDocument.write('.remitente { padding: 10px; border-radius: 5px; margin-bottom: 20px; clear: both; }');
-            printDocument.write('.destinatario { color: #dc3545; padding: 10px; border-radius: 5px; }');
-            printDocument.write('</style>');
-            printDocument.write('</head><body>');
-            printDocument.write('<div class="header">');
-            printDocument.write('<img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">');
-            printDocument.write('<div class="qr-container">');
-            printDocument.write('<img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">');
-            printDocument.write('<div class="escanear-text">ESCANEA Y DESCUBRE</div>');
-            printDocument.write('</div></div>');
-            printDocument.write('<div class="container remitente">');
-            printDocument.write('<h1>Datos del Remitente</h1>');
-            printDocument.write('<p><strong>De:</strong> Eyter Yoel Rojas Sanchez</p>');
-            printDocument.write('<p><strong>Dirección:</strong> Calle Huanuco N201 Ica-Ica-Ica</p>');
-            printDocument.write('<p><strong>Cel:</strong> 966177851</p>');
-            printDocument.write('<p><strong>RUC/DNI:</strong> 71813328</p>');
-            printDocument.write('</div>');
-            printDocument.write('<div class="container destinatario">');
-            printDocument.write('<h1>Datos del Destinatario</h1>');
-            printDocument.write('<p><strong>Nombre:</strong> ' + document.getElementById('nombre').innerText + '</p>');
-            printDocument.write('<p><strong>DNI:</strong> ' + document.getElementById('dni').innerText + '</p>');
-            printDocument.write('<p><strong>Teléfono:</strong> ' + document.getElementById('telefono').innerText + '</p>');
-            printDocument.write('<p><strong>Tipo de Envío:</strong> ' + document.getElementById('tipoEnvio').innerText + '</p>');
-            printDocument.write('<p><strong>Dirección:</strong> ' + document.getElementById('direccion').innerText + '</p>');
-            printDocument.write('<p><strong>Agencia:</strong> ' + document.getElementById('agencia').innerText + '</p>');
-            printDocument.close();
-
-            printWindow.print();
         }
 
         function cargarDetallesPedido() {
@@ -184,7 +126,6 @@
                     document.getElementById('direccion').innerText = data.direccion || "No disponible";
                     document.getElementById('agencia').innerText = data.agencia || "No disponible";
                     document.getElementById('estado').innerText = data.estado || "No disponible";
-
                     document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento || "No disponible";
                     document.getElementById('detalleMantenimiento').innerText = data.razonMantenimiento || "No disponible";
 
@@ -237,8 +178,6 @@
             <input type="hidden" name="item" value="" id="hiddenItemId">
             <button type="submit" id="enviarButton" class="btn" disabled>Enviar</button>
         </form>
-
-        <button type="button" onclick="printMembrete()">Imprimir Membrete</button>
     </div>
 </body>
 </html>

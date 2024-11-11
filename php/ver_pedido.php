@@ -1,4 +1,6 @@
 <?php
+header('Content-Type: application/json');
+
 // Conectar a la base de datos
 $servername = getenv('DB_HOST') ?: 'localhost';
 $username = getenv('DB_USER') ?: 'root';
