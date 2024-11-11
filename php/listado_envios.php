@@ -23,7 +23,7 @@ if ($conn->connect_error) {
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
 
 // Consulta SQL con límite de resultados según la selección
-$sql = "SELECT fecha_creacion, id, nombre, telefono, estado, item FROM clientes ORDER BY fecha_creacion DESC LIMIT $limit";
+$sql = "SELECT item, id, nombre, telefono, estado, fecha_creacion FROM clientes ORDER BY item DESC LIMIT $limit";
 $result = $conn->query($sql);
 
 if (!$result) {
@@ -107,7 +107,6 @@ if (!$result) {
             top: 20px;
             right: 20px;
         }
-        /* Estilos para el estado pendiente y enviado */
         .pendiente {
             color: red;
             font-weight: bold;
@@ -116,7 +115,6 @@ if (!$result) {
             color: green;
             font-weight: bold;
         }
-        /* Media queries para pantallas pequeñas */
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -170,10 +168,10 @@ if (!$result) {
         <table id="tablaEnvios">
             <thead>
                 <tr>
-                    <th>Fecha</th>
+                    <th>Items</th>
                     <th>Nombre</th>
-                    <th>Item</th>
                     <th>Estado</th>
+                    <th>Fecha de Creación</th>
                     <th>Ver Detalles</th>
                     <th>Ver Pedido</th>
                     <th>Eliminar</th>
@@ -183,13 +181,13 @@ if (!$result) {
                 <?php
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                        $fecha = $row['fecha_creacion'];
+                        $item = $row['item']; 
                         $nombre = $row['nombre'];
-                        $item = $row['item'];
                         $estado = $row['estado'];
+                        $fecha_creacion = $row['fecha_creacion'];
 
                         // URL para ver detalles
-                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?id=" . $row['id'];
+                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $item;
 
                         // URL de confirmación generada dinámicamente usando el campo 'id'
                         $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id'];
@@ -198,10 +196,10 @@ if (!$result) {
                         $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
 
                         echo "<tr>";
-                        echo "<td>" . $fecha . "</td>"; // Mostrar la fecha de creación
+                        echo "<td>" . $item . "</td>";
                         echo "<td>" . $nombre . "</td>";
-                        echo "<td>" . $item . "</td>"; // Mostrar el item
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
+                        echo "<td>" . $fecha_creacion . "</td>"; // Mostrar la fecha de creación
 
                         // Botón para ver detalles
                         echo '<td><a href="' . $urlVerDetalles . '" class="copy-btn">Ver Detalles</a></td>';
@@ -210,7 +208,7 @@ if (!$result) {
                         echo '<td><a href="' . $urlConfirmacion . '" class="copy-btn">Ver Pedido</a></td>';
                         
                         // Botón para eliminar pedido
-                        echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $row['id'] . ')">Eliminar</button></td>';
+                        echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
                         echo "</tr>";
                     }
                 } else {
@@ -227,8 +225,8 @@ if (!$result) {
     </div>
 
     <script>
-        // Función para confirmar y eliminar un pedido usando el campo id
-        function eliminarPedido(id) {
+        // Función para confirmar y eliminar un pedido usando el campo item
+        function eliminarPedido(item) {
             if (confirm("¿Estás seguro de eliminar este pedido?")) {
                 var form = document.createElement('form');
                 form.method = 'POST';
@@ -236,8 +234,8 @@ if (!$result) {
 
                 var input = document.createElement('input');
                 input.type = 'hidden';
-                input.name = 'id';
-                input.value = id;
+                input.name = 'item';
+                input.value = item;
 
                 form.appendChild(input);
                 document.body.appendChild(form);
