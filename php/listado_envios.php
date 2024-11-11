@@ -23,7 +23,7 @@ if ($conn->connect_error) {
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
 
 // Consulta SQL con límite de resultados según la selección
-$sql = "SELECT fecha_creacion, id, nombre, telefono, estado FROM clientes ORDER BY fecha_creacion DESC LIMIT $limit";
+$sql = "SELECT fecha_creacion, id, nombre, telefono, estado, item FROM clientes ORDER BY fecha_creacion DESC LIMIT $limit";
 $result = $conn->query($sql);
 
 if (!$result) {
@@ -172,6 +172,7 @@ if (!$result) {
                 <tr>
                     <th>Fecha de Creación</th>
                     <th>Nombre</th>
+                    <th>Item</th>
                     <th>Estado</th>
                     <th>Ver Detalles</th>
                     <th>Ver Pedido</th>
@@ -184,6 +185,7 @@ if (!$result) {
                     while ($row = $result->fetch_assoc()) {
                         $fecha = $row['fecha_creacion'];
                         $nombre = $row['nombre'];
+                        $item = $row['item'];
                         $estado = $row['estado'];
 
                         // URL para ver detalles
@@ -198,6 +200,7 @@ if (!$result) {
                         echo "<tr>";
                         echo "<td>" . $fecha . "</td>"; // Mostrar la fecha de creación
                         echo "<td>" . $nombre . "</td>";
+                        echo "<td>" . $item . "</td>"; // Mostrar el item
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
 
                         // Botón para ver detalles
