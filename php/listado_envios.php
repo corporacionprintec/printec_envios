@@ -170,7 +170,7 @@ if (!$result) {
         <table id="tablaEnvios">
             <thead>
                 <tr>
-                    <th>Fecha de Creación</th>
+                    <th>Fecha</th>
                     <th>Nombre</th>
                     <th>Item</th>
                     <th>Estado</th>
