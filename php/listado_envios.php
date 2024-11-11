@@ -170,7 +170,7 @@ if (!$result) {
         <table id="tablaEnvios">
             <thead>
                 <tr>
-                    <th>Fecha</th>
+                    <th>Fecha de Creación</th>
                     <th>Nombre</th>
                     <th>Estado</th>
                     <th>Ver Detalles</th>
@@ -196,7 +196,7 @@ if (!$result) {
                         $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
 
                         echo "<tr>";
-                        echo "<td>" . $fecha . "</td>";
+                        echo "<td>" . $fecha . "</td>"; // Mostrar la fecha de creación
                         echo "<td>" . $nombre . "</td>";
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
 
