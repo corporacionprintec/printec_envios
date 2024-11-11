@@ -23,7 +23,7 @@ if ($conn->connect_error) {
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
 
 // Consulta SQL con límite de resultados según la selección
-$sql = "SELECT fecha, id, nombre, telefono, estado FROM clientes ORDER BY fecha DESC LIMIT $limit";
+$sql = "SELECT fecha_creacion, id, nombre, telefono, estado FROM clientes ORDER BY fecha_creacion DESC LIMIT $limit";
 $result = $conn->query($sql);
 
 if (!$result) {
@@ -182,12 +182,12 @@ if (!$result) {
                 <?php
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                        $fecha = $row['fecha'];
+                        $fecha = $row['fecha_creacion'];
                         $nombre = $row['nombre'];
                         $estado = $row['estado'];
 
                         // URL para ver detalles
-                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?fecha=" . $fecha;
+                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?fecha_creacion=" . $fecha;
 
                         // URL de confirmación generada dinámicamente usando el campo 'id'
                         $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id'];
