@@ -187,7 +187,7 @@ if (!$result) {
                         $estado = $row['estado'];
 
                         // URL para ver detalles
-                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?fecha_creacion=" . $fecha;
+                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?id=" . $row['id'];
 
                         // URL de confirmación generada dinámicamente usando el campo 'id'
                         $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id'];
