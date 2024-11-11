@@ -23,7 +23,7 @@ if ($conn->connect_error) {
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
 
 // Consulta SQL con límite de resultados según la selección
-$sql = "SELECT item, id, nombre, telefono, estado FROM clientes ORDER BY item DESC LIMIT $limit";
+$sql = "SELECT fecha, id, nombre, telefono, estado FROM clientes ORDER BY fecha DESC LIMIT $limit";
 $result = $conn->query($sql);
 
 if (!$result) {
@@ -170,7 +170,7 @@ if (!$result) {
         <table id="tablaEnvios">
             <thead>
                 <tr>
-                    <th>Items</th>
+                    <th>Fecha</th>
                     <th>Nombre</th>
                     <th>Estado</th>
                     <th>Ver Detalles</th>
@@ -182,12 +182,12 @@ if (!$result) {
                 <?php
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                        $item = $row['item']; 
+                        $fecha = $row['fecha'];
                         $nombre = $row['nombre'];
                         $estado = $row['estado'];
 
                         // URL para ver detalles
-                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $item;
+                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?fecha=" . $fecha;
 
                         // URL de confirmación generada dinámicamente usando el campo 'id'
                         $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id'];
@@ -196,7 +196,7 @@ if (!$result) {
                         $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
 
                         echo "<tr>";
-                        echo "<td>" . $item . "</td>";
+                        echo "<td>" . $fecha . "</td>";
                         echo "<td>" . $nombre . "</td>";
                         echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
 
@@ -207,7 +207,7 @@ if (!$result) {
                         echo '<td><a href="' . $urlConfirmacion . '" class="copy-btn">Ver Pedido</a></td>';
                         
                         // Botón para eliminar pedido
-                        echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
+                        echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $row['id'] . ')">Eliminar</button></td>';
                         echo "</tr>";
                     }
                 } else {
@@ -224,8 +224,8 @@ if (!$result) {
     </div>
 
     <script>
-        // Función para confirmar y eliminar un pedido usando el campo item
-        function eliminarPedido(item) {
+        // Función para confirmar y eliminar un pedido usando el campo id
+        function eliminarPedido(id) {
             if (confirm("¿Estás seguro de eliminar este pedido?")) {
                 var form = document.createElement('form');
                 form.method = 'POST';
@@ -233,8 +233,8 @@ if (!$result) {
 
                 var input = document.createElement('input');
                 input.type = 'hidden';
-                input.name = 'item';
-                input.value = item;
+                input.name = 'id';
+                input.value = id;
 
                 form.appendChild(input);
                 document.body.appendChild(form);
