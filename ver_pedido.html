@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalles del Pedido</title>
     <style>
-        /* Estilos generales */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -19,7 +18,6 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-            position: relative;
         }
         .header {
             display: flex;
@@ -28,18 +26,18 @@
             margin-bottom: 20px;
         }
         .logo {
-            width: 100px;
+            width: 150px;
         }
         .qr-container {
             text-align: center;
         }
         .qr {
-            width: 100px;
+            width: 150px;
         }
         .escanear-text {
             color: black;
-            font-size: 12px;
-            margin-top: 5px;
+            font-size: 16px;
+            margin-top: 10px;
         }
         h1 {
             color: #333;
@@ -63,15 +61,21 @@
         .details p strong {
             color: #333;
         }
-        .remitente, .destinatario {
-            margin-bottom: 20px;
-        }
-        .destinatario {
-            color: red;
-        }
         .input-group {
             margin: 20px 0;
             text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
         .btn {
             padding: 10px 20px;
@@ -82,40 +86,56 @@
             cursor: pointer;
             font-size: 16px;
         }
-        .btn-imprimir {
-            margin-top: 10px;
-            background-color: #28a745;
-        }
-        @media print {
-            .btn, .input-group {
-                display: none;
-            }
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
     </style>
     <script>
+        function enableButton() {
+            var comprobanteEnvio = document.getElementById('comprobanteEnvio').files.length > 0;
+            var claveEnvio = document.getElementById('claveEnvio').value;
+            var enviarButton = document.getElementById('enviarButton');
+
+            enviarButton.disabled = !(comprobanteEnvio && claveEnvio);
+        }
+
         function cargarDetallesPedido() {
             const params = new URLSearchParams(window.location.search);
             const pedidoId = params.get('item');
 
             fetch(`/php/ver_pedido.php?item=${pedidoId}`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Error en la respuesta del servidor:', response.status);
+                    throw new Error('Error en la respuesta de la API');
+                }
+                return response.json();
+            })
             .then(data => {
-                document.getElementById('item').innerText = pedidoId;
-                document.getElementById('nombre').innerText = data.nombre || "No disponible";
-                document.getElementById('dni').innerText = data.dni || "No disponible";
-                document.getElementById('telefono').innerText = data.telefono || "No disponible";
-                document.getElementById('tipoEnvio').innerText = data.envio || "No disponible";
-                document.getElementById('direccion').innerText = data.direccion || "No disponible";
-                document.getElementById('agencia').innerText = data.agencia || "No disponible";
+                console.log("Datos recibidos:", data);
+
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    document.getElementById('item').innerText = pedidoId;
+                    document.getElementById('nombre').innerText = data.nombre || "No disponible";
+                    document.getElementById('dni').innerText = data.dni || "No disponible";
+                    document.getElementById('telefono').innerText = data.telefono || "No disponible";
+                    document.getElementById('tipoEnvio').innerText = data.envio || "No disponible";
+                    document.getElementById('direccion').innerText = data.direccion || "No disponible";
+                    document.getElementById('agencia').innerText = data.agencia || "No disponible";
+                    document.getElementById('estado').innerText = data.estado || "No disponible";
+                    document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento || "No disponible";
+                    document.getElementById('detalleMantenimiento').innerText = data.razonMantenimiento || "No disponible";
+
+                    document.getElementById('hiddenItemId').value = pedidoId;
+                }
             })
             .catch(error => {
                 console.error('Error al obtener los detalles del pedido:', error);
                 alert("Hubo un error al cargar los datos del pedido");
             });
-        }
-
-        function imprimirMembrete() {
-            window.print();
         }
 
         window.onload = cargarDetallesPedido;
@@ -124,51 +144,41 @@
 <body>
     <div class="container">
         <div class="header">
-            <!-- Logo de la empresa -->
             <img src="images_ventas/images.png" alt="Logo de la empresa" class="logo">
-            <!-- Código QR -->
             <div class="qr-container">
                 <img src="images_ventas/codigo_printec.png" alt="Código QR" class="qr">
                 <div class="escanear-text">ESCANEA Y DESCUBRE</div>
             </div>
         </div>
-
+        
         <h1>Detalles del Pedido</h1>
 
-        <!-- Datos del remitente -->
-        <div class="details remitente">
-            <h2>Datos del Remitente</h2>
-            <p><strong>De:</strong> Eyter Yoel Rojas Sanchez</p>
-            <p><strong>Dirección:</strong> Calle Huanuco N201 Ica-Ica-Ica</p>
-            <p><strong>Cel:</strong> 966177851</p>
-            <p><strong>RUC/DNI:</strong> 71813328</p>
-        </div>
-
-        <!-- Datos del destinatario -->
-        <div class="details destinatario">
-            <h2>Datos del Destinatario</h2>
+        <div class="details">
+            <p class="highlight"><strong>ID:</strong> <span id="item"></span></p>
             <p><strong>Nombre:</strong> <span id="nombre"></span></p>
             <p><strong>DNI:</strong> <span id="dni"></span></p>
             <p><strong>Teléfono:</strong> <span id="telefono"></span></p>
-            <p><strong>Tipo de Retiro:</strong> <span id="tipoEnvio"></span></p>
+            <p><strong>Tipo de Envío:</strong> <span id="tipoEnvio"></span></p>
             <p><strong>Dirección:</strong> <span id="direccion"></span></p>
             <p><strong>Agencia:</strong> <span id="agencia"></span></p>
+            <p><strong>Estado:</strong> <span id="estado"></span></p>
+            <p><strong>Producto a Realizar Mantenimiento:</strong> <span id="productoMantenimiento"></span></p>
+            <p><strong>Detalle del Mantenimiento:</strong> <span id="detalleMantenimiento"></span></p>
         </div>
-
-        <button onclick="imprimirMembrete()" class="btn btn-imprimir">Imprimir Membrete</button>
 
         <form action="php/subir_comprobante_drive.php" method="post" enctype="multipart/form-data">
             <div class="input-group">
                 <label for="comprobanteEnvio">Enviar Comprobante de Envío</label>
-                <input type="file" id="comprobanteEnvio" name="comprobanteEnvio" accept="image/*">
+                <input type="file" id="comprobanteEnvio" name="comprobanteEnvio" accept="image/*" onchange="enableButton()">
             </div>
             <div class="input-group">
                 <label for="claveEnvio">Clave de Envío</label>
-                <input type="text" id="claveEnvio" name="claveEnvio">
+                <input type="text" id="claveEnvio" name="claveEnvio" onkeyup="enableButton()">
             </div>
             <input type="hidden" name="item" value="" id="hiddenItemId">
-            <button type="submit" class="btn">Enviar</button>
+            <button type="submit" id="enviarButton" class="btn" disabled>Enviar</button>
         </form>
     </div>
 </body>
 </html>
+
