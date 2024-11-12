@@ -19,18 +19,8 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Obtener el límite de registros seleccionados por el usuario
-$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
-
-// Obtener el filtro de estado (si no se selecciona, se muestran todos)
-$estadoFiltro = isset($_GET['estadoFiltro']) ? $_GET['estadoFiltro'] : '';
-
-// Construir la consulta SQL
-$sql = "SELECT item, id, nombre, telefono, estado FROM clientes";
-if (!empty($estadoFiltro)) {
-    $sql .= " WHERE estado = '$estadoFiltro'";
-}
-$sql .= " ORDER BY item DESC LIMIT $limit";
+// Construir la consulta SQL para obtener hasta 100,000 registros sin filtros adicionales
+$sql = "SELECT item, id, nombre, telefono, estado, fecha_creacion FROM clientes ORDER BY item DESC LIMIT 100000";
 $result = $conn->query($sql);
 
 if (!$result) {
@@ -162,33 +152,13 @@ if (!$result) {
         <!-- Buscador -->
         <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="Buscar por nombre..." style="margin-bottom: 20px; padding: 10px; width: 100%; border: 1px solid #ddd; border-radius: 5px;">
 
-        <!-- Filtro de cantidad de registros a mostrar -->
-        <form method="GET" action="">
-            <label for="limit">Mostrar:</label>
-            <select name="limit" id="limit" onchange="this.form.submit()">
-                <option value="10" <?php echo $limit == 10 ? 'selected' : ''; ?>>10</option>
-                <option value="20" <?php echo $limit == 20 ? 'selected' : ''; ?>>20</option>
-                <option value="50" <?php echo $limit == 50 ? 'selected' : ''; ?>>50</option>
-                <option value="100" <?php echo $limit == 100 ? 'selected' : ''; ?>>100</option>
-                <option value="1000" <?php echo $limit == 1000 ? 'selected' : ''; ?>>1000</option>
-                <option value="10000" <?php echo $limit == 10000 ? 'selected' : ''; ?>>10000</option>
-            </select>
-
-            <!-- Filtro de estado -->
-            <label for="estadoFiltro">Estado:</label>
-            <select name="estadoFiltro" id="estadoFiltro" onchange="this.form.submit()">
-                <option value="">Todos</option>
-                <option value="pendiente" <?php echo $estadoFiltro == 'pendiente' ? 'selected' : ''; ?>>Pendiente</option>
-                <option value="enviado" <?php echo $estadoFiltro == 'enviado' ? 'selected' : ''; ?>>Enviado</option>
-            </select>
-        </form>
-
         <table id="tablaEnvios">
             <thead>
                 <tr>
                     <th>Items</th>
                     <th>Nombre</th>
                     <th>Estado</th>
+                    <th>Fecha de Creación</th>
                     <th>Ver Detalles</th>
                     <th>Ver Pedido</th>
                     <th>Eliminar</th>
@@ -198,9 +168,10 @@ if (!$result) {
                 <?php
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                        $item = $row['item']; // Mostrar el número de item sin prefijo
+                        $item = $row['item'];
                         $nombre = $row['nombre'];
                         $estado = $row['estado'];
+                        $fechaCreacion = $row['fecha_creacion'];
 
                         // URL para ver detalles
                         $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $item;
@@ -214,17 +185,8 @@ if (!$result) {
                         echo "<tr>";
                         echo "<td>" . $item . "</td>";
                         echo "<td>" . $nombre . "</td>";
-                        // Campo para cambiar estado manualmente
-                        echo "<td>
-                                <form method='POST' action='actualizar_estado.php'>
-                                    <select name='nuevo_estado' onchange='this.form.submit()' class='$estadoClass'>
-                                        <option value='pendiente' " . ($estado == 'pendiente' ? 'selected' : '') . ">Pendiente</option>
-                                        <option value='enviado' " . ($estado == 'enviado' ? 'selected' : '') . ">Enviado</option>
-                                    </select>
-                                    <input type='hidden' name='id' value='" . $row['id'] . "'>
-                                </form>
-                              </td>";
-
+                        echo "<td class='$estadoClass'>" . ucfirst($estado) . "</td>";
+                        echo "<td>" . $fechaCreacion . "</td>";
                         // Botón para ver detalles
                         echo '<td><a href="' . $urlVerDetalles . '" class="copy-btn">Ver Detalles</a></td>';
                         
@@ -236,7 +198,7 @@ if (!$result) {
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='6'>No hay envíos</td></tr>";
+                    echo "<tr><td colspan='7'>No hay envíos</td></tr>";
                 }
 
                 $conn->close();
