@@ -156,12 +156,9 @@ if (!$result) {
         <form method="GET" action="">
             <label for="limit">Mostrar:</label>
             <select name="limit" id="limit" onchange="this.form.submit()">
-                <option value="10" <?php echo $limit == 10 ? 'selected' : ''; ?>>10</option>
-                <option value="20" <?php echo $limit == 20 ? 'selected' : ''; ?>>20</option>
-                <option value="50" <?php echo $limit == 50 ? 'selected' : ''; ?>>50</option>
-                <option value="100" <?php echo $limit == 100 ? 'selected' : ''; ?>>100</option>
-                <option value="1000" <?php echo $limit == 1000 ? 'selected' : ''; ?>>1000</option>
-                <option value="10000" <?php echo $limit == 10000 ? 'selected' : ''; ?>>10000</option>
+                <option value="10000" <?php echo $limit == 10 ? 'selected' : ''; ?>>10</option>
+                <option value="20000" <?php echo $limit == 20 ? 'selected' : ''; ?>>20</option>
+                <option value="50000" <?php echo $limit == 50 ? 'selected' : ''; ?>>50</option>
             </select>
         </form>
 
@@ -261,5 +258,3 @@ if (!$result) {
     </script>
 </body>
 </html>
-
-
