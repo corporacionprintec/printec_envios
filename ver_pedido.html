@@ -1,3 +1,35 @@
+<?php
+// Configuración de la base de datos
+$servername = getenv('DB_HOST') ?: 'localhost';
+$username = getenv('DB_USER') ?: 'root';
+$password = getenv('DB_PASS') ?: '';
+$dbname = getenv('DB_NAME') ?: 'envios_clientes';
+$port = getenv('DB_PORT') ?: '3306';
+
+// Conexión a la base de datos
+$conn = new mysqli($servername, $username, $password, $dbname, $port);
+
+// Verificar la conexión
+if ($conn->connect_error) {
+    die("Conexión fallida: " . $conn->connect_error);
+}
+
+// Obtener el item del pedido desde la URL
+$item = isset($_GET['item']) ? intval($_GET['item']) : 0;
+
+// Consulta SQL para obtener los detalles del pedido
+$sql = "SELECT nombre, telefono, direccion, agencia, estado FROM clientes WHERE item = $item";
+$result = $conn->query($sql);
+
+// Verificar si se encontraron resultados
+if ($result && $result->num_rows > 0) {
+    $pedido = $result->fetch_assoc();
+} else {
+    echo "No se encontraron datos para el pedido especificado.";
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -45,100 +77,48 @@
             margin-bottom: 20px;
             text-align: center;
         }
-        .details {
+        .membrete {
             margin: 20px 0;
-            border: 1px solid #ddd;
             padding: 20px;
+            border: 1px solid #ddd;
             border-radius: 10px;
             text-align: left;
             font-size: 14px;
+            background-color: #f2f2f2;
         }
-        .details p {
+        .membrete p {
             margin: 8px 0;
             font-size: 14px;
             color: #555;
         }
-        .details p strong {
+        .membrete .remitente {
+            font-weight: bold;
             color: #333;
         }
-        .input-group {
-            margin: 20px 0;
-            text-align: left;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
+        .membrete .destinatario {
+            color: red;
             font-weight: bold;
         }
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .btn {
+        .btn-imprimir {
             padding: 10px 20px;
-            background-color: #007bff;
+            background-color: #28a745;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
+            margin-top: 20px;
         }
-        .btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
+        @media print {
+            .btn-imprimir {
+                display: none;
+            }
         }
     </style>
     <script>
-        function enableButton() {
-            var comprobanteEnvio = document.getElementById('comprobanteEnvio').files.length > 0;
-            var claveEnvio = document.getElementById('claveEnvio').value;
-            var enviarButton = document.getElementById('enviarButton');
-
-            enviarButton.disabled = !(comprobanteEnvio && claveEnvio);
+        function imprimirMembrete() {
+            window.print();
         }
-
-        function cargarDetallesPedido() {
-            const params = new URLSearchParams(window.location.search);
-            const pedidoId = params.get('item');
-
-            fetch(`/php/ver_pedido.php?item=${pedidoId}`)
-            .then(response => {
-                if (!response.ok) {
-                    console.error('Error en la respuesta del servidor:', response.status);
-                    throw new Error('Error en la respuesta de la API');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Datos recibidos:", data);
-
-                if (data.error) {
-                    alert('Error: ' + data.error);
-                } else {
-                    document.getElementById('item').innerText = pedidoId;
-                    document.getElementById('nombre').innerText = data.nombre || "No disponible";
-                    document.getElementById('dni').innerText = data.dni || "No disponible";
-                    document.getElementById('telefono').innerText = data.telefono || "No disponible";
-                    document.getElementById('tipoEnvio').innerText = data.envio || "No disponible";
-                    document.getElementById('direccion').innerText = data.direccion || "No disponible";
-                    document.getElementById('agencia').innerText = data.agencia || "No disponible";
-                    document.getElementById('estado').innerText = data.estado || "No disponible";
-                    document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento || "No disponible";
-                    document.getElementById('detalleMantenimiento').innerText = data.razonMantenimiento || "No disponible";
-
-                    document.getElementById('hiddenItemId').value = pedidoId;
-                }
-            })
-            .catch(error => {
-                console.error('Error al obtener los detalles del pedido:', error);
-                alert("Hubo un error al cargar los datos del pedido");
-            });
-        }
-
-        window.onload = cargarDetallesPedido;
     </script>
 </head>
 <body>
@@ -153,32 +133,28 @@
         
         <h1>Detalles del Pedido</h1>
 
-        <div class="details">
-            <p class="highlight"><strong>ID:</strong> <span id="item"></span></p>
-            <p><strong>Nombre:</strong> <span id="nombre"></span></p>
-            <p><strong>DNI:</strong> <span id="dni"></span></p>
-            <p><strong>Teléfono:</strong> <span id="telefono"></span></p>
-            <p><strong>Tipo de Envío:</strong> <span id="tipoEnvio"></span></p>
-            <p><strong>Dirección:</strong> <span id="direccion"></span></p>
-            <p><strong>Agencia:</strong> <span id="agencia"></span></p>
-            <p><strong>Estado:</strong> <span id="estado"></span></p>
-            <p><strong>Producto a Realizar Mantenimiento:</strong> <span id="productoMantenimiento"></span></p>
-            <p><strong>Detalle del Mantenimiento:</strong> <span id="detalleMantenimiento"></span></p>
+        <!-- Membrete con datos del remitente y destinatario -->
+        <div class="membrete">
+            <p class="remitente">Datos del Remitente</p>
+            <p>De: Eyter Yoel Rojas Sanchez</p>
+            <p>Dirección: Calle Huanuco N201 Ica-Ica-Ica</p>
+            <p>Cel: 966177851</p>
+            <p>RUC/DNI: 71813328</p>
+
+            <p class="destinatario">Datos del Destinatario</p>
+            <p>Nombre: <?php echo htmlspecialchars($pedido['nombre']); ?></p>
+            <p>Teléfono: <?php echo htmlspecialchars($pedido['telefono']); ?></p>
+            <p>Dirección: <?php echo htmlspecialchars($pedido['direccion']); ?></p>
+            <p>Agencia: <?php echo htmlspecialchars($pedido['agencia']); ?></p>
+            <p>Estado: <?php echo htmlspecialchars($pedido['estado']); ?></p>
         </div>
 
-        <form action="php/subir_comprobante_drive.php" method="post" enctype="multipart/form-data">
-            <div class="input-group">
-                <label for="comprobanteEnvio">Enviar Comprobante de Envío</label>
-                <input type="file" id="comprobanteEnvio" name="comprobanteEnvio" accept="image/*" onchange="enableButton()">
-            </div>
-            <div class="input-group">
-                <label for="claveEnvio">Clave de Envío</label>
-                <input type="text" id="claveEnvio" name="claveEnvio" onkeyup="enableButton()">
-            </div>
-            <input type="hidden" name="item" value="" id="hiddenItemId">
-            <button type="submit" id="enviarButton" class="btn" disabled>Enviar</button>
-        </form>
+        <!-- Botón para imprimir el membrete -->
+        <button onclick="imprimirMembrete()" class="btn-imprimir">Imprimir Membrete</button>
     </div>
 </body>
 </html>
 
+<?php
+$conn->close();
+?>
