@@ -198,12 +198,12 @@ if (!$result) {
                 <?php
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                        $item = '100000' . $row['item']; // Agregar prefijo 100000
+                        $item = $row['item']; // Mostrar el número de item sin prefijo
                         $nombre = $row['nombre'];
                         $estado = $row['estado'];
 
                         // URL para ver detalles
-                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $row['item'];
+                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $item;
 
                         // URL de confirmación generada dinámicamente usando el campo 'id'
                         $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id'];
@@ -217,7 +217,7 @@ if (!$result) {
                         // Campo para cambiar estado manualmente
                         echo "<td>
                                 <form method='POST' action='actualizar_estado.php'>
-                                    <select name='nuevo_estado' onchange='this.form.submit()'>
+                                    <select name='nuevo_estado' onchange='this.form.submit()' class='$estadoClass'>
                                         <option value='pendiente' " . ($estado == 'pendiente' ? 'selected' : '') . ">Pendiente</option>
                                         <option value='enviado' " . ($estado == 'enviado' ? 'selected' : '') . ">Enviado</option>
                                     </select>
@@ -232,11 +232,11 @@ if (!$result) {
                         echo '<td><a href="' . $urlConfirmacion . '" class="copy-btn">Ver Pedido</a></td>';
                         
                         // Botón para eliminar pedido
-                        echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $row['item'] . ')">Eliminar</button></td>';
+                        echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='8'>No hay envíos</td></tr>";
+                    echo "<tr><td colspan='6'>No hay envíos</td></tr>";
                 }
 
                 $conn->close();
