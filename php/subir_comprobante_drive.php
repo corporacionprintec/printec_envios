@@ -1,56 +1,51 @@
 <?php
+session_start();
 
-require 'vendor/autoload.php';
+// Configuración de la conexión a la base de datos
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "nombre_base_datos";
 
-use Google\Client;
-use Google\Service\Drive;
+// Crear conexión
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-// Ruta del archivo JSON de credenciales
-$credentialsPath = 'client_secret_200770608361-vn8spggg4bfoj3chlg2diaqducnib9eq.apps.googleusercontent.com.json';
+// Verificar la conexión
+if ($conn->connect_error) {
+    die("Conexión fallida: " . $conn->connect_error);
+}
 
 // Verificar si el archivo fue enviado
 if (!isset($_FILES['comprobanteEnvio']) || $_FILES['comprobanteEnvio']['error'] !== UPLOAD_ERR_OK) {
     die('Error al subir el archivo.');
 }
 
-// Iniciar el cliente de Google
-$client = new Client();
-$client->setAuthConfig($credentialsPath);
-$client->addScope(Drive::DRIVE_FILE);
-$client->setAccessType('offline');
-
-// Redirigir al usuario para autorización OAuth si es necesario
-if (!isset($_SESSION['access_token']) && !isset($_GET['code'])) {
-    $authUrl = $client->createAuthUrl();
-    header('Location: ' . filter_var($authUrl, FILTER_SANITIZE_URL));
-    exit();
+// Crear carpeta 'uploads' si no existe
+$uploadDir = 'uploads/';
+if (!file_exists($uploadDir)) {
+    mkdir($uploadDir, 0777, true);
 }
 
-// Intercambiar código por token de acceso
-if (isset($_GET['code'])) {
-    $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-    $_SESSION['access_token'] = $token;
+// Ruta completa donde se guardará el archivo
+$uploadFile = $uploadDir . basename($_FILES['comprobanteEnvio']['name']);
+
+// Mover el archivo a la carpeta 'uploads'
+if (move_uploaded_file($_FILES['comprobanteEnvio']['tmp_name'], $uploadFile)) {
+    echo "Archivo subido con éxito.<br>";
+    
+    // Insertar la ruta del archivo en la base de datos
+    $rutaComprobante = $conn->real_escape_string($uploadFile);
+    $sql = "INSERT INTO tu_tabla (comprobanteEnvioRuta) VALUES ('$rutaComprobante')";
+
+    if ($conn->query($sql) === TRUE) {
+        echo "Ruta guardada en la base de datos exitosamente.";
+    } else {
+        echo "Error al guardar en la base de datos: " . $conn->error;
+    }
 } else {
-    $client->setAccessToken($_SESSION['access_token']);
+    echo "Error al mover el archivo.";
 }
 
-// Subir el archivo a Google Drive
-$driveService = new Drive($client);
-
-// Crear archivo en Drive
-$fileMetadata = new Drive\File([
-    'name' => $_FILES['comprobanteEnvio']['name'],
-    'parents' => ['1t3ueZ7y0cAy4jhAyZCrzPkuse3O2lLkw'] // ID de la carpeta de destino en Google Drive
-]);
-
-$content = file_get_contents($_FILES['comprobanteEnvio']['tmp_name']);
-$file = $driveService->files->create($fileMetadata, [
-    'data' => $content,
-    'mimeType' => $_FILES['comprobanteEnvio']['type'],
-    'uploadType' => 'multipart',
-    'fields' => 'id'
-]);
-
-// Mostrar el ID del archivo subido
-echo 'Archivo subido con éxito. ID del archivo: ' . $file->id;
-
+// Cerrar conexión
+$conn->close();
+?>
