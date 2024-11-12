@@ -4,7 +4,7 @@ if (isset($_GET['msg']) && $_GET['msg'] == 'success') {
     echo "<div style='color: green; text-align: center;'>El pedido ha sido eliminado con éxito.</div>";
 }
 
-// Verificar si las variables de entorno están definidas (producción) o usar valores por defecto (desarrollo local)
+// Configuración de la base de datos
 $servername = getenv('DB_HOST') ?: 'localhost';
 $username = getenv('DB_USER') ?: 'root';
 $password = getenv('DB_PASS') ?: '';
@@ -19,11 +19,18 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Obtener el límite de registros seleccionados por el usuario (si no se selecciona, el valor por defecto es 10)
+// Obtener el límite de registros seleccionados por el usuario
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
 
-// Consulta SQL con límite de resultados según la selección
-$sql = "SELECT item, id, nombre, telefono, estado, fecha_creacion FROM clientes ORDER BY item DESC LIMIT $limit";
+// Obtener el filtro de estado (si no se selecciona, se muestran todos)
+$estadoFiltro = isset($_GET['estadoFiltro']) ? $_GET['estadoFiltro'] : '';
+
+// Construir la consulta SQL
+$sql = "SELECT item, id, nombre, telefono, estado FROM clientes";
+if (!empty($estadoFiltro)) {
+    $sql .= " WHERE estado = '$estadoFiltro'";
+}
+$sql .= " ORDER BY item DESC LIMIT $limit";
 $result = $conn->query($sql);
 
 if (!$result) {
@@ -38,6 +45,7 @@ if (!$result) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listado de Envíos</title>
     <style>
+        /* Estilos generales */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -107,6 +115,7 @@ if (!$result) {
             top: 20px;
             right: 20px;
         }
+        /* Estilos para el estado pendiente y enviado */
         .pendiente {
             color: red;
             font-weight: bold;
@@ -115,6 +124,7 @@ if (!$result) {
             color: green;
             font-weight: bold;
         }
+        /* Media queries para pantallas pequeñas */
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -156,9 +166,20 @@ if (!$result) {
         <form method="GET" action="">
             <label for="limit">Mostrar:</label>
             <select name="limit" id="limit" onchange="this.form.submit()">
-                <option value="10000" <?php echo $limit == 10 ? 'selected' : ''; ?>>10</option>
-                <option value="20000" <?php echo $limit == 20 ? 'selected' : ''; ?>>20</option>
-                <option value="50000" <?php echo $limit == 50 ? 'selected' : ''; ?>>50</option>
+                <option value="10" <?php echo $limit == 10 ? 'selected' : ''; ?>>10</option>
+                <option value="20" <?php echo $limit == 20 ? 'selected' : ''; ?>>20</option>
+                <option value="50" <?php echo $limit == 50 ? 'selected' : ''; ?>>50</option>
+                <option value="100" <?php echo $limit == 100 ? 'selected' : ''; ?>>100</option>
+                <option value="1000" <?php echo $limit == 1000 ? 'selected' : ''; ?>>1000</option>
+                <option value="10000" <?php echo $limit == 10000 ? 'selected' : ''; ?>>10000</option>
+            </select>
+
+            <!-- Filtro de estado -->
+            <label for="estadoFiltro">Estado:</label>
+            <select name="estadoFiltro" id="estadoFiltro" onchange="this.form.submit()">
+                <option value="">Todos</option>
+                <option value="pendiente" <?php echo $estadoFiltro == 'pendiente' ? 'selected' : ''; ?>>Pendiente</option>
+                <option value="enviado" <?php echo $estadoFiltro == 'enviado' ? 'selected' : ''; ?>>Enviado</option>
             </select>
         </form>
 
@@ -168,7 +189,6 @@ if (!$result) {
                     <th>Items</th>
                     <th>Nombre</th>
                     <th>Estado</th>
-                    <th>Fecha de Creación</th>
                     <th>Ver Detalles</th>
                     <th>Ver Pedido</th>
                     <th>Eliminar</th>
@@ -178,13 +198,12 @@ if (!$result) {
                 <?php
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                        $item = $row['item']; 
+                        $item = '100000' . $row['item']; // Agregar prefijo 100000
                         $nombre = $row['nombre'];
                         $estado = $row['estado'];
-                        $fecha_creacion = $row['fecha_creacion'];
 
                         // URL para ver detalles
-                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $item;
+                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $row['item'];
 
                         // URL de confirmación generada dinámicamente usando el campo 'id'
                         $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id'];
@@ -195,8 +214,16 @@ if (!$result) {
                         echo "<tr>";
                         echo "<td>" . $item . "</td>";
                         echo "<td>" . $nombre . "</td>";
-                        echo '<td class="' . $estadoClass . '">' . $estado . '</td>'; // Aplicar clase al estado
-                        echo "<td>" . $fecha_creacion . "</td>"; // Mostrar la fecha de creación
+                        // Campo para cambiar estado manualmente
+                        echo "<td>
+                                <form method='POST' action='actualizar_estado.php'>
+                                    <select name='nuevo_estado' onchange='this.form.submit()'>
+                                        <option value='pendiente' " . ($estado == 'pendiente' ? 'selected' : '') . ">Pendiente</option>
+                                        <option value='enviado' " . ($estado == 'enviado' ? 'selected' : '') . ">Enviado</option>
+                                    </select>
+                                    <input type='hidden' name='id' value='" . $row['id'] . "'>
+                                </form>
+                              </td>";
 
                         // Botón para ver detalles
                         echo '<td><a href="' . $urlVerDetalles . '" class="copy-btn">Ver Detalles</a></td>';
@@ -205,24 +232,20 @@ if (!$result) {
                         echo '<td><a href="' . $urlConfirmacion . '" class="copy-btn">Ver Pedido</a></td>';
                         
                         // Botón para eliminar pedido
-                        echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
+                        echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $row['item'] . ')">Eliminar</button></td>';
                         echo "</tr>";
                     }
                 } else {
                     echo "<tr><td colspan='8'>No hay envíos</td></tr>";
                 }
 
-                // Cerrar la conexión a la base de datos
-                if ($conn !== null && $conn->connect_error == null) {
-                    $conn->close();
-                }
+                $conn->close();
                 ?>
             </tbody>
         </table>
     </div>
 
     <script>
-        // Función para confirmar y eliminar un pedido usando el campo item
         function eliminarPedido(item) {
             if (confirm("¿Estás seguro de eliminar este pedido?")) {
                 var form = document.createElement('form');
@@ -240,15 +263,14 @@ if (!$result) {
             }
         }
 
-        // Función para filtrar la tabla por nombre
         function filtrarTabla() {
             var input = document.getElementById("buscador");
             var filtro = input.value.toLowerCase();
             var table = document.getElementById("tablaEnvios");
             var tr = table.getElementsByTagName("tr");
 
-            for (var i = 1; i < tr.length; i++) { // Empezar en 1 para omitir el encabezado
-                var tdNombre = tr[i].getElementsByTagName("td")[1]; // Columna de nombre
+            for (var i = 1; i < tr.length; i++) {
+                var tdNombre = tr[i].getElementsByTagName("td")[1];
                 if (tdNombre) {
                     var txtValue = tdNombre.textContent || tdNombre.innerText;
                     tr[i].style.display = txtValue.toLowerCase().indexOf(filtro) > -1 ? "" : "none";
