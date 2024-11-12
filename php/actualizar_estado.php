@@ -13,10 +13,10 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id = $_POST['id'];
-    $nuevo_estado = $_POST['nuevo_estado'];
+    $id = $conn->real_escape_string($_POST['id']);  // Asegura el valor de id para evitar inyecciones de SQL
+    $nuevo_estado = $conn->real_escape_string($_POST['nuevo_estado']);
 
-    $sql = "UPDATE clientes SET estado = '$nuevo_estado' WHERE id = $id";
+    $sql = "UPDATE clientes SET estado = '$nuevo_estado' WHERE id = '$id'";
     
     if ($conn->query($sql) === TRUE) {
         header("Location: index.php?msg=estado_actualizado");
