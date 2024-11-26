@@ -12,7 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Conexión a la base de datos
     $conn = new mysqli($servername, $username, $password, $dbname, $port);
 
-    // Verificar la conexión
     if ($conn->connect_error) {
         die("Conexión fallida: " . $conn->connect_error);
     }
@@ -39,45 +38,65 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $uuid = generateUUIDv4();
 
-    // Subir archivo de comprobante de pago
-    $comprobantePagoRuta = '';
+    // Procesar archivo de comprobante de pago
+    $comprobantePago = NULL; // Inicializar como NULL
     if (isset($_FILES['comprobantePago']) && $_FILES['comprobantePago']['error'] == UPLOAD_ERR_OK) {
-        $target_dir = __DIR__ . "/uploads/";  // Corregir la ruta, asegurando que sea relativa al script
-        $target_file = $target_dir . basename($_FILES["comprobantePago"]["name"]);
-        
-        // Verifica si la carpeta existe, si no, la crea
-        if (!file_exists($target_dir)) {
-            mkdir($target_dir, 0777, true);
+        // Validar el tamaño del archivo (por ejemplo, 5 MB máximo)
+        if ($_FILES['comprobantePago']['size'] > 5 * 1024 * 1024) {
+            die("El archivo de comprobante de pago es demasiado grande.");
         }
 
-        // Mueve el archivo a la ubicación deseada
-        if (move_uploaded_file($_FILES["comprobantePago"]["tmp_name"], $target_file)) {
-            $comprobantePagoRuta = basename($_FILES["comprobantePago"]["name"]);
-        } else {
-            $_SESSION['error'] = "Error al subir el archivo.";
-            header("Location: error_page.php");  // Redirigir a una página de error si falla la subida
-            exit();
-        }
+        // Leer el contenido del archivo
+        $comprobantePago = file_get_contents($_FILES['comprobantePago']['tmp_name']);
     }
 
-    // Insertar datos en la base de datos
-    $sql = "INSERT INTO clientes (id, nombre, dni, telefono, envio, direccion, agencia, compraMantenimiento, productos, productoMantenimiento, razonMantenimiento, comprobantePagoRuta, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+    // Ajuste en la consulta y vinculación
+    $sql = "INSERT INTO clientes (
+        id, 
+        nombre, 
+        dni, 
+        telefono, 
+        envio, 
+        direccion, 
+        agencia, 
+        compraMantenimiento, 
+        productos, 
+        productoMantenimiento, 
+        razonMantenimiento, 
+        comprobantePago, 
+        fecha_creacion
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+
     $stmt = $conn->prepare($sql);
 
     if ($stmt === false) {
         die('Error en la preparación de la consulta SQL: ' . $conn->error);
     }
+    // Ajusta el número de variables para que coincida
+    $stmt->bind_param(
+        "ssssssssssss", // 12 parámetros
+        $uuid, 
+        $nombre, 
+        $dni, 
+        $telefono, 
+        $envio, 
+        $direccion, 
+        $agencia, 
+        $compraMantenimiento, 
+        $productos, 
+        $productoMantenimiento, 
+        $razonMantenimiento, 
+        $comprobantePago
+    );
 
-    $stmt->bind_param("ssssssssssss", $uuid, $nombre, $dni, $telefono, $envio, $direccion, $agencia, $compraMantenimiento, $productos, $productoMantenimiento, $razonMantenimiento, $comprobantePagoRuta);
-    
+    // Ejecuta la consulta
     if ($stmt->execute()) {
-        // Redirigir a la página de confirmación en la raíz del servidor
         header("Location: /confirmacion.html?id=" . urlencode($uuid));
         exit();
     } else {
         echo "Error: " . $stmt->error;
     }
-    
+
     $stmt->close();
     $conn->close();
 }
