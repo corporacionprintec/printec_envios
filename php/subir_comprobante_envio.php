@@ -40,7 +40,7 @@ $comprobanteEnvio = file_get_contents($_FILES['comprobanteEnvio']['tmp_name']);
 
 // Actualizar la base de datos
 $sql = "UPDATE clientes 
-        SET comprobanteEnvio = ?, claveEnvio = ? 
+        SET comprobanteEnvio = ?, claveEnvio = ?, estado = ? 
         WHERE item = ?";
 $stmt = $conn->prepare($sql);
 
@@ -49,7 +49,11 @@ if (!$stmt) {
     exit;
 }
 
-$stmt->bind_param("bsi", $comprobanteEnvio, $claveEnvio, $item);
+// Define el estado como "enviado"
+$estado = "enviado";
+
+// Vincular los parámetros, incluido el nuevo estado
+$stmt->bind_param("sbsi", $comprobanteEnvio, $claveEnvio, $estado, $item);
 
 // Enviar los datos binarios
 $stmt->send_long_data(0, $comprobanteEnvio);
