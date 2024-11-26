@@ -163,15 +163,20 @@
                                 document.getElementById('productoMantenimiento').innerText = data.productoMantenimiento;
                                 document.getElementById('detalleMantenimiento').innerText = data.razonMantenimiento;
                                 document.getElementById('estadoPedidoContainer').style.display = 'block';
-                                document.getElementById('comprobantePago').innerHTML = '<a href="/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
+                                //document.getElementById('comprobantePago').innerHTML = '<a href="/uploads/' + data.comprobantePagoRuta + '" target="_blank">Ver Comprobante de Pago</a>';
+                            }
+                            if (data.comprobantePago) {
+                                document.getElementById('comprobantePago').innerHTML = '<img src="' + data.comprobantePago + '" alt="Comprobante de Pago" style="max-width: 100%; max-height: 300px;">';
+                            } else {
+                                document.getElementById('comprobantePago').innerText = 'No disponible';
                             }
 
-                            if (data.comprobanteEnvioRuta) {
-                                document.getElementById('comprobanteEnvio').innerHTML = '<a href="/uploads/' + data.comprobanteEnvioRuta + '" target="_blank">Ver Comprobante de Envío</a>';
+                            if (data.comprobanteEnvio) {
+                                document.getElementById('comprobanteEnvio').innerHTML = '<img src="' + data.comprobanteEnvio + '" alt="Comprobante de Envío" style="max-width: 100%; max-height: 300px;">';
+                            } else {
+                                document.getElementById('comprobanteEnvio').innerText = 'No disponible';
                             }
-                            if (data.claveEnvio) {
-                                document.getElementById('claveEnvio').innerText = data.claveEnvio;
-                            }
+
                         } else {
                             console.error('Error:', data.error);
                         }
