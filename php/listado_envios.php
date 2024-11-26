@@ -78,7 +78,7 @@ if (!$result) {
         a:hover {
             text-decoration: underline;
         }
-        .copy-btn, .delete-btn {
+        .copy-btn, .delete-btn, .duplicate-btn{
             background-color: #17a2b8;
             color: white;
             border: none;
@@ -92,6 +92,9 @@ if (!$result) {
         }
         .delete-btn {
             background-color: #dc3545;
+        }
+        .duplicate-btn{
+            background-color: #3346ff;
         }
         .guardar-contactos-btn {
             background-color: #28a745;
@@ -162,6 +165,7 @@ if (!$result) {
                     <th>Ver Detalles</th>
                     <th>Ver Pedido</th>
                     <th>Eliminar</th>
+                    <th>Duplicar</th>
                 </tr>
             </thead>
             <tbody>
@@ -195,6 +199,10 @@ if (!$result) {
                         
                         // Botón para eliminar pedido
                         echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
+
+                        // Botón para duplicar un los datos de un pedido
+                        echo '<td><button class="duplicate-btn" onclick="duplicarPedido(' . $item . ')">Duplicar</button></td>';
+
                         echo "</tr>";
                     }
                 } else {
@@ -224,6 +232,24 @@ if (!$result) {
                 form.submit();
             }
         }
+
+        function duplicarPedido(item) {
+            if (confirm("¿Deseas duplicar este pedido?")) {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'duplicar_pedido.php';
+
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'item';
+                input.value = item;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
 
         function filtrarTabla() {
             var input = document.getElementById("buscador");
