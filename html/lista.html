@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Envíos</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Listado de Envíos</h1>
+        <!-- Botón para guardar todos los contactos -->
+        <a href="guardar_todos_contactos.php" class="guardar-contactos-btn">Guardar Todos los Contactos</a>
+
+        <!-- Buscador -->
+        <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="Buscar por nombre..." style="margin-bottom: 20px; padding: 10px; width: 100%; border: 1px solid #ddd; border-radius: 5px;">
+
+        <table id="tablaEnvios">
+            <thead>
+                <tr>
+                    <th>Items</th>
+                    <th>Nombre</th>
+                    <th>Estado</th>
+                    <th>Fecha de Creación</th>
+                    <th>Ver Detalles</th>
+                    <th>Ver Pedido</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $item = $row['item'];
+                        $nombre = $row['nombre'];
+                        $estado = $row['estado'];
+                        $fechaCreacion = $row['fecha_creacion'];
+
+                        // URL para ver detalles
+                        $urlVerDetalles = "https://printecenvios-production.up.railway.app/ver_pedido.html?item=" . $item;
+
+                        // URL de confirmación generada dinámicamente usando el campo 'id'
+                        $urlConfirmacion = "https://printecenvios-production.up.railway.app/confirmacion.html?id=" . $row['id'];
+
+                        // Definir clase de estilo según el estado
+                        $estadoClass = strtolower($estado) == 'pendiente' ? 'pendiente' : (strtolower($estado) == 'enviado' ? 'enviado' : '');
+
+                        echo "<tr>";
+                        echo "<td>" . $item . "</td>";
+                        echo "<td>" . $nombre . "</td>";
+                        echo "<td class='$estadoClass'>" . ucfirst($estado) . "</td>";
+                        echo "<td>" . $fechaCreacion . "</td>";
+                        // Botón para ver detalles
+                        echo '<td><a href="' . $urlVerDetalles . '" class="copy-btn">Ver Detalles</a></td>';
+                        
+                        // Botón para ver pedido
+                        echo '<td><a href="' . $urlConfirmacion . '" class="copy-btn">Ver Pedido</a></td>';
+                        
+                        // Botón para eliminar pedido
+                        echo '<td><button class="delete-btn" onclick="eliminarPedido(' . $item . ')">Eliminar</button></td>';
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='7'>No hay envíos</td></tr>";
+                }
+
+                $conn->close();
+                ?>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function eliminarPedido(item) {
+            if (confirm("¿Estás seguro de eliminar este pedido?")) {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'eliminar_pedido.php';
+
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'item';
+                input.value = item;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        function filtrarTabla() {
+            var input = document.getElementById("buscador");
+            var filtro = input.value.toLowerCase();
+            var table = document.getElementById("tablaEnvios");
+            var tr = table.getElementsByTagName("tr");
+
+            for (var i = 1; i < tr.length; i++) {
+                var tdNombre = tr[i].getElementsByTagName("td")[1];
+                if (tdNombre) {
+                    var txtValue = tdNombre.textContent || tdNombre.innerText;
+                    tr[i].style.display = txtValue.toLowerCase().indexOf(filtro) > -1 ? "" : "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>
