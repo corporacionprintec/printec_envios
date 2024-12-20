@@ -247,6 +247,7 @@
             e.preventDefault(); // Evitar recargar la página
     
             const formData = new FormData(this);
+            console.log(formData)
     
             fetch('/php/subir_comprobante_envio.php', {
                 method: 'POST',
