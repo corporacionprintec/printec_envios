@@ -53,7 +53,7 @@ if (!$stmt) {
 $estado = "enviado";
 
 // Vincular los parámetros, incluido el nuevo estado
-$stmt->bind_param("sbsi", $comprobanteEnvio, $claveEnvio, $estado, $item);
+$stmt->bind_param("sssi", $comprobanteEnvio, $claveEnvio, $estado, $item);
 
 // Enviar los datos binarios
 $stmt->send_long_data(0, $comprobanteEnvio);
