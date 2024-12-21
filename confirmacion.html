@@ -127,6 +127,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data && !data.error) {
+                            console.log(data);
                             document.getElementById('nombre').innerText = data.nombre;
                             document.getElementById('dni').innerText = data.dni;
                             document.getElementById('telefono').innerText = data.telefono;  // Mostrar teléfono, pero no lo usaremos para redirección
