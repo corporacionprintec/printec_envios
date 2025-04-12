@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /ver_pedido.html
+Disallow: /confirmacion.html
